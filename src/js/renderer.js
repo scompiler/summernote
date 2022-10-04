@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import func from "./core/func";
 
 class Renderer {
   constructor(markup, children, options, callback) {
@@ -43,12 +44,19 @@ class Renderer {
     if (this.options && this.options.callback) {
       this.options.callback($node);
     }
+    if (this.options && this.options.callback2) {
+      this.options.callback2(func.jqueryToHtmlElement($node));
+    }
 
     if ($parent) {
       $parent.append($node);
     }
 
     return $node;
+  }
+
+  render2(parentEl) {
+    return func.jqueryToHtmlElement(this.render(func.htmlElementToJquery(parentEl)));
   }
 }
 

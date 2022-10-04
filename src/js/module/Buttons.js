@@ -353,7 +353,7 @@ export default class Buttons {
 
       if (this.options.addDefaultFonts) {
         // Add 'default' fonts into the fontnames array if not exist
-        $.each(styleInfo['font-family'].split(','), (idx, fontname) => {
+        styleInfo['font-family'].split(',').forEach((fontname) => {
           fontname = fontname.trim().replace(/['"]+/g, '');
           if (this.isFontDeservedToAdd(fontname)) {
             if (this.options.fontNames.indexOf(fontname) === -1) {

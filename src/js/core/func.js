@@ -164,6 +164,31 @@ function isValidUrl(url) {
   return expression.test(url);
 }
 
+/**
+ *
+ * @param {jQuery} jquery
+ * @returns {HTMLElement|null}
+ */
+function jqueryToHtmlElement(jquery) {
+  if (jquery.length > 1) {
+    throw new Error('Elements is more than 1');
+  }
+
+  return jquery.get(0) || null;
+}
+
+/**
+ * @param {HTMLElement} element
+ * @returns {jQuery}
+ */
+function htmlElementToJquery(element) {
+  return $(element);
+}
+
+function getJquery() {
+  return $;
+}
+
 export default {
   eq,
   eq2,
@@ -181,4 +206,7 @@ export default {
   namespaceToCamel,
   debounce,
   isValidUrl,
+  jqueryToHtmlElement,
+  htmlElementToJquery,
+  getJquery,
 };
