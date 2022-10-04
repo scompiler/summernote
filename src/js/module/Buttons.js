@@ -71,8 +71,8 @@ export default class Buttons {
       className: 'note-color ' + className,
       children: [
         this.button({
-          className: 'note-current-color-button',
-          contents: this.ui.icon(this.options.icons.font + ' note-recent-color'),
+          className: 'tea-editor__button--current-color note-current-color-button',
+          contents: this.ui.icon(this.options.icons.font),
           tooltip: tooltip,
           click: (event) => {
             const $button = $(event.currentTarget);
@@ -96,6 +96,8 @@ export default class Buttons {
             if (backColor) {
               $recentColor.css('background-color', this.options.colorButton.backColor);
               $button.attr('data-backColor', this.options.colorButton.backColor);
+
+              $button.css('--background-color', this.options.colorButton.backColor);
             }
             if (foreColor) {
               $recentColor.css('color', this.options.colorButton.foreColor);
@@ -214,10 +216,16 @@ export default class Buttons {
               if (lists.contains(['backColor', 'foreColor'], eventName)) {
                 const key = eventName === 'backColor' ? 'background-color' : 'color';
                 const $color = $button.closest('.note-color').find('.note-recent-color');
-                const $currentButton = $button.closest('.note-color').find('.note-current-color-button');
+                const $currentButton = $button.closest('.note-color').find('.tea-editor__button--current-color');
 
                 $color.css(key, value);
                 $currentButton.attr('data-' + eventName, value);
+
+                if (eventName === 'backColor') {
+                  $currentButton.css('--background-color', value);
+                } else if (eventName === 'foreColor') {
+                  $currentButton.css('--font-color', value);
+                }
               }
               this.context.invoke('editor.' + eventName, value);
             }
@@ -491,6 +499,21 @@ export default class Buttons {
     this.context.memo('button.indent', func.invoke(indent, 'render'));
 
     this.context.memo('button.paragraph', () => {
+      let children = [
+        this.ui.buttonGroup({
+          className: 'note-align',
+          children: [justifyLeft, justifyCenter, justifyRight, justifyFull],
+        }),
+        this.ui.buttonGroup({
+          className: 'note-list',
+          children: [outdent, indent],
+        }),
+      ];
+
+      if (this.ui.buttonsStack) {
+        children = [this.ui.buttonsStack(children)];
+      }
+
       return this.ui.buttonGroup([
         this.button({
           className: 'dropdown-toggle',
@@ -500,16 +523,7 @@ export default class Buttons {
             toggle: 'dropdown',
           },
         }),
-        this.ui.dropdown([
-          this.ui.buttonGroup({
-            className: 'note-align',
-            children: [justifyLeft, justifyCenter, justifyRight, justifyFull],
-          }),
-          this.ui.buttonGroup({
-            className: 'note-list',
-            children: [outdent, indent],
-          }),
-        ]),
+        this.ui.dropdown(children),
       ]).render();
     });
 
@@ -860,7 +874,7 @@ export default class Buttons {
         const isChecked = ($item.data('value') + '') === (fontName + '');
         $item.toggleClass('checked', isChecked);
       });
-      $cont.find('.note-current-fontname').text(fontName).css('font-family', fontName);
+      $cont.find('.note-current-fontname').text(fontName)/*.css('font-family', fontName)*/;
     }
 
     if (styleInfo['font-size']) {

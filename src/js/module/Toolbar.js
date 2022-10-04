@@ -10,6 +10,7 @@ export default class Toolbar {
     this.$note = context.layoutInfo.note;
     this.$editor = context.layoutInfo.editor;
     this.$toolbar = context.layoutInfo.toolbar;
+    this.$toolbarContent = context.layoutInfo.toolbarContent;
     this.$editable = context.layoutInfo.editable;
     this.$statusbar = context.layoutInfo.statusbar;
     this.options = context.options;
@@ -28,7 +29,7 @@ export default class Toolbar {
     if (!this.options.toolbar.length) {
       this.$toolbar.hide();
     } else {
-      this.context.invoke('buttons.build', this.$toolbar, this.options.toolbar);
+      this.context.invoke('buttons.build', this.$toolbarContent || this.$toolbar, this.options.toolbar);
     }
 
     if (this.options.toolbarContainer) {

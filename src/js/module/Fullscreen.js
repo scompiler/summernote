@@ -32,7 +32,12 @@ export default class Fullscreen {
    * toggle fullscreen
    */
   toggle() {
-    this.$editor.toggleClass('fullscreen');
+    if (this.$editor.attr('data-fullscreen') === 'true') {
+      this.$editor.removeAttr('data-fullscreen');
+    } else {
+      this.$editor.attr('data-fullscreen', 'true');
+    }
+
     const isFullscreen = this.isFullscreen();
     this.$scrollbar.toggleClass(this.scrollbarClassName, isFullscreen);
     if (isFullscreen) {
@@ -50,7 +55,7 @@ export default class Fullscreen {
   }
 
   isFullscreen() {
-    return this.$editor.hasClass('fullscreen');
+    return this.$editor.attr('data-fullscreen') === 'true';
   }
 
   destroy() {
