@@ -189,6 +189,20 @@ function getJquery() {
   return $;
 }
 
+/**
+ * @param {Element} element
+ */
+function getElementRect(element) {
+  const rect = element.getBoundingClientRect();
+
+  return new DOMRect(
+    rect.x + element.ownerDocument.defaultView.scrollX,
+    rect.y + element.ownerDocument.defaultView.scrollY,
+    rect.width,
+    rect.height,
+  );
+}
+
 export default {
   eq,
   eq2,
@@ -209,4 +223,5 @@ export default {
   jqueryToHtmlElement,
   htmlElementToJquery,
   getJquery,
+  getElementRect,
 };

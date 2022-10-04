@@ -1,30 +1,31 @@
-import $ from 'jquery';
+import func from "../core/func";
 
 export default class Fullscreen {
   constructor(context) {
     this.context = context;
 
-    this.$editor = context.layoutInfo.editor;
-    this.$toolbar = context.layoutInfo.toolbar;
-    this.$editable = context.layoutInfo.editable;
-    this.$codable = context.layoutInfo.codable;
+    this.editorEl = func.jqueryToHtmlElement(context.layoutInfo.editor);
+    this.toolbarEl = func.jqueryToHtmlElement(context.layoutInfo.toolbar);
+    this.editableEl = func.jqueryToHtmlElement(context.layoutInfo.editable);
+    this.codableEl = func.jqueryToHtmlElement(context.layoutInfo.codable);
 
-    this.$window = $(window);
-    this.$scrollbar = $('html, body');
+    this.window = window;
+    this.htmlEl = document.documentElement;
     this.scrollbarClassName = 'note-fullscreen-body';
 
     this.onResize = () => {
       this.resizeTo({
-        h: this.$window.height() - this.$toolbar.outerHeight(),
+        h: (this.window.innerHeight - this.toolbarEl.offsetHeight) + 'px',
       });
     };
   }
 
   resizeTo(size) {
-    this.$editable.css('height', size.h);
-    this.$codable.css('height', size.h);
-    if (this.$codable.data('cmeditor')) {
-      this.$codable.data('cmeditor').setsize(null, size.h);
+    this.editableEl.style.height = size.h;
+    this.codableEl.style.height = size.h;
+
+    if (func.htmlElementToJquery(this.codableEl).data('cmeditor')) {
+      func.htmlElementToJquery(this.codableEl).data('cmeditor').setsize(null, size.h);
     }
   }
 
@@ -32,33 +33,37 @@ export default class Fullscreen {
    * toggle fullscreen
    */
   toggle() {
-    if (this.$editor.attr('data-fullscreen') === 'true') {
-      this.$editor.removeAttr('data-fullscreen');
+    if (this.isFullscreen()) {
+      this.editorEl.removeAttribute('data-fullscreen');
     } else {
-      this.$editor.attr('data-fullscreen', 'true');
+      this.editorEl.setAttribute('data-fullscreen', 'true');
     }
 
     const isFullscreen = this.isFullscreen();
-    this.$scrollbar.toggleClass(this.scrollbarClassName, isFullscreen);
+    this.htmlEl.classList.toggle(this.scrollbarClassName, isFullscreen);
     if (isFullscreen) {
-      this.$editable.data('orgHeight', this.$editable.css('height'));
-      this.$editable.data('orgMaxHeight', this.$editable.css('maxHeight'));
-      this.$editable.css('maxHeight', '');
-      this.$window.on('resize', this.onResize).trigger('resize');
+      this.editableEl.setAttribute('data-height', this.editableEl.style.height);
+      this.editableEl.setAttribute('data-max-height', this.editableEl.style.maxHeight);
+      this.editableEl.style.maxHeight = '';
+
+      this.window.addEventListener('resize', this.onResize);
+      this.onResize();
     } else {
-      this.$window.off('resize', this.onResize);
-      this.resizeTo({ h: this.$editable.data('orgHeight') });
-      this.$editable.css('maxHeight', this.$editable.css('orgMaxHeight'));
+      this.window.removeEventListener('resize', this.onResize);
+      this.resizeTo({
+        h: this.editableEl.getAttribute('data-height'),
+      });
+      this.editableEl.style.maxHeight = this.editableEl.getAttribute('data-max-height');
     }
 
     this.context.invoke('toolbar.updateFullscreen', isFullscreen);
   }
 
   isFullscreen() {
-    return this.$editor.attr('data-fullscreen') === 'true';
+    return this.editorEl.getAttribute('data-fullscreen') === 'true';
   }
 
   destroy() {
-    this.$scrollbar.removeClass(this.scrollbarClassName);
+    this.htmlEl.classList.remove(this.scrollbarClassName);
   }
 }
