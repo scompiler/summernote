@@ -13,7 +13,6 @@ export default class Statusbar {
 
   initialize() {
     if (this.options.airMode || this.options.disableResizeEditor) {
-      this.destroy();
       return;
     }
 
