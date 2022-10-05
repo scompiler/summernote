@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import lists from '../core/lists';
 import func from '../core/func';
 
@@ -8,8 +7,10 @@ const AIRMODE_POPOVER_Y_OFFSET = 5;
 export default class AirPopover {
   constructor(context) {
     this.context = context;
-    this.ui = $.summernote.ui;
+    this.ui = func.getJquery().summernote.ui;
     this.options = context.options;
+    /** @type {HTMLElement | null} */
+    this.popoverEl = null;
 
     this.hidable = true;
     this.onContextmenu = false;
@@ -49,7 +50,9 @@ export default class AirPopover {
         this.hide();
       },
       'summernote.focusout': () => {
-        if (!this.$popover.is(':active,:focus')) {
+        const activeEls = [].slice.call(this.popoverEl.parentElement.querySelectorAll(':focus, :active'));
+
+        if (!activeEls.includes(this.popoverEl)) {
           this.hide();
         }
       },
@@ -61,21 +64,24 @@ export default class AirPopover {
   }
 
   initialize() {
-    this.$popover = this.ui.popover({
+    this.popoverEl = this.ui.popover({
       className: 'note-air-popover',
-    }).render().appendTo(this.options.container);
-    const $content = this.$popover.find('.popover-content');
+    }).render2();
 
-    this.context.invoke('buttons.build', $content, this.options.popover.air);
+    func.jqueryToHtmlElement(this.options.container).appendChild(this.popoverEl);
+
+    const contentEl = this.popoverEl.querySelector('.popover-content');
+
+    this.context.invoke('buttons.build', contentEl, this.options.popover.air);
 
     // disable hiding this popover preemptively by 'summernote.blur' event.
-    this.$popover.on('mousedown', () => { this.hidable = false; });
+    this.popoverEl.addEventListener('mousedown', () => { this.hidable = false; });
     // (re-)enable hiding after 'summernote.blur' has been handled (aka. ignored).
-    this.$popover.on('mouseup', () => { this.hidable = true; });
+    this.popoverEl.addEventListener('mouseup', () => { this.hidable = true; });
   }
 
   destroy() {
-    this.$popover.remove();
+    this.popoverEl.remove();
   }
 
   update(forcelyOpen) {
@@ -86,23 +92,27 @@ export default class AirPopover {
         top: this.pageY,
       };
 
-      const containerOffset = $(this.options.container).offset();
+      const containerEl = func.jqueryToHtmlElement(this.options.container);
+      const containerRect = containerEl.getBoundingClientRect();
+      const containerOffset = {
+        top: containerRect.top + containerEl.ownerDocument.defaultView.scrollY,
+        left: containerRect.left + containerEl.ownerDocument.defaultView.scrollX,
+      };
       rect.top -= containerOffset.top;
       rect.left -= containerOffset.left;
 
-      this.$popover.css({
-        display: 'block',
-        left: Math.max(rect.left, 0) + AIRMODE_POPOVER_X_OFFSET,
-        top: rect.top + AIRMODE_POPOVER_Y_OFFSET,
-      });
-      this.context.invoke('buttons.updateCurrentStyle', this.$popover);
+      this.popoverEl.style.display = 'block';
+      this.popoverEl.style.left = (Math.max(rect.left, 0) + AIRMODE_POPOVER_X_OFFSET) + 'px';
+      this.popoverEl.style.top = (rect.top + AIRMODE_POPOVER_Y_OFFSET) + 'px';
+
+      this.context.invoke('buttons.updateCurrentStyle', this.popoverEl);
     } else {
       this.hide();
     }
   }
 
   updateCodeview(isCodeview) {
-    this.ui.toggleBtnActive(this.$popover.find('.btn-codeview'), isCodeview);
+    this.ui.toggleBtnActive(func.htmlElementToJquery(this.popoverEl.querySelector('.btn-codeview')), isCodeview);
     if (isCodeview) {
       this.hide();
     }
@@ -110,7 +120,7 @@ export default class AirPopover {
 
   hide() {
     if (this.hidable) {
-      this.$popover.hide();
+      this.popoverEl.style.display = 'none';
     }
   }
 }

@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import lists from '../core/lists';
 import dom from '../core/dom';
+import func from "../core/func";
 
 /**
  * Image popover module
@@ -40,7 +41,7 @@ export default class ImagePopover {
       className: 'note-image-popover',
     }).render().appendTo(this.options.container);
     const $content = this.$popover.find('.popover-content,.note-popover-content');
-    this.context.invoke('buttons.build', $content, this.options.popover.image);
+    this.context.invoke('buttons.build', func.jqueryToHtmlElement($content), this.options.popover.image);
 
     this.$popover.on('mousedown', (event) => { event.preventDefault(); });
   }

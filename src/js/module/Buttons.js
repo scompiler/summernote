@@ -1,13 +1,12 @@
-import $ from 'jquery';
 import func from '../core/func';
 import lists from '../core/lists';
 import env from '../core/env';
 
 export default class Buttons {
   constructor(context) {
-    this.ui = $.summernote.ui;
+    this.ui = func.getJquery().summernote.ui;
     this.context = context;
-    this.$toolbar = context.layoutInfo.toolbar;
+    this.toolbarEl = func.jqueryToHtmlElement(context.layoutInfo.toolbar);
     this.options = context.options;
     this.lang = this.options.langInfo;
     this.invertedKeyMap = func.invertObject(
@@ -75,35 +74,45 @@ export default class Buttons {
           contents: this.ui.icon(this.options.icons.font),
           tooltip: tooltip,
           click: (event) => {
-            const $button = $(event.currentTarget);
+            const buttonEl = event.currentTarget;
             if (backColor && foreColor) {
               this.context.invoke('editor.color', {
-                backColor: $button.attr('data-backColor'),
-                foreColor: $button.attr('data-foreColor'),
+                backColor: buttonEl.getAttribute('data-backColor'),
+                foreColor: buttonEl.getAttribute('data-foreColor'),
               });
             } else if (backColor) {
               this.context.invoke('editor.color', {
-                backColor: $button.attr('data-backColor'),
+                backColor: buttonEl.getAttribute('data-backColor'),
               });
             } else if (foreColor) {
               this.context.invoke('editor.color', {
-                foreColor: $button.attr('data-foreColor'),
+                foreColor: buttonEl.getAttribute('data-foreColor'),
               });
             }
           },
-          callback: ($button) => {
-            const $recentColor = $button.find('.note-recent-color');
-            if (backColor) {
-              $recentColor.css('background-color', this.options.colorButton.backColor);
-              $button.attr('data-backColor', this.options.colorButton.backColor);
+          /**
+           * @param {HTMLElement} buttonEl
+           */
+          callback2: (buttonEl) => {
+            /** @type {HTMLElement} */
+            const recentColorEl = buttonEl.querySelector('.note-recent-color');
 
-              $button.css('--background-color', this.options.colorButton.backColor);
+            if (backColor) {
+              if (recentColorEl) {
+                recentColorEl.style.backgroundColor = this.options.colorButton.backColor;
+              }
+              buttonEl.setAttribute('data-backColor', this.options.colorButton.backColor);
+              buttonEl.style.setProperty('--background-color', this.options.colorButton.backColor);
             }
             if (foreColor) {
-              $recentColor.css('color', this.options.colorButton.foreColor);
-              $button.attr('data-foreColor', this.options.colorButton.foreColor);
+              if (recentColorEl) {
+                recentColorEl.style.color = this.options.colorButton.foreColor;
+              }
+              buttonEl.setAttribute('data-foreColor', this.options.colorButton.foreColor);
             } else {
-              $recentColor.css('color', 'transparent');
+              if (recentColorEl) {
+                recentColorEl.style.color = 'transparent';
+              }
             }
           },
         }),
@@ -152,79 +161,91 @@ export default class Buttons {
               '<div class="note-holder-custom" id="foreColorPalette-'+this.options.id+'" data-event="foreColor"></div>',
             '</div>',
           ].join('') : ''),
-          callback: ($dropdown) => {
-            $dropdown.find('.note-holder').each((idx, item) => {
-              const $holder = $(item);
-              $holder.append(this.ui.palette({
+          callback2: (dropdownEl) => {
+            [].slice.call(dropdownEl.querySelectorAll('.note-holder')).forEach((item) => {
+              item.appendChild(this.ui.palette({
                 colors: this.options.colors,
                 colorsName: this.options.colorsName,
-                eventName: $holder.data('event'),
+                eventName: item.getAttribute('data-event'),
                 container: this.options.container,
                 tooltip: this.options.tooltip,
-              }).render());
+              }).render2());
             });
             /* TODO: do we have to record recent custom colors within cookies? */
-            var customColors = [
+            const customColors = [
               ['#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF'],
             ];
-            $dropdown.find('.note-holder-custom').each((idx, item) => {
-              const $holder = $(item);
-              $holder.append(this.ui.palette({
+            [].slice.call(dropdownEl.querySelectorAll('.note-holder-custom')).forEach((item) => {
+              item.appendChild(this.ui.palette({
                 colors: customColors,
                 colorsName: customColors,
-                eventName: $holder.data('event'),
+                eventName: item.getAttribute('data-event'),
                 container: this.options.container,
                 tooltip: this.options.tooltip,
-              }).render());
+              }).render2());
             });
-            $dropdown.find('input[type=color]').each((idx, item) => {
-              $(item).on("change", function() {
-                const $chip = $dropdown.find('#' + $(this).data('event')).find('.note-color-btn').first();
+            [].slice.call(dropdownEl.querySelectorAll('input[type=color]')).forEach((item) => {
+              item.addEventListener('change', function() {
+                const chipEl = dropdownEl
+                  .querySelector('#' + this.getAttribute('data-event'))
+                  .querySelector('.note-color-btn');
                 const color = this.value.toUpperCase();
-                $chip.css('background-color', color)
-                  .attr('aria-label', color)
-                  .attr('data-value', color)
-                  .attr('data-original-title', color);
-                $chip.click();
+
+                chipEl.style.backgroundColor = color;
+                chipEl.setAttribute('aria-label', color);
+                chipEl.setAttribute('data-value', color);
+                chipEl.setAttribute('data-original-title', color);
+                chipEl.click();
               });
             });
           },
           click: (event) => {
             event.stopPropagation();
 
-            const $parent = $('.' + className).find('.note-dropdown-menu');
-            const $button = $(event.target);
-            const eventName = $button.data('event');
-            const value = $button.attr('data-value');
+            const buttonEl = event.target;
+            const parentEl = event.target.closest('.note-dropdown-menu');
+            const eventName = buttonEl.getAttribute('data-event');
+            const value = buttonEl.getAttribute('data-value');
 
             if (eventName === 'openPalette') {
-              const $picker = $parent.find('#' + value);
-              const $palette = $($parent.find('#' + $picker.data('event')).find('.note-color-row')[0]);
+              const pickerEl = parentEl.querySelector('#' + value);
+              const paletteEl = parentEl
+                .querySelector('#' + pickerEl.getAttribute('data-event'))
+                .querySelector('.note-color-row');
 
               // Shift palette chips
-              const $chip = $palette.find('.note-color-btn').last().detach();
+              const chipEls = paletteEl.querySelectorAll('.note-color-btn');
+              const chipEl = chipEls[chipEls.length - 1];
+
+              chipEl.remove();
 
               // Set chip attributes
-              const color = $picker.val();
-              $chip.css('background-color', color)
-                .attr('aria-label', color)
-                .attr('data-value', color)
-                .attr('data-original-title', color);
-              $palette.prepend($chip);
-              $picker.click();
+              const color = pickerEl.value;
+
+              chipEl.style.backgroundColor = color;
+              chipEl.setAttribute('aria-label', color);
+              chipEl.setAttribute('data-value', color);
+              chipEl.setAttribute('data-original-title', color);
+
+              paletteEl.insertBefore(chipEl, paletteEl.firstChild);
+
+              pickerEl.click();
             } else {
               if (lists.contains(['backColor', 'foreColor'], eventName)) {
                 const key = eventName === 'backColor' ? 'background-color' : 'color';
-                const $color = $button.closest('.note-color').find('.note-recent-color');
-                const $currentButton = $button.closest('.note-color').find('.tea-editor__button--current-color');
+                const colorEl = buttonEl.closest('.note-color').querySelector('.note-recent-color');
+                const currentButtonEl = buttonEl.closest('.note-color').querySelector('.tea-editor__button--current-color');
 
-                $color.css(key, value);
-                $currentButton.attr('data-' + eventName, value);
+                if (colorEl) {
+                  colorEl.style.setProperty(key, value);
+                }
+
+                currentButtonEl.setAttribute('data-' + eventName, value);
 
                 if (eventName === 'backColor') {
-                  $currentButton.css('--background-color', value);
+                  currentButtonEl.style.setProperty('--background-color', value);
                 } else if (eventName === 'foreColor') {
-                  $currentButton.css('--font-color', value);
+                  currentButtonEl.style.setProperty('--font-color', value);
                 }
               }
               this.context.invoke('editor.' + eventName, value);
@@ -232,7 +253,7 @@ export default class Buttons {
           },
         }),
       ],
-    }).render();
+    }).render2();
   }
 
   addToolbarButtons() {
@@ -270,7 +291,7 @@ export default class Buttons {
           },
           click: this.context.createInvokeHandler('editor.formatBlock'),
         }),
-      ]).render();
+      ]).render2();
     });
 
     for (let styleIdx = 0, styleLen = this.options.styleTags.length; styleIdx < styleLen; styleIdx++) {
@@ -282,7 +303,7 @@ export default class Buttons {
           contents: '<div data-value="' + item + '">' + item.toUpperCase() + '</div>',
           tooltip: this.lang.style[item],
           click: this.context.createInvokeHandler('editor.formatBlock'),
-        }).render();
+        }).render2();
       });
     }
 
@@ -292,7 +313,7 @@ export default class Buttons {
         contents: this.ui.icon(this.options.icons.bold),
         tooltip: this.lang.font.bold + this.representShortcut('bold'),
         click: this.context.createInvokeHandlerAndUpdateState('editor.bold'),
-      }).render();
+      }).render2();
     });
 
     this.context.memo('button.italic', () => {
@@ -301,7 +322,7 @@ export default class Buttons {
         contents: this.ui.icon(this.options.icons.italic),
         tooltip: this.lang.font.italic + this.representShortcut('italic'),
         click: this.context.createInvokeHandlerAndUpdateState('editor.italic'),
-      }).render();
+      }).render2();
     });
 
     this.context.memo('button.underline', () => {
@@ -310,7 +331,7 @@ export default class Buttons {
         contents: this.ui.icon(this.options.icons.underline),
         tooltip: this.lang.font.underline + this.representShortcut('underline'),
         click: this.context.createInvokeHandlerAndUpdateState('editor.underline'),
-      }).render();
+      }).render2();
     });
 
     this.context.memo('button.clear', () => {
@@ -318,7 +339,7 @@ export default class Buttons {
         contents: this.ui.icon(this.options.icons.eraser),
         tooltip: this.lang.font.clear + this.representShortcut('removeFormat'),
         click: this.context.createInvokeHandler('editor.removeFormat'),
-      }).render();
+      }).render2();
     });
 
     this.context.memo('button.strikethrough', () => {
@@ -327,7 +348,7 @@ export default class Buttons {
         contents: this.ui.icon(this.options.icons.strikethrough),
         tooltip: this.lang.font.strikethrough + this.representShortcut('strikethrough'),
         click: this.context.createInvokeHandlerAndUpdateState('editor.strikethrough'),
-      }).render();
+      }).render2();
     });
 
     this.context.memo('button.superscript', () => {
@@ -336,7 +357,7 @@ export default class Buttons {
         contents: this.ui.icon(this.options.icons.superscript),
         tooltip: this.lang.font.superscript,
         click: this.context.createInvokeHandlerAndUpdateState('editor.superscript'),
-      }).render();
+      }).render2();
     });
 
     this.context.memo('button.subscript', () => {
@@ -345,7 +366,7 @@ export default class Buttons {
         contents: this.ui.icon(this.options.icons.subscript),
         tooltip: this.lang.font.subscript,
         click: this.context.createInvokeHandlerAndUpdateState('editor.subscript'),
-      }).render();
+      }).render2();
     });
 
     this.context.memo('button.fontname', () => {
@@ -384,7 +405,7 @@ export default class Buttons {
           },
           click: this.context.createInvokeHandlerAndUpdateState('editor.fontName'),
         }),
-      ]).render();
+      ]).render2();
     });
 
     this.context.memo('button.fontsize', () => {
@@ -404,7 +425,7 @@ export default class Buttons {
           title: this.lang.font.size,
           click: this.context.createInvokeHandlerAndUpdateState('editor.fontSize'),
         }),
-      ]).render();
+      ]).render2();
     });
 
     this.context.memo('button.fontsizeunit', () => {
@@ -424,7 +445,7 @@ export default class Buttons {
           title: this.lang.font.sizeunit,
           click: this.context.createInvokeHandlerAndUpdateState('editor.fontSizeUnit'),
         }),
-      ]).render();
+      ]).render2();
     });
 
     this.context.memo('button.color', () => {
@@ -444,7 +465,7 @@ export default class Buttons {
         contents: this.ui.icon(this.options.icons.unorderedlist),
         tooltip: this.lang.lists.unordered + this.representShortcut('insertUnorderedList'),
         click: this.context.createInvokeHandler('editor.insertUnorderedList'),
-      }).render();
+      }).render2();
     });
 
     this.context.memo('button.ol', () => {
@@ -452,7 +473,7 @@ export default class Buttons {
         contents: this.ui.icon(this.options.icons.orderedlist),
         tooltip: this.lang.lists.ordered + this.representShortcut('insertOrderedList'),
         click: this.context.createInvokeHandler('editor.insertOrderedList'),
-      }).render();
+      }).render2();
     });
 
     const justifyLeft = this.button({
@@ -491,12 +512,12 @@ export default class Buttons {
       click: this.context.createInvokeHandler('editor.indent'),
     });
 
-    this.context.memo('button.justifyLeft', func.invoke(justifyLeft, 'render'));
-    this.context.memo('button.justifyCenter', func.invoke(justifyCenter, 'render'));
-    this.context.memo('button.justifyRight', func.invoke(justifyRight, 'render'));
-    this.context.memo('button.justifyFull', func.invoke(justifyFull, 'render'));
-    this.context.memo('button.outdent', func.invoke(outdent, 'render'));
-    this.context.memo('button.indent', func.invoke(indent, 'render'));
+    this.context.memo('button.justifyLeft', func.invoke(justifyLeft, 'render2'));
+    this.context.memo('button.justifyCenter', func.invoke(justifyCenter, 'render2'));
+    this.context.memo('button.justifyRight', func.invoke(justifyRight, 'render2'));
+    this.context.memo('button.justifyFull', func.invoke(justifyFull, 'render2'));
+    this.context.memo('button.outdent', func.invoke(outdent, 'render2'));
+    this.context.memo('button.indent', func.invoke(indent, 'render2'));
 
     this.context.memo('button.paragraph', () => {
       let children = [
@@ -524,7 +545,7 @@ export default class Buttons {
           },
         }),
         this.ui.dropdown(children),
-      ]).render();
+      ]).render2();
     });
 
     this.context.memo('button.height', () => {
@@ -544,7 +565,7 @@ export default class Buttons {
           title: this.lang.font.height,
           click: this.context.createInvokeHandler('editor.lineHeight'),
         }),
-      ]).render();
+      ]).render2();
     });
 
     this.context.memo('button.table', () => {
@@ -570,15 +591,16 @@ export default class Buttons {
           ].join(''),
         }),
       ], {
-        callback: ($node) => {
-          const $catcher = $node.find('.note-dimension-picker-mousecatcher');
-          $catcher.css({
-            width: this.options.insertTableMaxSize.col + 'em',
-            height: this.options.insertTableMaxSize.row + 'em',
-          }).mousedown(this.context.createInvokeHandler('editor.insertTable'))
-            .on('mousemove', this.tableMoveHandler.bind(this));
+        callback2: (nodeEl) => {
+          const catcherEl = nodeEl.querySelector('.note-dimension-picker-mousecatcher');
+
+          catcherEl.style.width = this.options.insertTableMaxSize.col + 'em';
+          catcherEl.style.height = this.options.insertTableMaxSize.row + 'em';
+
+          catcherEl.addEventListener('mousedown', this.context.createInvokeHandler('editor.insertTable'));
+          catcherEl.addEventListener('mousemove', this.tableMoveHandler.bind(this));
         },
-      }).render();
+      }).render2();
     });
 
     this.context.memo('button.link', () => {
@@ -586,7 +608,7 @@ export default class Buttons {
         contents: this.ui.icon(this.options.icons.link),
         tooltip: this.lang.link.link + this.representShortcut('linkDialog.show'),
         click: this.context.createInvokeHandler('linkDialog.show'),
-      }).render();
+      }).render2();
     });
 
     this.context.memo('button.picture', () => {
@@ -594,7 +616,7 @@ export default class Buttons {
         contents: this.ui.icon(this.options.icons.picture),
         tooltip: this.lang.image.image,
         click: this.context.createInvokeHandler('imageDialog.show'),
-      }).render();
+      }).render2();
     });
 
     this.context.memo('button.video', () => {
@@ -602,7 +624,7 @@ export default class Buttons {
         contents: this.ui.icon(this.options.icons.video),
         tooltip: this.lang.video.video,
         click: this.context.createInvokeHandler('videoDialog.show'),
-      }).render();
+      }).render2();
     });
 
     this.context.memo('button.hr', () => {
@@ -610,7 +632,7 @@ export default class Buttons {
         contents: this.ui.icon(this.options.icons.minus),
         tooltip: this.lang.hr.insert + this.representShortcut('insertHorizontalRule'),
         click: this.context.createInvokeHandler('editor.insertHorizontalRule'),
-      }).render();
+      }).render2();
     });
 
     this.context.memo('button.fullscreen', () => {
@@ -619,7 +641,7 @@ export default class Buttons {
         contents: this.ui.icon(this.options.icons.arrowsAlt),
         tooltip: this.lang.options.fullscreen,
         click: this.context.createInvokeHandler('fullscreen.toggle'),
-      }).render();
+      }).render2();
     });
 
     this.context.memo('button.codeview', () => {
@@ -628,7 +650,7 @@ export default class Buttons {
         contents: this.ui.icon(this.options.icons.code),
         tooltip: this.lang.options.codeview,
         click: this.context.createInvokeHandler('codeview.toggle'),
-      }).render();
+      }).render2();
     });
 
     this.context.memo('button.redo', () => {
@@ -636,7 +658,7 @@ export default class Buttons {
         contents: this.ui.icon(this.options.icons.redo),
         tooltip: this.lang.history.redo + this.representShortcut('redo'),
         click: this.context.createInvokeHandler('editor.redo'),
-      }).render();
+      }).render2();
     });
 
     this.context.memo('button.undo', () => {
@@ -644,7 +666,7 @@ export default class Buttons {
         contents: this.ui.icon(this.options.icons.undo),
         tooltip: this.lang.history.undo + this.representShortcut('undo'),
         click: this.context.createInvokeHandler('editor.undo'),
-      }).render();
+      }).render2();
     });
 
     this.context.memo('button.help', () => {
@@ -652,7 +674,7 @@ export default class Buttons {
         contents: this.ui.icon(this.options.icons.question),
         tooltip: this.lang.options.help,
         click: this.context.createInvokeHandler('helpDialog.show'),
-      }).render();
+      }).render2();
     });
   }
 
@@ -670,28 +692,28 @@ export default class Buttons {
         contents: '<span class="note-fontsize-10">100%</span>',
         tooltip: this.lang.image.resizeFull,
         click: this.context.createInvokeHandler('editor.resize', '1'),
-      }).render();
+      }).render2();
     });
     this.context.memo('button.resizeHalf', () => {
       return this.button({
         contents: '<span class="note-fontsize-10">50%</span>',
         tooltip: this.lang.image.resizeHalf,
         click: this.context.createInvokeHandler('editor.resize', '0.5'),
-      }).render();
+      }).render2();
     });
     this.context.memo('button.resizeQuarter', () => {
       return this.button({
         contents: '<span class="note-fontsize-10">25%</span>',
         tooltip: this.lang.image.resizeQuarter,
         click: this.context.createInvokeHandler('editor.resize', '0.25'),
-      }).render();
+      }).render2();
     });
     this.context.memo('button.resizeNone', () => {
       return this.button({
         contents: this.ui.icon(this.options.icons.rollback),
         tooltip: this.lang.image.resizeNone,
         click: this.context.createInvokeHandler('editor.resize', '0'),
-      }).render();
+      }).render2();
     });
 
     // Float Buttons
@@ -700,7 +722,7 @@ export default class Buttons {
         contents: this.ui.icon(this.options.icons.floatLeft),
         tooltip: this.lang.image.floatLeft,
         click: this.context.createInvokeHandler('editor.floatMe', 'left'),
-      }).render();
+      }).render2();
     });
 
     this.context.memo('button.floatRight', () => {
@@ -708,7 +730,7 @@ export default class Buttons {
         contents: this.ui.icon(this.options.icons.floatRight),
         tooltip: this.lang.image.floatRight,
         click: this.context.createInvokeHandler('editor.floatMe', 'right'),
-      }).render();
+      }).render2();
     });
 
     this.context.memo('button.floatNone', () => {
@@ -716,7 +738,7 @@ export default class Buttons {
         contents: this.ui.icon(this.options.icons.rollback),
         tooltip: this.lang.image.floatNone,
         click: this.context.createInvokeHandler('editor.floatMe', 'none'),
-      }).render();
+      }).render2();
     });
 
     // Remove Buttons
@@ -725,7 +747,7 @@ export default class Buttons {
         contents: this.ui.icon(this.options.icons.trash),
         tooltip: this.lang.image.remove,
         click: this.context.createInvokeHandler('editor.removeMedia'),
-      }).render();
+      }).render2();
     });
   }
 
@@ -735,7 +757,7 @@ export default class Buttons {
         contents: this.ui.icon(this.options.icons.link),
         tooltip: this.lang.link.edit,
         click: this.context.createInvokeHandler('linkDialog.show'),
-      }).render();
+      }).render2();
     });
 
     this.context.memo('button.unlink', () => {
@@ -743,7 +765,7 @@ export default class Buttons {
         contents: this.ui.icon(this.options.icons.unlink),
         tooltip: this.lang.link.unlink,
         click: this.context.createInvokeHandler('editor.unlink'),
-      }).render();
+      }).render2();
     });
   }
 
@@ -760,7 +782,7 @@ export default class Buttons {
         contents: this.ui.icon(this.options.icons.rowAbove),
         tooltip: this.lang.table.addRowAbove,
         click: this.context.createInvokeHandler('editor.addRow', 'top'),
-      }).render();
+      }).render2();
     });
     this.context.memo('button.addRowDown', () => {
       return this.button({
@@ -768,7 +790,7 @@ export default class Buttons {
         contents: this.ui.icon(this.options.icons.rowBelow),
         tooltip: this.lang.table.addRowBelow,
         click: this.context.createInvokeHandler('editor.addRow', 'bottom'),
-      }).render();
+      }).render2();
     });
     this.context.memo('button.addColLeft', () => {
       return this.button({
@@ -776,7 +798,7 @@ export default class Buttons {
         contents: this.ui.icon(this.options.icons.colBefore),
         tooltip: this.lang.table.addColLeft,
         click: this.context.createInvokeHandler('editor.addCol', 'left'),
-      }).render();
+      }).render2();
     });
     this.context.memo('button.addColRight', () => {
       return this.button({
@@ -784,7 +806,7 @@ export default class Buttons {
         contents: this.ui.icon(this.options.icons.colAfter),
         tooltip: this.lang.table.addColRight,
         click: this.context.createInvokeHandler('editor.addCol', 'right'),
-      }).render();
+      }).render2();
     });
     this.context.memo('button.deleteRow', () => {
       return this.button({
@@ -792,7 +814,7 @@ export default class Buttons {
         contents: this.ui.icon(this.options.icons.rowRemove),
         tooltip: this.lang.table.delRow,
         click: this.context.createInvokeHandler('editor.deleteRow'),
-      }).render();
+      }).render2();
     });
     this.context.memo('button.deleteCol', () => {
       return this.button({
@@ -800,7 +822,7 @@ export default class Buttons {
         contents: this.ui.icon(this.options.icons.colRemove),
         tooltip: this.lang.table.delCol,
         click: this.context.createInvokeHandler('editor.deleteCol'),
-      }).render();
+      }).render2();
     });
     this.context.memo('button.deleteTable', () => {
       return this.button({
@@ -808,38 +830,42 @@ export default class Buttons {
         contents: this.ui.icon(this.options.icons.trash),
         tooltip: this.lang.table.delTable,
         click: this.context.createInvokeHandler('editor.deleteTable'),
-      }).render();
+      }).render2();
     });
   }
 
-  build($container, groups) {
+  build(containerEl, groups) {
     for (let groupIdx = 0, groupLen = groups.length; groupIdx < groupLen; groupIdx++) {
       const group = groups[groupIdx];
       const groupName = Array.isArray(group) ? group[0] : group;
       const buttons = Array.isArray(group) ? ((group.length === 1) ? [group[0]] : group[1]) : [group];
 
-      const $group = this.ui.buttonGroup({
+      const groupEl = this.ui.buttonGroup({
         className: 'note-' + groupName,
-      }).render();
+      }).render2();
 
       for (let idx = 0, len = buttons.length; idx < len; idx++) {
         const btn = this.context.memo('button.' + buttons[idx]);
         if (btn) {
-          $group.append(typeof btn === 'function' ? btn(this.context) : btn);
+          groupEl.appendChild(typeof btn === 'function' ? btn(this.context) : btn);
         }
       }
-      $group.appendTo($container);
+      containerEl.appendChild(groupEl);
     }
   }
 
   /**
-   * @param {jQuery} [$container]
+   * @param {jQuery} containerEl
    */
-  updateCurrentStyle($container) {
-    const $cont = $container || this.$toolbar;
+  updateCurrentStyle(containerEl) {
+    const cont = containerEl || this.toolbarEl;
+
+    if (!cont) {
+      return;
+    }
 
     const styleInfo = this.context.invoke('editor.currentStyle');
-    this.updateBtnStates($cont, {
+    this.updateBtnStates(cont, {
       '.note-btn-bold': () => {
         return styleInfo['font-bold'] === 'bold';
       },
@@ -868,91 +894,87 @@ export default class Buttons {
       });
       const fontName = lists.find(fontNames, this.isFontInstalled.bind(this));
 
-      $cont.find('.dropdown-fontname a').each((idx, item) => {
-        const $item = $(item);
+      [].slice.call(cont.querySelectorAll('.dropdown-fontname a')).forEach((item) => {
         // always compare string to avoid creating another func.
-        const isChecked = ($item.data('value') + '') === (fontName + '');
-        $item.toggleClass('checked', isChecked);
+        const isChecked = (item.getAttribute('data-value') + '') === (fontName + '');
+        item.classList.toggle('checked', isChecked);
       });
-      $cont.find('.note-current-fontname').text(fontName)/*.css('font-family', fontName)*/;
+      const currentFontNameEl = cont.querySelector('.note-current-fontname');
+      if (currentFontNameEl) {
+        currentFontNameEl.innerText = fontName;
+        // currentFontNameEl.style.fontFamily = fontName;
+      }
     }
 
     if (styleInfo['font-size']) {
       const fontSize = styleInfo['font-size'];
-      $cont.find('.dropdown-fontsize a').each((idx, item) => {
-        const $item = $(item);
+      [].slice.call(cont.querySelectorAll('.dropdown-fontsize a')).forEach((item) => {
         // always compare with string to avoid creating another func.
-        const isChecked = ($item.data('value') + '') === (fontSize + '');
-        $item.toggleClass('checked', isChecked);
+        const isChecked = (item.getAttribute('data-value') + '') === (fontSize + '');
+        item.classList.toggle('checked', isChecked);
       });
-      $cont.find('.note-current-fontsize').text(fontSize);
+      const currentFontSizeEl = cont.querySelector('.note-current-fontsize');
+      if (currentFontSizeEl) {
+        currentFontSizeEl.innerText = fontSize;
+      }
 
       const fontSizeUnit = styleInfo['font-size-unit'];
-      $cont.find('.dropdown-fontsizeunit a').each((idx, item) => {
-        const $item = $(item);
-        const isChecked = ($item.data('value') + '') === (fontSizeUnit + '');
-        $item.toggleClass('checked', isChecked);
+      [].slice.call(cont.querySelectorAll('.dropdown-fontsizeunit a')).forEach((item) => {
+        const isChecked = (item.getAttribute('data-value') + '') === (fontSizeUnit + '');
+        item.classList.toggle('checked', isChecked);
       });
-      $cont.find('.note-current-fontsizeunit').text(fontSizeUnit);
+      const currentFontSizeUnitEl = cont.querySelector('.note-current-fontsizeunit');
+      if (currentFontSizeUnitEl) {
+        currentFontSizeUnitEl.innerText = fontSizeUnit;
+      }
     }
 
     if (styleInfo['line-height']) {
       const lineHeight = styleInfo['line-height'];
-      $cont.find('.dropdown-line-height a').each((idx, item) => {
-        const $item = $(item);
+      [].slice.call(cont.querySelectorAll('.dropdown-line-height a')).forEach((item) => {
         // always compare with string to avoid creating another func.
-        const isChecked = ($(item).data('value') + '') === (lineHeight + '');
-        $item.toggleClass('checked', isChecked);
+        const isChecked = parseFloat(item.getAttribute('data-value')).toFixed(8) === parseFloat(lineHeight).toFixed(8);
+        item.classList.toggle('checked', isChecked);
       });
-      $cont.find('.note-current-line-height').text(lineHeight);
+      const currentLineHeightEl = cont.querySelector('.note-current-line-height');
+      if (currentLineHeightEl) {
+        currentLineHeightEl.innerText = lineHeight;
+      }
     }
   }
 
-  updateBtnStates($container, infos) {
-    $.each(infos, (selector, pred) => {
-      this.ui.toggleBtnActive($container.find(selector), pred());
-    });
+  updateBtnStates(containerEl, infos) {
+    for (const selector in infos) {
+      const pred = infos[selector];
+      this.ui.toggleBtnActive(func.htmlElementToJquery(containerEl.querySelector(selector)), pred());
+    }
   }
 
   tableMoveHandler(event) {
     const PX_PER_EM = 18;
-    const $picker = $(event.target.parentNode); // target is mousecatcher
-    const $dimensionDisplay = $picker.next();
-    const $catcher = $picker.find('.note-dimension-picker-mousecatcher');
-    const $highlighted = $picker.find('.note-dimension-picker-highlighted');
-    const $unhighlighted = $picker.find('.note-dimension-picker-unhighlighted');
-
-    let posOffset;
-    // HTML5 with jQuery - e.offsetX is undefined in Firefox
-    if (event.offsetX === undefined) {
-      const posCatcher = $(event.target).offset();
-      posOffset = {
-        x: event.pageX - posCatcher.left,
-        y: event.pageY - posCatcher.top,
-      };
-    } else {
-      posOffset = {
-        x: event.offsetX,
-        y: event.offsetY,
-      };
-    }
+    const pickerEl = event.target.parentNode; // target is mousecatcher
+    const dimensionDisplayEl = pickerEl.nextElementSibling;
+    const catcherEl = pickerEl.querySelector('.note-dimension-picker-mousecatcher');
+    const highlightedEl = pickerEl.querySelector('.note-dimension-picker-highlighted');
+    const unhighlightedEl = pickerEl.querySelector('.note-dimension-picker-unhighlighted');
 
     const dim = {
-      c: Math.ceil(posOffset.x / PX_PER_EM) || 1,
-      r: Math.ceil(posOffset.y / PX_PER_EM) || 1,
+      c: Math.ceil(event.offsetX / PX_PER_EM) || 1,
+      r: Math.ceil(event.offsetY / PX_PER_EM) || 1,
     };
 
-    $highlighted.css({ width: dim.c + 'em', height: dim.r + 'em' });
-    $catcher.data('value', dim.c + 'x' + dim.r);
+    highlightedEl.style.width = dim.c + 'em';
+    highlightedEl.style.height = dim.r + 'em';
+    catcherEl.setAttribute('data-value', dim.c + 'x' + dim.r);
 
     if (dim.c > 3 && dim.c < this.options.insertTableMaxSize.col) {
-      $unhighlighted.css({ width: dim.c + 1 + 'em' });
+      unhighlightedEl.style.width = dim.c + 1 + 'em';
     }
 
     if (dim.r > 3 && dim.r < this.options.insertTableMaxSize.row) {
-      $unhighlighted.css({ height: dim.r + 1 + 'em' });
+      unhighlightedEl.style.height = dim.r + 1 + 'em';
     }
 
-    $dimensionDisplay.html(dim.c + ' x ' + dim.r);
+    dimensionDisplayEl.innerHTML = dim.c + ' x ' + dim.r;
   }
 }

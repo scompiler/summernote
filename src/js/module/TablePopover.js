@@ -2,6 +2,7 @@ import $ from 'jquery';
 import env from '../core/env';
 import lists from '../core/lists';
 import dom from '../core/dom';
+import func from "../core/func";
 
 export default class TablePopover {
   constructor(context) {
@@ -41,7 +42,7 @@ export default class TablePopover {
     }).render().appendTo(this.options.container);
     const $content = this.$popover.find('.popover-content,.note-popover-content');
 
-    this.context.invoke('buttons.build', $content, this.options.popover.table);
+    this.context.invoke('buttons.build', func.jqueryToHtmlElement($content), this.options.popover.table);
 
     // [workaround] Disable Firefox's default table editor
     if (env.isFF) {

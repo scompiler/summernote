@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import func from "../core/func";
 export default class Toolbar {
   constructor(context) {
     this.context = context;
@@ -29,7 +30,7 @@ export default class Toolbar {
     if (!this.options.toolbar.length) {
       this.$toolbar.hide();
     } else {
-      this.context.invoke('buttons.build', this.$toolbarContent || this.$toolbar, this.options.toolbar);
+      this.context.invoke('buttons.build', func.jqueryToHtmlElement(this.$toolbarContent || this.$toolbar), this.options.toolbar);
     }
 
     if (this.options.toolbarContainer) {

@@ -51,7 +51,7 @@ export default class LinkPopover {
 
     const contentEl = this.popoverEl.querySelector('.popover-content,.note-popover-content');
 
-    this.context.invoke('buttons.build', func.htmlElementToJquery(contentEl), this.options.popover.link);
+    this.context.invoke('buttons.build', contentEl, this.options.popover.link);
 
     this.popoverEl.addEventListener('mousedown', (event) => {
       event.preventDefault();
