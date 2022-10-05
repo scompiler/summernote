@@ -14,8 +14,10 @@ export default class Fullscreen {
     this.scrollbarClassName = 'note-fullscreen-body';
 
     this.onResize = () => {
+      const toolbarHeight = this.toolbarEl ? this.toolbarEl.offsetHeight : 0;
+
       this.resizeTo({
-        h: (this.window.innerHeight - this.toolbarEl.offsetHeight) + 'px',
+        h: (this.window.innerHeight - toolbarHeight) + 'px',
       });
     };
   }
