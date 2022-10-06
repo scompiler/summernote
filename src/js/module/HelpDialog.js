@@ -1,19 +1,18 @@
-import $ from 'jquery';
 import env from '../core/env';
+import func from "../core/func";
 
 export default class HelpDialog {
   constructor(context) {
     this.context = context;
 
-    this.ui = $.summernote.ui;
-    this.$body = $(document.body);
-    this.$editor = context.layoutInfo.editor;
+    this.ui = func.getJquery().summernote.ui;
+    this.bodyEl = document.body;
     this.options = context.options;
     this.lang = this.options.langInfo;
   }
 
   initialize() {
-    const $container = this.options.dialogsInBody ? this.$body : this.options.container;
+    const containerEl = this.options.dialogsInBody ? this.bodyEl : func.jqueryToHtmlElement(this.options.container);
     const body = [
       '<p class="text-center">',
         '<a href="http://summernote.org/" target="_blank" rel="noopener noreferrer">Summernote @@VERSION@@</a> · ',
@@ -22,35 +21,46 @@ export default class HelpDialog {
       '</p>',
     ].join('');
 
-    this.$dialog = this.ui.dialog({
+    this.dialogEl = this.ui.dialog({
       title: this.lang.options.help,
       fade: this.options.dialogsFade,
       body: this.createShortcutList(),
       footer: body,
-      callback: ($node) => {
-        $node.find('.modal-body,.note-modal-body').css({
-          'max-height': 300,
-          'overflow': 'scroll',
+      callback2: (nodeEl) => {
+        [].slice.call(nodeEl.querySelectorAll('.modal-body, .note-modal-body')).forEach((item) => {
+          item.style.maxHeight = 300 + 'px';
+          item.style.overflow = 'scroll';
         });
       },
-    }).render().appendTo($container);
+    }).render2();
+
+    containerEl.appendChild(this.dialogEl);
   }
 
   destroy() {
-    this.ui.hideDialog(this.$dialog);
-    this.$dialog.remove();
+    this.ui.hideDialog(func.htmlElementToJquery(this.dialogEl));
+    this.dialogEl.remove();
   }
 
   createShortcutList() {
     const keyMap = this.options.keyMap[env.isMac ? 'mac' : 'pc'];
     return Object.keys(keyMap).map((key) => {
       const command = keyMap[key];
-      const $row = $('<div><div class="help-list-item"></div></div>');
-      $row.append($('<label><kbd>' + key + '</kdb></label>').css({
-        'width': 180,
-        'margin-right': 10,
-      })).append($('<span></span>').html(this.context.memo('help.' + command) || command));
-      return $row.html();
+
+      const rowEl = func.makeElement('<div><div class="help-list-item"></div></div>');
+      const labelEl = func.makeElement('<label><kbd>' + key + '</kdb></label>');
+
+      labelEl.style.width = 180 + 'px';
+      labelEl.style.marginRight = 10 + 'px';
+
+      const spanEl = func.makeElement('<span></span>');
+
+      spanEl.innerHTML = this.context.memo('help.' + command) || command;
+
+      rowEl.appendChild(labelEl);
+      rowEl.appendChild(spanEl);
+
+      return rowEl.innerHTML;
     }).join('');
   }
 
@@ -60,13 +70,13 @@ export default class HelpDialog {
    * @return {Promise}
    */
   showHelpDialog() {
-    return $.Deferred((deferred) => {
-      this.ui.onDialogShown(this.$dialog, () => {
+    return new Promise((resolve) => {
+      this.ui.onDialogShown(func.htmlElementToJquery(this.dialogEl), () => {
         this.context.triggerEvent('dialog.shown');
-        deferred.resolve();
+        resolve();
       });
-      this.ui.showDialog(this.$dialog);
-    }).promise();
+      this.ui.showDialog(func.htmlElementToJquery(this.dialogEl));
+    });
   }
 
   show() {

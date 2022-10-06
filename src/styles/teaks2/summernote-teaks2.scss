@@ -17,6 +17,8 @@
 .note-editor {
   .note-editing-area {
     .note-editable {
+      box-sizing: border-box;
+
       table {
         width: 100%;
         border-collapse: collapse;

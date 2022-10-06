@@ -1,5 +1,5 @@
 import dom from '../core/dom';
-import key from '../core/key';
+import func from "../core/func";
 
 /**
  * @class Codeview
@@ -7,9 +7,9 @@ import key from '../core/key';
 export default class CodeView {
   constructor(context) {
     this.context = context;
-    this.$editor = context.layoutInfo.editor;
-    this.$editable = context.layoutInfo.editable;
-    this.$codable = context.layoutInfo.codable;
+    this.editorEl = func.jqueryToHtmlElement(context.layoutInfo.editor);
+    this.editableEl = func.jqueryToHtmlElement(context.layoutInfo.editable);
+    this.codableEl = func.jqueryToHtmlElement(context.layoutInfo.codable);
     this.options = context.options;
     this.CodeMirrorConstructor = window.CodeMirror;
 
@@ -25,21 +25,21 @@ export default class CodeView {
     if (isCodeview) {
       if (html) {
         if (CodeMirror) {
-          this.$codable.data('cmEditor').getDoc().setValue(html);
+          func.htmlElementToJquery(this.codableEl).data('cmEditor').getDoc().setValue(html);
         } else {
-          this.$codable.val(html);
+          this.codableEl.value = html;
         }
       } else {
         if (CodeMirror) {
-          this.$codable.data('cmEditor').save();
+          func.htmlElementToJquery(this.codableEl).data('cmEditor').save();
         }
       }
     }
   }
 
   initialize() {
-    this.$codable.on('keyup', (event) => {
-      if (event.keyCode === key.code.ESCAPE) {
+    this.codableEl.addEventListener('keyup', (event) => {
+      if (event.key === 'Escape') {
         this.deactivate();
       }
     });
@@ -49,7 +49,7 @@ export default class CodeView {
    * @return {Boolean}
    */
   isActivated() {
-    return this.$editor.hasClass('codeview');
+    return this.editorEl.classList.contains('codeview');
   }
 
   /**
@@ -99,18 +99,18 @@ export default class CodeView {
    */
   activate() {
     const CodeMirror = this.CodeMirrorConstructor;
-    this.$codable.val(dom.html(this.$editable, this.options.prettifyHtml));
-    this.$codable.height(this.$editable.height());
+    this.codableEl.value = dom.html(this.editableEl, this.options.prettifyHtml);
+    this.codableEl.style.height = this.editableEl.offsetHeight + 'px';
 
     this.context.invoke('toolbar.updateCodeview', true);
     this.context.invoke('airPopover.updateCodeview', true);
 
-    this.$editor.addClass('codeview');
-    this.$codable.focus();
+    this.editorEl.classList.add('codeview');
+    this.codableEl.focus();
 
     // activate CodeMirror as codable
     if (CodeMirror) {
-      const cmEditor = CodeMirror.fromTextArea(this.$codable[0], this.options.codemirror);
+      const cmEditor = CodeMirror.fromTextArea(this.codableEl, this.options.codemirror);
 
       // CodeMirror TernServer
       if (this.options.codemirror.tern) {
@@ -129,14 +129,14 @@ export default class CodeView {
       });
 
       // CodeMirror hasn't Padding.
-      cmEditor.setSize(null, this.$editable.outerHeight());
-      this.$codable.data('cmEditor', cmEditor);
+      cmEditor.setSize(null, this.editableEl.offsetHeight);
+      func.htmlElementToJquery(this.codableEl).data('cmEditor', cmEditor);
     } else {
-      this.$codable.on('blur', (event) => {
-        this.context.triggerEvent('blur.codeview', this.$codable.val(), event);
+      this.codableEl.addEventListener('blur', (event) => {
+        this.context.triggerEvent('blur.codeview', this.codableEl.value, event);
       });
-      this.$codable.on('input', () => {
-        this.context.triggerEvent('change.codeview', this.$codable.val(), this.$codable);
+      this.codableEl.addEventListener('input', () => {
+        this.context.triggerEvent('change.codeview', this.codableEl.value, this.codableEl);
       });
     }
   }
@@ -148,23 +148,23 @@ export default class CodeView {
     const CodeMirror = this.CodeMirrorConstructor;
     // deactivate CodeMirror as codable
     if (CodeMirror) {
-      const cmEditor = this.$codable.data('cmEditor');
-      this.$codable.val(cmEditor.getValue());
+      const cmEditor = func.htmlElementToJquery(this.codableEl).data('cmEditor');
+      this.codableEl.value = cmEditor.getValue();
       cmEditor.toTextArea();
     }
 
-    const value = this.purify(dom.value(this.$codable, this.options.prettifyHtml) || dom.emptyPara);
-    const isChange = this.$editable.html() !== value;
+    const value = this.purify(dom.value(this.codableEl, this.options.prettifyHtml) || dom.emptyPara);
+    const isChange = this.editableEl.innerHTML !== value;
 
-    this.$editable.html(value);
-    this.$editable.height(this.options.height ? this.$codable.height() : 'auto');
-    this.$editor.removeClass('codeview');
+    this.editableEl.innerHTML = value;
+    this.editableEl.style.height = this.options.height ? (this.codableEl.offsetHeight + 'px') : 'auto';
+    this.editorEl.classList.remove('codeview');
 
     if (isChange) {
-      this.context.triggerEvent('change', this.$editable.html(), this.$editable);
+      this.context.triggerEvent('change', this.editableEl.innerHTML, func.htmlElementToJquery(this.editableEl));
     }
 
-    this.$editable.focus();
+    this.editableEl.focus();
 
     this.context.invoke('toolbar.updateCodeview', false);
     this.context.invoke('airPopover.updateCodeview', false);

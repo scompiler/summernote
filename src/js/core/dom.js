@@ -1075,10 +1075,11 @@ function replace(node, nodeName) {
 const isTextarea = makePredByNodeName('TEXTAREA');
 
 /**
- * @param {jQuery} $node
+ * @param {HTMLElement|jQuery} node
  * @param {Boolean} [stripLinebreaks] - default: false
  */
-function value($node, stripLinebreaks) {
+function value(node, stripLinebreaks) {
+  const $node = $(node);
   const val = isTextarea($node[0]) ? $node.val() : $node.html();
   if (stripLinebreaks) {
     return val.replace(/[\n\r]/g, '');
@@ -1091,10 +1092,11 @@ function value($node, stripLinebreaks) {
  *
  * get the HTML contents of node
  *
- * @param {jQuery} $node
+ * @param {HTMLElement|jQuery} node
  * @param {Boolean} [isNewlineOnBlock]
  */
-function html($node, isNewlineOnBlock) {
+function html(node, isNewlineOnBlock) {
+  const $node = $(node);
   let markup = value($node);
 
   if (isNewlineOnBlock) {

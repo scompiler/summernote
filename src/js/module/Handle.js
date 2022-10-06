@@ -1,11 +1,11 @@
-import $ from 'jquery';
 import dom from '../core/dom';
+import func from "../core/func";
 
 export default class Handle {
   constructor(context) {
     this.context = context;
-    this.$document = $(document);
-    this.$editingArea = context.layoutInfo.editingArea;
+    this.documentEl = document;
+    this.editingAreaEl = func.jqueryToHtmlElement(context.layoutInfo.editingArea);
     this.options = context.options;
     this.lang = this.options.langInfo;
 
@@ -28,62 +28,72 @@ export default class Handle {
   }
 
   initialize() {
-    this.$handle = $([
-      '<div class="note-handle">',
-        '<div class="note-control-selection">',
-          '<div class="note-control-selection-bg"></div>',
-          '<div class="note-control-holder note-control-nw"></div>',
-          '<div class="note-control-holder note-control-ne"></div>',
-          '<div class="note-control-holder note-control-sw"></div>',
-          '<div class="',
-            (this.options.disableResizeImage ? 'note-control-holder' : 'note-control-sizing'),
-          ' note-control-se"></div>',
-          (this.options.disableResizeImage ? '' : '<div class="note-control-selection-info"></div>'),
-        '</div>',
-      '</div>',
-    ].join('')).prependTo(this.$editingArea);
+    this.handleEl = (() => {
+      const div = document.createElement('div');
 
-    this.$handle.on('mousedown', (event) => {
+      div.innerHTML = [
+        '<div class="note-handle">',
+          '<div class="note-control-selection">',
+            '<div class="note-control-selection-bg"></div>',
+            '<div class="note-control-holder note-control-nw"></div>',
+            '<div class="note-control-holder note-control-ne"></div>',
+            '<div class="note-control-holder note-control-sw"></div>',
+            '<div class="',
+              (this.options.disableResizeImage ? 'note-control-holder' : 'note-control-sizing'),
+              ' note-control-se"></div>',
+            (this.options.disableResizeImage ? '' : '<div class="note-control-selection-info"></div>'),
+          '</div>',
+        '</div>',
+      ].join('');
+
+      return div.firstElementChild;
+    })();
+    this.editingAreaEl.insertBefore(this.handleEl, this.editingAreaEl.firstChild);
+
+    this.handleEl.addEventListener('mousedown', (event) => {
       if (dom.isControlSizing(event.target)) {
         event.preventDefault();
         event.stopPropagation();
 
-        const $target = this.$handle.find('.note-control-selection').data('target');
-        const posStart = $target.offset();
-        const scrollTop = this.$document.scrollTop();
+        const targetEl = this.handleEl.querySelector('.note-control-selection').__target;
+        const posStart = func.getElementOffset(targetEl);
+        const scrollTop = this.documentEl.scrollingElement.scrollTop;
 
         const onMouseMove = (event) => {
           this.context.invoke('editor.resizeTo', {
             x: event.clientX - posStart.left,
             y: event.clientY - (posStart.top - scrollTop),
-          }, $target, !event.shiftKey);
+          }, func.htmlElementToJquery(targetEl), !event.shiftKey);
 
-          this.update($target[0], event);
+          this.update(targetEl, event);
         };
 
-        this.$document
-          .on('mousemove', onMouseMove)
-          .one('mouseup', (e) => {
-            e.preventDefault();
-            this.$document.off('mousemove', onMouseMove);
-            this.context.invoke('editor.afterCommand');
-          });
+        const onMouseUp = (event) => {
+          event.preventDefault();
 
-        if (!$target.data('ratio')) { // original ratio.
-          $target.data('ratio', $target.height() / $target.width());
+          this.documentEl.removeEventListener('mousemove', onMouseMove);
+          this.documentEl.removeEventListener('mouseup', onMouseUp);
+          this.context.invoke('editor.afterCommand');
+        };
+
+        this.documentEl.addEventListener('mousemove', onMouseMove);
+        this.documentEl.addEventListener('mouseup', onMouseUp);
+
+        if (!targetEl.hasAttribute('data-ratio')) { // original ratio.
+          targetEl.setAttribute('data-ratio', targetEl.offsetHeight / targetEl.offsetWidth);
         }
       }
     });
 
     // Listen for scrolling on the handle overlay.
-    this.$handle.on('wheel', (event) => {
+    this.handleEl.addEventListener('wheel', (event) => {
       event.preventDefault();
       this.update();
     });
   }
 
   destroy() {
-    this.$handle.remove();
+    this.handleEl.remove();
   }
 
   update(target, event) {
@@ -91,31 +101,28 @@ export default class Handle {
       return false;
     }
 
-    const isImage = dom.isImg(target);
-    const $selection = this.$handle.find('.note-control-selection');
+    const imageEl = target;
+    const isImage = dom.isImg(imageEl);
+    const selectionEl = this.handleEl.querySelector('.note-control-selection');
 
-    this.context.invoke('imagePopover.update', target, event);
+    this.context.invoke('imagePopover.update', imageEl, event);
 
     if (isImage) {
-      const $image = $(target);
+      const areaRect = this.editingAreaEl.getBoundingClientRect();
+      const imageRect = imageEl.getBoundingClientRect();
 
-      const areaRect = this.$editingArea[0].getBoundingClientRect();
-      const imageRect = target.getBoundingClientRect();
-
-      $selection.css({
-        display: 'block',
-        left: imageRect.left - areaRect.left,
-        top: imageRect.top - areaRect.top,
-        width: imageRect.width,
-        height: imageRect.height,
-      }).data('target', $image); // save current image element.
+      selectionEl.style.display = 'block';
+      selectionEl.style.left = (imageRect.left - areaRect.left) + 'px';
+      selectionEl.style.top = (imageRect.top - areaRect.top) + 'px';
+      selectionEl.style.width = imageRect.width + 'px';
+      selectionEl.style.height = imageRect.height + 'px';
+      selectionEl.__target = imageEl;
 
       const origImageObj = new Image();
-      origImageObj.src = $image.attr('src');
+      origImageObj.src = imageEl.src;
 
-      const sizingText = imageRect.width + 'x' + imageRect.height + ' (' + this.lang.image.original + ': ' + origImageObj.width + 'x' + origImageObj.height + ')';
-      $selection.find('.note-control-selection-info').text(sizingText);
-      this.context.invoke('editor.saveTarget', target);
+      selectionEl.querySelector('.note-control-selection-info').innerText = imageRect.width + 'x' + imageRect.height + ' (' + this.lang.image.original + ': ' + origImageObj.width + 'x' + origImageObj.height + ')';
+      this.context.invoke('editor.saveTarget', imageEl);
     } else {
       this.hide();
     }
@@ -125,11 +132,9 @@ export default class Handle {
 
   /**
    * hide
-   *
-   * @param {jQuery} $handle
    */
   hide() {
     this.context.invoke('editor.clearTarget');
-    this.$handle.children().hide();
+    this.handleEl.firstElementChild.style.display = 'none';
   }
 }

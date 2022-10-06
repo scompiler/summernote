@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import lists from '../core/lists';
 import dom from '../core/dom';
 import func from "../core/func";
@@ -11,9 +10,8 @@ import func from "../core/func";
 export default class ImagePopover {
   constructor(context) {
     this.context = context;
-    this.ui = $.summernote.ui;
+    this.ui = func.getJquery().summernote.ui;
 
-    this.editable = context.layoutInfo.editable[0];
     this.options = context.options;
 
     this.events = {
@@ -22,7 +20,7 @@ export default class ImagePopover {
       },
       'summernote.blur': (we, event) => {
         if (event.originalEvent && event.originalEvent.relatedTarget) {
-          if (!this.$popover[0].contains(event.originalEvent.relatedTarget)) {
+          if (!this.popoverEl.contains(event.originalEvent.relatedTarget)) {
             this.hide();
           }
         } else {
@@ -37,23 +35,24 @@ export default class ImagePopover {
   }
 
   initialize() {
-    this.$popover = this.ui.popover({
+    this.popoverEl = this.ui.popover({
       className: 'note-image-popover',
-    }).render().appendTo(this.options.container);
-    const $content = this.$popover.find('.popover-content,.note-popover-content');
-    this.context.invoke('buttons.build', func.jqueryToHtmlElement($content), this.options.popover.image);
+    }).render2();
+    func.jqueryToHtmlElement(this.options.container).appendChild(this.popoverEl);
+    const contentEl = this.popoverEl.querySelector('.popover-content, .note-popover-content');
+    this.context.invoke('buttons.build', contentEl, this.options.popover.image);
 
-    this.$popover.on('mousedown', (event) => { event.preventDefault(); });
+    this.popoverEl.addEventListener('mousedown', (event) => { event.preventDefault(); });
   }
 
   destroy() {
-    this.$popover.remove();
+    this.popoverEl.remove();
   }
 
   update(target, event) {
     if (dom.isImg(target)) {
-      const position = $(target).offset();
-      const containerOffset = $(this.options.container).offset();
+      const position = func.getElementOffset(target);
+      const containerOffset = func.getElementOffset(func.jqueryToHtmlElement(this.options.container));
       let pos = {};
       if (this.options.popatmouse) {
         pos.left = event.pageX - 20;
@@ -64,17 +63,15 @@ export default class ImagePopover {
       pos.top -= containerOffset.top;
       pos.left -= containerOffset.left;
 
-      this.$popover.css({
-        display: 'block',
-        left: pos.left,
-        top: pos.top,
-      });
+      this.popoverEl.style.display = 'block';
+      this.popoverEl.style.left = pos.left + 'px';
+      this.popoverEl.style.top = pos.top + 'px';
     } else {
       this.hide();
     }
   }
 
   hide() {
-    this.$popover.hide();
+    this.popoverEl.style.display = 'none';
   }
 }

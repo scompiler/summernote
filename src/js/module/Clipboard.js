@@ -1,26 +1,26 @@
 import lists from '../core/lists';
+import func from "../core/func";
 
 export default class Clipboard {
   constructor(context) {
     this.context = context;
-    this.$editable = context.layoutInfo.editable;
+    this.editableEl = func.jqueryToHtmlElement(context.layoutInfo.editable);
   }
 
   initialize() {
-    this.$editable.on('paste', this.pasteByEvent.bind(this));
+    this.editableEl.addEventListener('paste', this.pasteByEvent.bind(this));
   }
 
   /**
    * paste by clipboard event
    *
-   * @param {Event} event
+   * @param {ClipboardEvent} event
    */
   pasteByEvent(event) {
-
     if (this.context.isDisabled()) {
       return;
     }
-    const clipboardData = event.originalEvent.clipboardData;
+    const clipboardData = event.clipboardData;
 
     if (clipboardData && clipboardData.items && clipboardData.items.length) {
       const item = clipboardData.items.length > 1 ? clipboardData.items[1] : lists.head(clipboardData.items);

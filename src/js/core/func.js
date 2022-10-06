@@ -203,6 +203,26 @@ function getElementRect(element) {
   );
 }
 
+/**
+ * @param {Element} element
+ */
+function getElementOffset(element) {
+  const rect = element.getBoundingClientRect();
+
+  return {
+    top: rect.top + element.ownerDocument.defaultView.pageYOffset,
+    left: rect.left + element.ownerDocument.defaultView.pageXOffset,
+  };
+}
+
+function makeElement(markup) {
+  const div = document.createElement('div');
+
+  div.innerHTML = markup;
+
+  return div.firstElementChild;
+}
+
 export default {
   eq,
   eq2,
@@ -224,4 +244,6 @@ export default {
   htmlElementToJquery,
   getJquery,
   getElementRect,
+  getElementOffset,
+  makeElement,
 };
