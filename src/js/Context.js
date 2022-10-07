@@ -10,6 +10,7 @@ export default class Context {
    */
   constructor($note, options) {
     this.$note = $note;
+    this.noteEl = func.jqueryToHtmlElement($note);
 
     this.memos = {};
     this.modules = {};
