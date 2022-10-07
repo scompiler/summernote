@@ -63,7 +63,7 @@ export default class Handle {
           this.context.invoke('editor.resizeTo', {
             x: event.clientX - posStart.left,
             y: event.clientY - (posStart.top - scrollTop),
-          }, func.htmlElementToJquery(targetEl), !event.shiftKey);
+          }, targetEl, !event.shiftKey);
 
           this.update(targetEl, event);
         };
@@ -121,7 +121,7 @@ export default class Handle {
       const origImageObj = new Image();
       origImageObj.src = imageEl.src;
 
-      selectionEl.querySelector('.note-control-selection-info').innerText = imageRect.width + 'x' + imageRect.height + ' (' + this.lang.image.original + ': ' + origImageObj.width + 'x' + origImageObj.height + ')';
+      selectionEl.querySelector('.note-control-selection-info').textContent = imageRect.width + 'x' + imageRect.height + ' (' + this.lang.image.original + ': ' + origImageObj.width + 'x' + origImageObj.height + ')';
       this.context.invoke('editor.saveTarget', imageEl);
     } else {
       this.hide();

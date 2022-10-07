@@ -12,6 +12,7 @@ import env from 'src/js/core/env';
 import range from 'src/js/core/range';
 import Context from 'src/js/Context';
 import 'src/styles/bs4/summernote-bs4';
+import func from "../../../src/js/core/func";
 
 describe('Editor', () => {
   var expect = chai.expect;
@@ -38,7 +39,7 @@ describe('Editor', () => {
   function expectToHaveBeenCalled(context, customEvent, handler) {
     const $note = context.layoutInfo.note;
     const spy = chai.spy();
-    $note.on(customEvent, spy);
+    $note[0].addEventListener(customEvent, spy);
     handler();
     expect(spy).to.have.been.called();
   }
@@ -65,7 +66,7 @@ describe('Editor', () => {
         'keydown', 'keyup', 'blur', 'mousedown', 'mouseup', 'scroll', 'focusin', 'focusout',
       ].forEach((eventName) => {
         expectToHaveBeenCalled(context, 'summernote.' + eventName, () => {
-          $editable.trigger(eventName);
+          $editable[0].dispatchEvent(new Event(eventName));
         });
       });
 
@@ -198,7 +199,7 @@ describe('Editor', () => {
       document.body.click();
       editor.setLastRange();
 
-      expect(editor.lastRange.sc).await(done).to.equal(editor.editable.lastChild);
+      expect(editor.lastRange.sc).await(done).to.equal(editor.editableEl.lastChild);
     });
 
     it('should set last range without content', (done) => {
@@ -206,7 +207,7 @@ describe('Editor', () => {
       document.body.click();
       editor.setLastRange();
 
-      expect(editor.lastRange.sc).await(done).to.equal(editor.editable);
+      expect(editor.lastRange.sc).await(done).to.equal(editor.editableEl);
     });
   });
 
@@ -391,7 +392,7 @@ describe('Editor', () => {
       editor.setLastRange(range.create(textNode, 0, textNode, 0).select());
 
       setTimeout(() => {
-        editor.formatBlock('h1');
+        editor.formatBlock2('h1');
         expectContentsAwait(context, '<h1>hello</h1>', done);
       }, 10);
     });
@@ -431,7 +432,7 @@ describe('Editor', () => {
       // all p tags is wrapped
       range.create(startNode, 0, endNode, 1).normalize().select();
 
-      editor.formatBlock('h3');
+      editor.formatBlock2('h3');
 
       var nodeName = $editable.children()[0].nodeName;
       expect(nodeName).to.equalsIgnoreCase('h3');
@@ -444,7 +445,7 @@ describe('Editor', () => {
       var $target = $('<h4 class="customH4Class"></h4>');
       $editable.appendTo('body');
       range.createFromNode($editable.find('p')[0]).normalize().select();
-      editor.formatBlock('h4', $target);
+      editor.formatBlock2('h4', func.jqueryToHtmlElement($target));
 
       // start <p>hello</p> => <h4 class="h4">hello</h4>
       expectContentsAwait(context, '<h4 class="customH4Class">hello</h4>', done);
@@ -454,7 +455,7 @@ describe('Editor', () => {
       var $target = $('<a class="dropdown-item" href="#" data-value="h6" role="listitem" aria-label="h6"><h6 class="customH6Class">H6</h6></a>');
       $editable.appendTo('body');
       range.createFromNode($editable.find('p')[0]).normalize().select();
-      editor.formatBlock('h6', $target);
+      editor.formatBlock2('h6', func.jqueryToHtmlElement($target));
 
       // start <p>hello</p> => <h6 class="h6">hello</h6>
       expectContentsAwait(context, '<h6 class="customH6Class">hello</h6>', done);
@@ -464,9 +465,9 @@ describe('Editor', () => {
       const $target1 = $('<p class="old"></p>');
       $editable.appendTo('body');
       range.createFromNode($editable.find('p')[0]).normalize().select();
-      editor.formatBlock('p', $target1);
+      editor.formatBlock2('p', func.jqueryToHtmlElement($target1));
       const $target2 = $('<p class="new"></p>');
-      editor.formatBlock('p', $target2);
+      editor.formatBlock2('p', func.jqueryToHtmlElement($target2));
 
       // start <p class="old">hello</p> => <p class="new">hello</p>
       expectContentsAwait(context, '<p class="new">hello</p>', done);
@@ -476,9 +477,9 @@ describe('Editor', () => {
       const $target1 = $('<p class="customClass" />');
       $editable.appendTo('body');
       range.createFromNode($editable.find('p')[0]).normalize().select();
-      editor.formatBlock('p', $target1);
+      editor.formatBlock2('p', func.jqueryToHtmlElement($target1));
       const $target2 = $('<p />');
-      editor.formatBlock('p', $target2);
+      editor.formatBlock2('p', func.jqueryToHtmlElement($target2));
 
       // start <p class="customClass">hello</p> => <p>hello</p>
       expectContentsAwait(context, '<p class="">hello</p>', done);

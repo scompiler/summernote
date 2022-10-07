@@ -143,6 +143,9 @@ export default class Context {
       callback.apply(this.$note[0], args);
     }
     this.$note.trigger('summernote.' + namespace, args);
+    this.$note[0].dispatchEvent(new CustomEvent('summernote.' + namespace, {
+      detail: args,
+    }));
   }
 
   initializeModule(key) {
@@ -218,8 +221,12 @@ export default class Context {
   createInvokeHandler(namespace, value) {
     return (event) => {
       event.preventDefault();
-      const $target = $(event.target);
-      this.invoke(namespace, value || $target.closest('[data-value]').data('value'), $target);
+      const targetEl = event.target;
+      const dataValueEl = targetEl.closest('[data-value]');
+      const dataValue = dataValueEl && dataValueEl.getAttribute('data-value');
+      const $target = $(targetEl);
+      this.invoke(namespace, value || dataValue, $target);
+      this.invoke2(namespace, value || dataValue, targetEl);
     };
   }
 
@@ -231,6 +238,23 @@ export default class Context {
     const hasSeparator = splits.length > 1;
     const moduleName = hasSeparator && lists.head(splits);
     const methodName = hasSeparator ? lists.last(splits) : lists.head(splits);
+
+    const module = this.modules[moduleName || 'editor'];
+    if (!moduleName && this[methodName]) {
+      return this[methodName].apply(this, args);
+    } else if (module && module[methodName] && module.shouldInitialize()) {
+      return module[methodName].apply(module, args);
+    }
+  }
+
+  invoke2() {
+    const namespace = lists.head(arguments);
+    const args = lists.tail(lists.from(arguments));
+
+    const splits = namespace.split('.');
+    const hasSeparator = splits.length > 1;
+    const moduleName = hasSeparator && lists.head(splits);
+    const methodName = (hasSeparator ? lists.last(splits) : lists.head(splits)) + '2';
 
     const module = this.modules[moduleName || 'editor'];
     if (!moduleName && this[methodName]) {

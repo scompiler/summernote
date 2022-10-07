@@ -77,7 +77,7 @@ export default class LinkPopover {
       const a = this.popoverEl.querySelector('a');
 
       a.setAttribute('href', href);
-      a.innerText = href;
+      a.textContent = href;
 
       const pos = dom.posFromPlaceholder(anchor);
       const containerEl = func.jqueryToHtmlElement(this.options.container);

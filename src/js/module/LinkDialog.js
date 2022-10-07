@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import env from '../core/env';
 import key from '../core/key';
 import func from '../core/func';
@@ -7,9 +6,8 @@ export default class LinkDialog {
   constructor(context) {
     this.context = context;
 
-    this.ui = $.summernote.ui;
-    this.$body = $(document.body);
-    this.$editor = context.layoutInfo.editor;
+    this.ui = func.getJquery().summernote.ui;
+    this.bodyEl = document.body;
     this.options = context.options;
     this.lang = this.options.langInfo;
 
@@ -17,7 +15,7 @@ export default class LinkDialog {
   }
 
   initialize() {
-    const $container = this.options.dialogsInBody ? this.$body : this.options.container;
+    const containerEl = this.options.dialogsInBody ? this.bodyEl : func.jqueryToHtmlElement(this.options.container);
     const body = [
       '<div class="form-group note-form-group">',
         `<label for="note-dialog-link-txt-${this.options.id}" class="note-form-label">${this.lang.link.textToDisplay}</label>`,
@@ -27,51 +25,57 @@ export default class LinkDialog {
         `<label for="note-dialog-link-url-${this.options.id}" class="note-form-label">${this.lang.link.url}</label>`,
         `<input id="note-dialog-link-url-${this.options.id}" class="note-link-url form-control note-form-control note-input" type="text" value="http://"/>`,
       '</div>',
-      !this.options.disableLinkTarget
-        ? $('<div></div>').append(this.ui.checkbox({
-          className: 'sn-checkbox-open-in-new-window',
-          text: this.lang.link.openInNewWindow,
+      (() => {
+        if (!this.options.disableLinkTarget) {
+          const div = document.createElement('div');
+
+          div.appendChild(this.ui.checkbox({
+            className: 'sn-checkbox-open-in-new-window',
+            text: this.lang.link.openInNewWindow,
+            checked: true,
+          }).render2());
+
+          return div.innerHTML;
+        }
+
+        return '';
+      })(),
+      (() => {
+        const div = document.createElement('div');
+
+        div.appendChild(this.ui.checkbox({
+          className: 'sn-checkbox-use-protocol',
+          text: this.lang.link.useProtocol,
           checked: true,
-        }).render()).html()
-        : '',
-      $('<div></div>').append(this.ui.checkbox({
-        className: 'sn-checkbox-use-protocol',
-        text: this.lang.link.useProtocol,
-        checked: true,
-      }).render()).html(),
+        }).render2());
+
+        return div.innerHTML;
+      })(),
     ].join('');
 
     const buttonClass = 'btn btn-primary note-btn note-btn-primary note-link-btn';
     const footer = `<input type="button" href="#" class="${buttonClass}" value="${this.lang.link.insert}" disabled>`;
 
-    this.$dialog = this.ui.dialog({
+    this.dialogEl = this.ui.dialog({
       className: 'link-dialog',
       title: this.lang.link.insert,
       fade: this.options.dialogsFade,
       body: body,
       footer: footer,
-    }).render().appendTo($container);
+    }).render2();
+    containerEl.appendChild(this.dialogEl);
   }
 
   destroy() {
-    this.ui.hideDialog(this.$dialog);
-    this.$dialog.remove();
-  }
-
-  bindEnterKey($input, $btn) {
-    $input.on('keypress', (event) => {
-      if (event.keyCode === key.code.ENTER) {
-        event.preventDefault();
-        $btn.trigger('click');
-      }
-    });
+    this.ui.hideDialog(func.htmlElementToJquery(this.dialogEl));
+    this.dialogEl.remove();
   }
 
   /**
    * toggle update button
    */
-  toggleLinkBtn($linkBtn, $linkText, $linkUrl) {
-    this.ui.toggleBtn($linkBtn, $linkText.val() && $linkUrl.val());
+  toggleLinkBtn(linkBtnEl, linkTextEl, linkUrlEl) {
+    this.ui.toggleBtn(func.htmlElementToJquery(linkBtnEl), linkTextEl.value && linkUrlEl.value);
   }
 
   /**
@@ -81,16 +85,47 @@ export default class LinkDialog {
    * @return {Promise}
    */
   showLinkDialog(linkInfo) {
-    return $.Deferred((deferred) => {
-      const $linkText = this.$dialog.find('.note-link-text');
-      const $linkUrl = this.$dialog.find('.note-link-url');
-      const $linkBtn = this.$dialog.find('.note-link-btn');
-      const $openInNewWindow = this.$dialog
-        .find('.sn-checkbox-open-in-new-window input[type=checkbox]');
-      const $useProtocol = this.$dialog
-        .find('.sn-checkbox-use-protocol input[type=checkbox]');
+    return new Promise((resolve) => {
+      const linkTextEl = this.dialogEl.querySelector('.note-link-text');
+      const linkUrlEl = this.dialogEl.querySelector('.note-link-url');
+      const linkBtnEl = this.dialogEl.querySelector('.note-link-btn');
+      const openInNewWindowEl = this.dialogEl.querySelector('.sn-checkbox-open-in-new-window input[type=checkbox]');
+      const useProtocolEl = this.dialogEl.querySelector('.sn-checkbox-use-protocol input[type=checkbox]');
 
-      this.ui.onDialogShown(this.$dialog, () => {
+      let listeners = [];
+
+      const listen = (node, event, callback, once) => {
+        once = !!once;
+        const originalCallback = callback;
+
+        event.trim().replace(/ +/, ' ').split(' ').forEach((eachEvent) => {
+          const callback = (event) => {
+            if (once) {
+              node.removeEventListener(eachEvent, callback);
+
+              listeners = listeners.filter(x => x !== entry);
+            }
+
+            return originalCallback(event);
+          };
+          const entry = {node, event: eachEvent, callback};
+
+          node.addEventListener(eachEvent, callback);
+
+          listeners.push(entry);
+        });
+      };
+
+      const bindEnterKey = (inputEl, btnEl) => {
+        listen(inputEl, 'keypress', (event) => {
+          if (event.keyCode === key.code.ENTER) {
+            event.preventDefault();
+            btnEl.click();
+          }
+        });
+      };
+
+      this.ui.onDialogShown(func.htmlElementToJquery(this.dialogEl), () => {
         this.context.triggerEvent('dialog.shown');
 
         // If no url was given and given text is valid URL then copy that into URL Field
@@ -98,72 +133,63 @@ export default class LinkDialog {
           linkInfo.url = linkInfo.text;
         }
 
-        $linkText.on('input paste propertychange', () => {
+        listen(linkTextEl, 'input paste propertychange', () => {
           // If linktext was modified by input events,
           // cloning text from linkUrl will be stopped.
-          linkInfo.text = $linkText.val();
-          this.toggleLinkBtn($linkBtn, $linkText, $linkUrl);
-        }).val(linkInfo.text);
+          linkInfo.text = linkTextEl.value;
+          this.toggleLinkBtn(linkBtnEl, linkTextEl, linkUrlEl);
+        });
+        linkTextEl.value = linkInfo.text;
 
-        $linkUrl.on('input paste propertychange', () => {
+        listen(linkUrlEl, 'input paste propertychange', () => {
           // Display same text on `Text to display` as default
           // when linktext has no text
           if (!linkInfo.text) {
-            $linkText.val($linkUrl.val());
+            linkTextEl.value = linkUrlEl.value;
           }
-          this.toggleLinkBtn($linkBtn, $linkText, $linkUrl);
-        }).val(linkInfo.url);
+          this.toggleLinkBtn(linkBtnEl, linkTextEl, linkUrlEl);
+        });
+        linkUrlEl.value = linkInfo.url;
 
         if (!env.isSupportTouch) {
-          $linkUrl.trigger('focus');
+          linkUrlEl.focus();
         }
 
-        this.toggleLinkBtn($linkBtn, $linkText, $linkUrl);
-        this.bindEnterKey($linkUrl, $linkBtn);
-        this.bindEnterKey($linkText, $linkBtn);
+        this.toggleLinkBtn(linkBtnEl, linkTextEl, linkUrlEl);
 
-        const isNewWindowChecked = linkInfo.isNewWindow !== undefined
+        bindEnterKey(linkUrlEl, linkBtnEl);
+        bindEnterKey(linkTextEl, linkBtnEl);
+
+        openInNewWindowEl.checked = linkInfo.isNewWindow !== undefined
           ? linkInfo.isNewWindow : this.context.options.linkTargetBlank;
 
-        $openInNewWindow.prop('checked', isNewWindowChecked);
-
-        const useProtocolChecked = linkInfo.url
+        useProtocolEl.checked = linkInfo.url
           ? false : this.context.options.useProtocol;
 
-        $useProtocol.prop('checked', useProtocolChecked);
-
-        $linkBtn.one('click', (event) => {
+        const onBtnClick = (event) => {
           event.preventDefault();
 
-          deferred.resolve({
+          resolve({
             range: linkInfo.range,
-            url: $linkUrl.val(),
-            text: $linkText.val(),
-            isNewWindow: $openInNewWindow.is(':checked'),
-            checkProtocol: $useProtocol.is(':checked'),
+            url: linkUrlEl.value,
+            text: linkTextEl.value,
+            isNewWindow: openInNewWindowEl.checked,
+            checkProtocol: useProtocolEl.checked,
           });
-          this.ui.hideDialog(this.$dialog);
-        });
+          this.ui.hideDialog(func.htmlElementToJquery(this.dialogEl));
+        };
+        listen(linkBtnEl, 'click', onBtnClick, true);
       });
 
-      this.ui.onDialogHidden(this.$dialog, () => {
-        // detach events
-        $linkText.off();
-        $linkUrl.off();
-        $linkBtn.off();
-
-        if (deferred.state() === 'pending') {
-          deferred.reject();
-        }
+      this.ui.onDialogHidden(func.htmlElementToJquery(this.dialogEl), () => {
+        listeners.forEach(x => x.node.removeEventListener(x.event, x.callback));
+        listeners = [];
       });
 
-      this.ui.showDialog(this.$dialog);
-    }).promise();
+      this.ui.showDialog(func.htmlElementToJquery(this.dialogEl));
+    });
   }
 
-  /**
-   * @param {Object} layoutInfo
-   */
   show() {
     const linkInfo = this.context.invoke('editor.getLinkInfo');
 
@@ -171,7 +197,7 @@ export default class LinkDialog {
     this.showLinkDialog(linkInfo).then((linkInfo) => {
       this.context.invoke('editor.restoreRange');
       this.context.invoke('editor.createLink', linkInfo);
-    }).fail(() => {
+    }).catch(() => {
       this.context.invoke('editor.restoreRange');
     });
   }

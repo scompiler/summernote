@@ -1,19 +1,18 @@
-import $ from 'jquery';
 import func from "../core/func";
 export default class Toolbar {
   constructor(context) {
     this.context = context;
 
-    this.$window = $(window);
-    this.$document = $(document);
+    this.window = window;
+    this.document = document;
 
-    this.ui = $.summernote.ui;
-    this.$note = context.layoutInfo.note;
-    this.$editor = context.layoutInfo.editor;
-    this.$toolbar = context.layoutInfo.toolbar;
-    this.$toolbarContent = context.layoutInfo.toolbarContent;
-    this.$editable = context.layoutInfo.editable;
-    this.$statusbar = context.layoutInfo.statusbar;
+    this.ui = func.getJquery().summernote.ui;
+    this.noteEl = func.jqueryToHtmlElement(context.layoutInfo.note);
+    this.editorEl = func.jqueryToHtmlElement(context.layoutInfo.editor);
+    this.toolbarEl = func.jqueryToHtmlElement(context.layoutInfo.toolbar);
+    this.toolbarContentEl = func.jqueryToHtmlElement(context.layoutInfo.toolbarContent);
+    this.editableEl = func.jqueryToHtmlElement(context.layoutInfo.editable);
+    this.statusbarEl = func.jqueryToHtmlElement(context.layoutInfo.statusbar);
     this.options = context.options;
 
     this.isFollowing = false;
@@ -28,53 +27,56 @@ export default class Toolbar {
     this.options.toolbar = this.options.toolbar || [];
 
     if (!this.options.toolbar.length) {
-      this.$toolbar.hide();
+      this.toolbarEl.style.display = 'none';
     } else {
-      this.context.invoke('buttons.build', func.jqueryToHtmlElement(this.$toolbarContent || this.$toolbar), this.options.toolbar);
+      this.context.invoke('buttons.build', this.toolbarContentEl || this.toolbarEl, this.options.toolbar);
     }
 
     if (this.options.toolbarContainer) {
-      this.$toolbar.appendTo(this.options.toolbarContainer);
+      func.jqueryToHtmlElement(this.options.toolbarContainer).appendChild(this.toolbarEl);
     }
 
     this.changeContainer(false);
 
-    this.$note.on('summernote.keyup summernote.mouseup summernote.change', () => {
-      this.context.invoke('buttons.updateCurrentStyle');
+    ['summernote.keyup', 'summernote.mouseup', 'summernote.change'].forEach((type) => {
+      this.noteEl.addEventListener(type, () => this.context.invoke('buttons.updateCurrentStyle'));
     });
 
     this.context.invoke('buttons.updateCurrentStyle');
     if (this.options.followingToolbar) {
-      this.$window.on('scroll resize', this.followScroll);
+      ['scroll', 'resize'].forEach((type) => this.window.addEventListener(type, this.followScroll));
     }
   }
 
   destroy() {
-    this.$toolbar.children().remove();
+    this.toolbarEl.innerHTML = '';
 
     if (this.options.followingToolbar) {
-      this.$window.off('scroll resize', this.followScroll);
+      ['scroll', 'resize'].forEach((type) => this.window.removeEventListener(type, this.followScroll));
     }
   }
 
   followScroll() {
-    if (this.$editor.hasClass('fullscreen')) {
+    if (this.editorEl.getAttribute('data-fullscreen') === 'true') {
       return false;
     }
 
-    const editorHeight = this.$editor.outerHeight();
-    const editorWidth = this.$editor.width();
-    const toolbarHeight = this.$toolbar.height();
-    const statusbarHeight = this.$statusbar.height();
+
+    const editorStyle = getComputedStyle(this.editorEl);
+    const editorPaddingX = parseFloat(editorStyle.paddingLeft) + parseFloat(editorStyle.paddingRight);
+    const editorHeight = this.editorEl.offsetHeight;
+    const editorWidth = this.editorEl.clientWidth - editorPaddingX;
+    const toolbarHeight = this.toolbarEl.offsetHeight;
+    const statusbarHeight = this.statusbarEl.offsetHeight;
 
     // check if the web app is currently using another static bar
     let otherBarHeight = 0;
     if (this.options.otherStaticBar) {
-      otherBarHeight = $(this.options.otherStaticBar).outerHeight();
+      otherBarHeight = func.jqueryToHtmlElement(this.options.otherStaticBar).offsetHeight;
     }
 
-    const currentOffset = this.$document.scrollTop();
-    const editorOffsetTop = this.$editor.offset().top;
+    const currentOffset = this.document.scrollingElement.scrollTop;
+    const editorOffsetTop = func.getElementOffset(this.editorEl).top;
     const editorOffsetBottom = editorOffsetTop + editorHeight;
     const activateOffset = editorOffsetTop - otherBarHeight;
     const deactivateOffsetBottom = editorOffsetBottom - otherBarHeight - toolbarHeight - statusbarHeight;
@@ -82,36 +84,28 @@ export default class Toolbar {
     if (!this.isFollowing &&
       (currentOffset > activateOffset) && (currentOffset < deactivateOffsetBottom - toolbarHeight)) {
       this.isFollowing = true;
-      this.$editable.css({
-        marginTop: this.$toolbar.outerHeight(),
-      });
-      this.$toolbar.css({
-        position: 'fixed',
-        top: otherBarHeight,
-        width: editorWidth,
-        zIndex: 1000,
-      });
+      this.editableEl.style.marginTop = toolbarHeight + 'px';
+      this.toolbarEl.style.position = 'fixed';
+      this.toolbarEl.style.top = otherBarHeight + 'px';
+      this.toolbarEl.style.width = editorWidth + 'px';
+      this.toolbarEl.style.zIndex = '1000';
     } else if (this.isFollowing &&
       ((currentOffset < activateOffset) || (currentOffset > deactivateOffsetBottom))) {
       this.isFollowing = false;
-      this.$toolbar.css({
-        position: 'relative',
-        top: 0,
-        width: '100%',
-        zIndex: 'auto',
-      });
-      this.$editable.css({
-        marginTop: '',
-      });
+      this.toolbarEl.style.position = 'relative';
+      this.toolbarEl.style.top = '0';
+      this.toolbarEl.style.width = '100%';
+      this.toolbarEl.style.zIndex = 'auto';
+      this.editableEl.style.marginTop = '';
     }
   }
 
   changeContainer(isFullscreen) {
     if (isFullscreen) {
-      this.$toolbar.prependTo(this.$editor);
+      this.editorEl.insertBefore(this.toolbarEl, this.editorEl.firstChild);
     } else {
       if (this.options.toolbarContainer) {
-        this.$toolbar.appendTo(this.options.toolbarContainer);
+        func.jqueryToHtmlElement(this.options.toolbarContainer).appendChild(this.toolbarEl);
       }
     }
     if (this.options.followingToolbar) {
@@ -120,13 +114,15 @@ export default class Toolbar {
   }
 
   updateFullscreen(isFullscreen) {
-    this.ui.toggleBtnActive(this.$toolbar.find('.btn-fullscreen'), isFullscreen);
+    const btnEl = this.toolbarEl.querySelector('.btn-fullscreen');
+    this.ui.toggleBtnActive(func.htmlElementToJquery(btnEl), isFullscreen);
 
     this.changeContainer(isFullscreen);
   }
 
   updateCodeview(isCodeview) {
-    this.ui.toggleBtnActive(this.$toolbar.find('.btn-codeview'), isCodeview);
+    const btnEl = this.toolbarEl.querySelector('.btn-codeview');
+    this.ui.toggleBtnActive(func.htmlElementToJquery(btnEl), isCodeview);
     if (isCodeview) {
       this.deactivate();
     } else {
@@ -135,18 +131,18 @@ export default class Toolbar {
   }
 
   activate(isIncludeCodeview) {
-    let $btn = this.$toolbar.find('button');
+    let btnEls = [].slice.call(this.toolbarEl.querySelectorAll('button'));
     if (!isIncludeCodeview) {
-      $btn = $btn.not('.note-codeview-keep');
+      btnEls = btnEls.filter((btnEl) => !btnEl.classList.contains('note-codeview-keep'));
     }
-    this.ui.toggleBtn($btn, true);
+    btnEls.forEach((btnEl) => this.ui.toggleBtn(func.htmlElementToJquery(btnEl), true));
   }
 
   deactivate(isIncludeCodeview) {
-    let $btn = this.$toolbar.find('button');
+    let btnEls = [].slice.call(this.toolbarEl.querySelectorAll('button'));
     if (!isIncludeCodeview) {
-      $btn = $btn.not('.note-codeview-keep');
+      btnEls = btnEls.filter((btnEl) => !btnEl.classList.contains('note-codeview-keep'));
     }
-    this.ui.toggleBtn($btn, false);
+    btnEls.forEach((btnEl) => this.ui.toggleBtn(func.htmlElementToJquery(btnEl), false));
   }
 }

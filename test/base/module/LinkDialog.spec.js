@@ -45,9 +45,7 @@ describe('LinkDialog', () => {
       context.invoke('editor.setLastRange');
       dialog.show();
 
-      var checked = dialog.$dialog
-        .find('.sn-checkbox-open-in-new-window input[type=checkbox]')
-        .is(':checked');
+      var checked = dialog.dialogEl.querySelector('.sn-checkbox-open-in-new-window input[type=checkbox]').checked;
       expect(checked).to.be.true;
     });
 
@@ -56,9 +54,7 @@ describe('LinkDialog', () => {
       context.invoke('editor.setLastRange');
       dialog.show();
 
-      var checked = dialog.$dialog
-        .find('.sn-checkbox-open-in-new-window input[type=checkbox]')
-        .is(':checked');
+      var checked = dialog.dialogEl.querySelector('.sn-checkbox-open-in-new-window input[type=checkbox]').checked;
       expect(checked).to.be.false;
     });
 
@@ -68,9 +64,7 @@ describe('LinkDialog', () => {
       context.invoke('editor.setLastRange');
       dialog.show();
 
-      var checked = dialog.$dialog
-        .find('.sn-checkbox-use-protocol input[type=checkbox]')
-        .is(':checked');
+      var checked = dialog.dialogEl.querySelector('.sn-checkbox-use-protocol input[type=checkbox]').checked;
       expect(checked).to.be.false;
     });
 
@@ -79,9 +73,7 @@ describe('LinkDialog', () => {
       context.invoke('editor.setLastRange');
       dialog.show();
 
-      var checked = dialog.$dialog
-        .find('.sn-checkbox-use-protocol input[type=checkbox]')
-        .is(':checked');
+      var checked = dialog.dialogEl.querySelector('.sn-checkbox-use-protocol input[type=checkbox]').checked;
       expect(checked).to.be.false;
     });
 
@@ -90,9 +82,7 @@ describe('LinkDialog', () => {
       context.invoke('editor.setLastRange');
       dialog.show();
 
-      var checked = dialog.$dialog
-        .find('.sn-checkbox-use-protocol input[type=checkbox]')
-        .is(':checked');
+      var checked = dialog.dialogEl.querySelector('.sn-checkbox-use-protocol input[type=checkbox]').checked;
       expect(checked).to.be.true;
     });
 
@@ -101,9 +91,7 @@ describe('LinkDialog', () => {
       context.invoke('editor.setLastRange');
       dialog.show();
 
-      var checked = dialog.$dialog
-        .find('.sn-checkbox-use-protocol input[type=checkbox]')
-        .is(':checked');
+      var checked = dialog.dialogEl.querySelector('.sn-checkbox-use-protocol input[type=checkbox]').checked;
       expect(checked).to.be.true;
     });
   });

@@ -92,11 +92,13 @@
 
   position: relative;
   background: #fff;
+  box-sizing: border-box;
 
   .tea-editor__toolbar {
     box-shadow: inset 0 -1px #ccc;
     background: #fafafa;
     padding: 6px 6px 7px;
+    box-sizing: border-box;
   }
 
 

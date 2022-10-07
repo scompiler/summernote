@@ -28,10 +28,11 @@ export default class Style {
   /**
    * returns style object from node
    *
-   * @param {jQuery} $node
+   * @param {HTMLElement|jQuery} node
    * @return {Object}
    */
-  fromNode($node) {
+  fromNode(node) {
+    const $node = $(node);
     const properties = ['font-family', 'font-size', 'text-align', 'list-style-type', 'line-height'];
     const styleInfo = this.jQueryCSS($node, properties) || {};
 

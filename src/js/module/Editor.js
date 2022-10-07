@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import env from '../core/env';
 import key from '../core/key';
 import func from '../core/func';
@@ -21,13 +20,12 @@ export default class Editor {
   constructor(context) {
     this.context = context;
 
-    this.$note = context.layoutInfo.note;
-    this.$editor = context.layoutInfo.editor;
-    this.$editable = context.layoutInfo.editable;
+    this.noteEl = func.jqueryToHtmlElement(context.layoutInfo.note);
+    this.editorEl = func.jqueryToHtmlElement(context.layoutInfo.editor);
+    this.editableEl = func.jqueryToHtmlElement(context.layoutInfo.editable);
     this.options = context.options;
     this.lang = this.options.langInfo;
 
-    this.editable = this.$editable[0];
     this.lastRange = null;
     this.snapshot = null;
 
@@ -50,6 +48,8 @@ export default class Editor {
     this.context.memo('help.formatPara', this.lang.help.formatPara);
     this.context.memo('help.insertHorizontalRule', this.lang.help.insertHorizontalRule);
     this.context.memo('help.fontName', this.lang.help.fontName);
+
+    this.listeners = [];
 
     // native commands(with execCommand), generate function for execCommand
     const commands = [
@@ -86,30 +86,30 @@ export default class Editor {
     for (let idx = 1; idx <= 6; idx++) {
       this['formatH' + idx] = ((idx) => {
         return () => {
-          this.formatBlock('H' + idx);
+          this.formatBlock2('H' + idx);
         };
       })(idx);
       this.context.memo('help.formatH' + idx, this.lang.help['formatH' + idx]);
     }
 
     this.insertParagraph = this.wrapCommand(() => {
-      this.typing.insertParagraph(this.editable);
+      this.typing.insertParagraph(this.editableEl);
     });
 
     this.insertOrderedList = this.wrapCommand(() => {
-      this.bullet.insertOrderedList(this.editable);
+      this.bullet.insertOrderedList(this.editableEl);
     });
 
     this.insertUnorderedList = this.wrapCommand(() => {
-      this.bullet.insertUnorderedList(this.editable);
+      this.bullet.insertUnorderedList(this.editableEl);
     });
 
     this.indent = this.wrapCommand(() => {
-      this.bullet.indent(this.editable);
+      this.bullet.indent(this.editableEl);
     });
 
     this.outdent = this.wrapCommand(() => {
-      this.bullet.outdent(this.editable);
+      this.bullet.outdent(this.editableEl);
     });
 
     /**
@@ -118,7 +118,7 @@ export default class Editor {
      * @param {Node} node
      */
     this.insertNode = this.wrapCommand((node) => {
-      if (this.isLimited($(node).text().length)) {
+      if (this.isLimited(node.textContent.length)) {
         return;
       }
       const rng = this.getLastRange();
@@ -157,12 +157,12 @@ export default class Editor {
      *
      * @param {String} tagName
      */
-    this.formatBlock = this.wrapCommand((tagName, $target) => {
+    this.formatBlock2 = this.wrapCommand((tagName, targetEl) => {
       const onApplyCustomStyle = this.options.callbacks.onApplyCustomStyle;
       if (onApplyCustomStyle) {
-        onApplyCustomStyle.call(this, $target, this.context, this.onFormatBlock);
+        onApplyCustomStyle.call(this, targetEl, this.context, this.onFormatBlock);
       } else {
-        this.onFormatBlock(tagName, $target);
+        this.onFormatBlock(tagName, targetEl);
       }
     });
 
@@ -222,7 +222,7 @@ export default class Editor {
       let anchors = [];
       if (isTextChanged) {
         rng = rng.deleteContents();
-        const anchor = rng.insertNode($('<A>' + linkText + '</A>')[0]);
+        const anchor = rng.insertNode(func.makeElement('<A>' + linkText + '</A>'));
         anchors.push(anchor);
       } else {
         anchors = this.style.styleNodes(rng, {
@@ -232,10 +232,10 @@ export default class Editor {
         });
       }
 
-      $.each(anchors, (idx, anchor) => {
-        $(anchor).attr('href', linkUrl);
+      anchors.forEach((anchor) => {
+        anchor.setAttribute('href', linkUrl);
         if (isNewWindow) {
-          $(anchor).attr('target', '_blank');
+          anchor.setAttribute('target', '_blank');
           if (addNoReferrer) {
             rel.push('noreferrer');
           }
@@ -243,10 +243,10 @@ export default class Editor {
             rel.push('noopener');
           }
           if (rel.length) {
-            $(anchor).attr('rel', rel.join(' '));
+            anchor.setAttribute('rel', rel.join(' '));
           }
         } else {
-          $(anchor).removeAttr('target');
+          anchor.removeAttribute('target');
         }
       });
 
@@ -295,13 +295,21 @@ export default class Editor {
      * remove media object and Figure Elements if media object is img with Figure.
      */
     this.removeMedia = this.wrapCommand(() => {
-      let $target = $(this.restoreTarget()).parent();
-      if ($target.closest('figure').length) {
-        $target.closest('figure').remove();
+      let targetEl = this.restoreTarget();
+
+      targetEl = targetEl && targetEl.parentElement;
+      const figureEl = targetEl && targetEl.closest('figure');
+
+      if (figureEl) {
+        figureEl.remove();
       } else {
-        $target = $(this.restoreTarget()).detach();
+        targetEl = this.restoreTarget();
+
+        if (targetEl) {
+          targetEl.remove();
+        }
       }
-      this.context.triggerEvent('media.delete', $target, this.$editable);
+      this.context.triggerEvent('media.delete', targetEl, this.editableEl);
     });
 
     /**
@@ -310,10 +318,13 @@ export default class Editor {
      * @param {String} value
      */
     this.floatMe = this.wrapCommand((value) => {
-      const $target = $(this.restoreTarget());
-      $target.toggleClass('note-float-left', value === 'left');
-      $target.toggleClass('note-float-right', value === 'right');
-      $target.css('float', (value === 'none' ? '' : value));
+      const targetEl = this.restoreTarget();
+
+      if (targetEl) {
+        targetEl.classList.toggle('note-float-left', value === 'left');
+        targetEl.classList.toggle('note-float-right', value === 'right');
+        targetEl.style.float = value === 'none' ? '' : value;
+      }
     });
 
     /**
@@ -321,38 +332,47 @@ export default class Editor {
      * @param {String} value
      */
     this.resize = this.wrapCommand((value) => {
-      const $target = $(this.restoreTarget());
-      value = parseFloat(value);
-      if (value === 0) {
-        $target.css('width', '');
-      } else {
-        $target.css({
-          width: value * 100 + '%',
-          height: '',
-        });
+      const targetEl = this.restoreTarget();
+
+      if (targetEl) {
+        value = parseFloat(value);
+        if (value === 0) {
+          targetEl.style.width = '';
+        } else {
+          targetEl.style.width = value * 100 + '%';
+          targetEl.style.height = '';
+        }
       }
+    });
+  }
+
+  listen(node, type, callback) {
+    type.trim().replace(/ +/, ' ').split(' ').forEach((eachType) => {
+      node.addEventListener(eachType, callback);
+
+      this.listeners.push({node, event: eachType, callback});
     });
   }
 
   initialize() {
     // bind custom events
-    this.$editable.on('keydown', (event) => {
-      if (event.keyCode === key.code.ENTER) {
-        this.context.triggerEvent('enter', event);
+    this.listen(this.editableEl, 'keydown', (domEvent) => {
+      if (domEvent.keyCode === key.code.ENTER) {
+        this.context.triggerEvent('enter', domEvent);
       }
-      this.context.triggerEvent('keydown', event);
+      this.context.triggerEvent('keydown', domEvent);
 
       // keep a snapshot to limit text on input event
       this.snapshot = this.history.makeSnapshot();
       this.hasKeyShortCut = false;
-      if (!event.isDefaultPrevented()) {
+      if (!domEvent.defaultPrevented) {
         if (this.options.shortcuts) {
-          this.hasKeyShortCut = this.handleKeyMap(event);
+          this.hasKeyShortCut = this.handleKeyMap(domEvent);
         } else {
-          this.preventDefaultEditableShortCuts(event);
+          this.preventDefaultEditableShortCuts(domEvent);
         }
       }
-      if (this.isLimited(1, event)) {
+      if (this.isLimited(1, domEvent)) {
         const lastRange = this.getLastRange();
         if (lastRange.eo - lastRange.so === 0) {
           return false;
@@ -366,72 +386,80 @@ export default class Editor {
           this.history.recordUndo();
         }
       }
-    }).on('keyup', (event) => {
+    });
+    this.listen(this.editableEl, 'keyup', (domEvent) => {
       this.setLastRange();
-      this.context.triggerEvent('keyup', event);
-    }).on('focus', (event) => {
+      this.context.triggerEvent('keyup', domEvent);
+    });
+    this.listen(this.editableEl, 'focus', (domEvent) => {
       this.setLastRange();
-      this.context.triggerEvent('focus', event);
-    }).on('blur', (event) => {
-      this.context.triggerEvent('blur', event);
-    }).on('mousedown', (event) => {
-      this.context.triggerEvent('mousedown', event);
-    }).on('mouseup', (event) => {
+      this.context.triggerEvent('focus', domEvent);
+    });
+    this.listen(this.editableEl, 'blur', (domEvent) => {
+      this.context.triggerEvent('blur', domEvent);
+    });
+    this.listen(this.editableEl, 'mousedown', (domEvent) => {
+      this.context.triggerEvent('mousedown', domEvent);
+    });
+    this.listen(this.editableEl, 'mouseup', (domEvent) => {
       this.setLastRange();
       this.history.recordUndo();
-      this.context.triggerEvent('mouseup', event);
-    }).on('scroll', (event) => {
-      this.context.triggerEvent('scroll', event);
-    }).on('paste', (event) => {
+      this.context.triggerEvent('mouseup', domEvent);
+    });
+    this.listen(this.editableEl, 'scroll', (domEvent) => {
+      this.context.triggerEvent('scroll', domEvent);
+    });
+    this.listen(this.editableEl, 'paste', (domEvent) => {
       this.setLastRange();
-      this.context.triggerEvent('paste', event);
-    }).on('input', () => {
+      this.context.triggerEvent('paste', domEvent);
+    });
+    this.listen(this.editableEl, 'input', () => {
       // To limit composition characters (e.g. Korean)
       if (this.isLimited(0) && this.snapshot) {
         this.history.applySnapshot(this.snapshot);
       }
     });
 
-    this.$editable.attr('spellcheck', this.options.spellCheck);
-
-    this.$editable.attr('autocorrect', this.options.spellCheck);
+    this.editableEl.setAttribute('spellcheck', this.options.spellCheck);
+    this.editableEl.setAttribute('autocorrect', this.options.spellCheck);
 
     if (this.options.disableGrammar) {
-      this.$editable.attr('data-gramm', false);
+      this.editableEl.setAttribute('data-gramm', false);
     }
 
     // init content before set event
-    this.$editable.html(dom.html(this.$note) || dom.emptyPara);
+    this.editableEl.innerHTML = dom.html(this.noteEl) || dom.emptyPara;
 
-    this.$editable.on(env.inputEventName, func.debounce(() => {
-      this.context.triggerEvent('change', this.$editable.html(), this.$editable);
+    this.listen(this.editableEl, env.inputEventName, func.debounce(() => {
+      this.context.triggerEvent('change', this.editableEl.innerHTML, func.htmlElementToJquery(this.editableEl));
     }, 10));
 
-    this.$editable.on('focusin', (event) => {
-      this.context.triggerEvent('focusin', event);
-    }).on('focusout', (event) => {
-      this.context.triggerEvent('focusout', event);
+    this.listen(this.editableEl, 'focusin', (domEvent) => {
+      this.context.triggerEvent('focusin', domEvent);
+    });
+    this.listen(this.editableEl, 'focusout', (domEvent) => {
+      this.context.triggerEvent('focusout', domEvent);
     });
 
     if (this.options.airMode) {
       if (this.options.overrideContextMenu) {
-        this.$editor.on('contextmenu', (event) => {
-          this.context.triggerEvent('contextmenu', event);
-          return false;
+        this.editorEl.addEventListener('contextmenu', (domEvent) => {
+          domEvent.preventDefault();
+          this.context.triggerEvent('contextmenu', domEvent);
         });
       }
     } else {
       if (this.options.width) {
-        this.$editor.outerWidth(this.options.width);
+        this.editorEl.style.width = this.options.width + 'px';
       }
       if (this.options.height) {
-        this.$editable.outerHeight(this.options.height);
+        this.editableEl.style.height = this.options.height + 'px';
       }
       if (this.options.maxHeight) {
-        this.$editable.css('max-height', this.options.maxHeight);
+        this.editableEl.style.maxHeight = this.options.maxHeight + 'px';
       }
       if (this.options.minHeight) {
-        this.$editable.css('min-height', this.options.minHeight);
+        this.editableEl.style.minHeight = this.options.minHeight + 'px';
       }
     }
 
@@ -440,7 +468,8 @@ export default class Editor {
   }
 
   destroy() {
-    this.$editable.off();
+    this.listeners.forEach(x => x.node.removeEventListener(x.event, x.callback));
+    this.listeners = [];
   }
 
   handleKeyMap(event) {
@@ -496,7 +525,7 @@ export default class Editor {
     }
 
     if (this.options.maxTextLength > 0) {
-      if ((this.$editable.text().length + pad) > this.options.maxTextLength) {
+      if ((this.editableEl.textContent.length + pad) > this.options.maxTextLength) {
         return true;
       }
     }
@@ -545,10 +574,12 @@ export default class Editor {
     if (rng) {
       this.lastRange = rng;
     } else {
-      this.lastRange = range.create(this.editable);
+      this.lastRange = range.create(this.editableEl);
 
-      if ($(this.lastRange.sc).closest('.note-editable').length === 0) {
-        this.lastRange = range.createFromBodyElement(this.editable);
+      const el = this.lastRange.sc instanceof Node ? this.lastRange.sc.parentElement : this.lastRange.sc;
+
+      if (!(el instanceof Element && el.closest('.note-editable'))) {
+        this.lastRange = range.createFromBodyElement(this.editableEl);
       }
     }
   }
@@ -594,15 +625,15 @@ export default class Editor {
   }
 
   saveTarget(node) {
-    this.$editable.data('target', node);
+    this.editableEl.__dataTarget = node;
   }
 
   clearTarget() {
-    this.$editable.removeData('target');
+    delete this.editableEl.__dataTarget;
   }
 
   restoreTarget() {
-    return this.$editable.data('target');
+    return this.editableEl.__dataTarget;
   }
 
   /**
@@ -616,51 +647,51 @@ export default class Editor {
     if (rng) {
       rng = rng.normalize();
     }
-    return rng ? this.style.current(rng) : this.style.fromNode(this.$editable);
+    return rng ? this.style.current(rng) : this.style.fromNode(this.editableEl);
   }
 
   /**
    * style from node
    *
-   * @param {jQuery} $node
+   * @param {HTMLElement} nodeEl
    * @return {Object}
    */
-  styleFromNode($node) {
-    return this.style.fromNode($node);
+  styleFromNode(nodeEl) {
+    return this.style.fromNode(func.htmlElementToJquery(nodeEl));
   }
 
   /**
    * undo
    */
   undo() {
-    this.context.triggerEvent('before.command', this.$editable.html());
+    this.context.triggerEvent('before.command', this.editableEl.innerHTML);
     this.history.undo();
-    this.context.triggerEvent('change', this.$editable.html(), this.$editable);
+    this.context.triggerEvent('change', this.editableEl.innerHTML, func.htmlElementToJquery(this.editableEl));
   }
 
   /*
   * commit
   */
   commit() {
-    this.context.triggerEvent('before.command', this.$editable.html());
+    this.context.triggerEvent('before.command', this.editableEl.innerHTML);
     this.history.commit();
-    this.context.triggerEvent('change', this.$editable.html(), this.$editable);
+    this.context.triggerEvent('change', this.editableEl.innerHTML, func.htmlElementToJquery(this.editableEl));
   }
 
   /**
    * redo
    */
   redo() {
-    this.context.triggerEvent('before.command', this.$editable.html());
+    this.context.triggerEvent('before.command', this.editableEl.innerHTML);
     this.history.redo();
-    this.context.triggerEvent('change', this.$editable.html(), this.$editable);
+    this.context.triggerEvent('change', this.editableEl.innerHTML, func.htmlElementToJquery(this.editableEl));
   }
 
   /**
    * before command
    */
   beforeCommand() {
-    this.context.triggerEvent('before.command', this.$editable.html());
+    this.context.triggerEvent('before.command', this.editableEl.innerHTML);
 
     // Set styleWithCSS before run a command
     document.execCommand('styleWithCSS', false, this.options.styleWithCSS);
@@ -677,7 +708,7 @@ export default class Editor {
     this.normalizeContent();
     this.history.recordUndo();
     if (!isPreventTrigger) {
-      this.context.triggerEvent('change', this.$editable.html(), this.$editable);
+      this.context.triggerEvent('change', this.editableEl.innerHTML, func.htmlElementToJquery(this.editableEl));
     }
   }
 
@@ -752,23 +783,28 @@ export default class Editor {
    * @return {Promise}
    */
   insertImage(src, param) {
-    return createImage(src, param).then(($image) => {
+    return createImage(src, param).then((imageEl) => {
       this.beforeCommand();
 
       if (typeof param === 'function') {
-        param($image);
+        param(imageEl);
       } else {
         if (typeof param === 'string') {
-          $image.attr('data-filename', param);
+          imageEl.setAttribute('data-filename', param);
         }
-        $image.css('width', Math.min(this.$editable.width(), $image.width()));
+
+        const editableStyle = getComputedStyle(this.editableEl);
+        const editablePaddingX = parseFloat(editableStyle.paddingLeft) + parseFloat(editableStyle.paddingRight);
+        const editableWidth = this.editableEl.clientWidth - editablePaddingX;
+
+        imageEl.style.width = Math.min(editableWidth, imageEl.width) + 'px';
       }
 
-      $image.show();
-      this.getLastRange().insertNode($image[0]);
-      this.setLastRange(range.createFromNodeAfter($image[0]).select());
+      imageEl.style.display = '';
+      this.getLastRange().insertNode(imageEl);
+      this.setLastRange(range.createFromNodeAfter(imageEl).select());
       this.afterCommand();
-    }).fail((e) => {
+    }).catch((e) => {
       this.context.triggerEvent('image.upload.error', e);
     });
   }
@@ -778,14 +814,14 @@ export default class Editor {
    * @param {File[]} files
    */
   insertImagesAsDataURL(files) {
-    $.each(files, (idx, file) => {
+    [].slice.call(files).forEach((file) => {
       const filename = file.name;
       if (this.options.maximumImageFileSize && this.options.maximumImageFileSize < file.size) {
         this.context.triggerEvent('image.upload.error', this.lang.image.maximumFileSizeError);
       } else {
         readFileAsDataURL(file).then((dataURL) => {
           return this.insertImage(dataURL, filename);
-        }).fail(() => {
+        }).catch(() => {
           this.context.triggerEvent('image.upload.error');
         });
       }
@@ -822,41 +858,51 @@ export default class Editor {
     return rng.toString();
   }
 
-  onFormatBlock(tagName, $target) {
+  onFormatBlock(tagName, targetEl) {
     // [workaround] for MSIE, IE need `<`
     document.execCommand('FormatBlock', false, env.isMSIE ? '<' + tagName + '>' : tagName);
 
     // support custom class
-    if ($target && $target.length) {
-      // find the exact element has given tagName
-      if ($target[0].tagName.toUpperCase() !== tagName.toUpperCase()) {
-        $target = $target.find(tagName);
-      }
-
-      if ($target && $target.length) {
-        const currentRange = this.createRange();
-        const $parent = $([currentRange.sc, currentRange.ec]).closest(tagName);
-        // remove class added for current block
-        $parent.removeClass();
-        const className = $target[0].className || '';
-        if (className) {
-          $parent.addClass(className);
+    if (targetEl && targetEl.tagName.toUpperCase() !== tagName.toUpperCase()) {
+      targetEl = targetEl.querySelector(tagName);
+    }
+    if (targetEl) {
+      const currentRange = this.createRange();
+      const parentEls = [currentRange.sc, currentRange.ec].map((el) => {
+        if (el instanceof Node) {
+          el = el.parentElement;
         }
+
+        return el instanceof Element ? el.closest(tagName) : null;
+      }).filter(el => el);
+      // remove class added for current block
+      parentEls.forEach(x => x.className = '');
+
+      const className = targetEl.className || '';
+      if (className) {
+        parentEls.forEach(x => x.className = className);
       }
     }
   }
 
   formatPara() {
-    this.formatBlock('P');
+    this.formatBlock2('P');
   }
 
   fontStyling(target, value) {
     const rng = this.getLastRange();
+    const outputEl = this.editorEl.querySelector('.note-status-output');
 
     if (rng !== '') {
       const spans = this.style.styleNodes(rng);
-      this.$editor.find('.note-status-output').html('');
-      $(spans).css(target, value);
+      if (outputEl) {
+        outputEl.innerHTML = '';
+      }
+      spans.forEach(span => {
+        if (span instanceof HTMLElement) {
+          span.style.setProperty(target, value);
+        }
+      });
 
       // [workaround] added styled bogus span for style
       //  - also bogus character needed for cursor position
@@ -866,15 +912,23 @@ export default class Editor {
           firstSpan.innerHTML = dom.ZERO_WIDTH_NBSP_CHAR;
           range.createFromNode(firstSpan.firstChild).select();
           this.setLastRange();
-          this.$editable.data(KEY_BOGUS, firstSpan);
+          this.editableEl['__data' + KEY_BOGUS] = firstSpan;
         }
       } else {
         rng.select();
       }
     } else {
-      const noteStatusOutput = $.now();
-      this.$editor.find('.note-status-output').html('<div id="note-status-output-' + noteStatusOutput + '" class="alert alert-info">' + this.lang.output.noSelection + '</div>');
-      setTimeout(function() { $('#note-status-output-' + noteStatusOutput).remove(); }, 5000);
+      const noteStatusOutput = (new Date()).getTime();
+      if (outputEl) {
+        outputEl.innerHTML = '<div id="note-status-output-' + noteStatusOutput + '" class="alert alert-info">' + this.lang.output.noSelection + '</div>';
+      }
+      setTimeout(() => {
+        const el = document.querySelector('#note-status-output-' + noteStatusOutput);
+
+        if (el) {
+          el.remove();
+        }
+        }, 5000);
     }
   }
 
@@ -909,24 +963,24 @@ export default class Editor {
   getLinkInfo() {
     const rng = this.getLastRange().expand(dom.isAnchor);
     // Get the first anchor on range(for edit).
-    const $anchor = $(lists.head(rng.nodes(dom.isAnchor)));
+    const anchorEl = lists.head(rng.nodes(dom.isAnchor));
     const linkInfo = {
       range: rng,
       text: rng.toString(),
-      url: $anchor.length ? $anchor.attr('href') : '',
+      url: anchorEl ? anchorEl.getAttribute('href') : '',
     };
 
     // When anchor exists,
-    if ($anchor.length) {
+    if (anchorEl) {
       // Set isNewWindow by checking its target.
-      linkInfo.isNewWindow = $anchor.attr('target') === '_blank';
+      linkInfo.isNewWindow = anchorEl.getAttribute('target') === '_blank';
     }
 
     return linkInfo;
   }
 
   addRow(position) {
-    const rng = this.getLastRange(this.$editable);
+    const rng = this.getLastRange();
     if (rng.isCollapsed() && rng.isOnCell()) {
       this.beforeCommand();
       this.table.addRow(rng, position);
@@ -935,7 +989,7 @@ export default class Editor {
   }
 
   addCol(position) {
-    const rng = this.getLastRange(this.$editable);
+    const rng = this.getLastRange();
     if (rng.isCollapsed() && rng.isOnCell()) {
       this.beforeCommand();
       this.table.addCol(rng, position);
@@ -944,7 +998,7 @@ export default class Editor {
   }
 
   deleteRow() {
-    const rng = this.getLastRange(this.$editable);
+    const rng = this.getLastRange();
     if (rng.isCollapsed() && rng.isOnCell()) {
       this.beforeCommand();
       this.table.deleteRow(rng);
@@ -953,7 +1007,7 @@ export default class Editor {
   }
 
   deleteCol() {
-    const rng = this.getLastRange(this.$editable);
+    const rng = this.getLastRange();
     if (rng.isCollapsed() && rng.isOnCell()) {
       this.beforeCommand();
       this.table.deleteCol(rng);
@@ -962,7 +1016,7 @@ export default class Editor {
   }
 
   deleteTable() {
-    const rng = this.getLastRange(this.$editable);
+    const rng = this.getLastRange();
     if (rng.isCollapsed() && rng.isOnCell()) {
       this.beforeCommand();
       this.table.deleteTable(rng);
@@ -972,14 +1026,14 @@ export default class Editor {
 
   /**
    * @param {Position} pos
-   * @param {jQuery} $target - target element
+   * @param {HTMLElement} targetEl - target element
    * @param {Boolean} [bKeepRatio] - keep ratio
    */
-  resizeTo(pos, $target, bKeepRatio) {
+  resizeTo(pos, targetEl, bKeepRatio) {
     let imageSize;
     if (bKeepRatio) {
       const newRatio = pos.y / pos.x;
-      const ratio = $target.data('ratio');
+      const ratio = targetEl.getAttribute('data-ratio');
       imageSize = {
         width: ratio > newRatio ? pos.x : pos.y / ratio,
         height: ratio > newRatio ? pos.x * ratio : pos.y,
@@ -991,14 +1045,15 @@ export default class Editor {
       };
     }
 
-    $target.css(imageSize);
+    targetEl.style.width = imageSize.width + 'px';
+    targetEl.style.height = imageSize.height + 'px';
   }
 
   /**
    * returns whether editable area has focus or not.
    */
   hasFocus() {
-    return this.$editable.is(':focus');
+    return document.activeElement === this.editableEl;
   }
 
   /**
@@ -1008,7 +1063,8 @@ export default class Editor {
     // [workaround] Screen will move when page is scolled in IE.
     //  - do focus when not focused
     if (!this.hasFocus()) {
-      this.$editable.focus();
+      this.editableEl.focus();
+      this.editableEl.dispatchEvent(new Event('focus'));
     }
   }
 
@@ -1017,7 +1073,7 @@ export default class Editor {
    * @return {Boolean}
    */
   isEmpty() {
-    return dom.isEmpty(this.$editable[0]) || dom.emptyPara === this.$editable.html();
+    return dom.isEmpty(this.editableEl) || dom.emptyPara === this.editableEl.innerHTML;
   }
 
   /**
@@ -1031,6 +1087,6 @@ export default class Editor {
    * normalize content
    */
   normalizeContent() {
-    this.$editable[0].normalize();
+    this.editableEl.normalize();
   }
 }

@@ -170,6 +170,10 @@ function isValidUrl(url) {
  * @returns {HTMLElement|null}
  */
 function jqueryToHtmlElement(jquery) {
+  if (!jquery) {
+    return null;
+  }
+
   if (jquery.length > 1) {
     throw new Error('Elements is more than 1');
   }

@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import env from '../core/env';
 import lists from '../core/lists';
 import dom from '../core/dom';
@@ -8,7 +7,7 @@ export default class TablePopover {
   constructor(context) {
     this.context = context;
 
-    this.ui = $.summernote.ui;
+    this.ui = func.getJquery().summernote.ui;
     this.options = context.options;
     this.events = {
       'summernote.mousedown': (we, event) => {
@@ -22,7 +21,7 @@ export default class TablePopover {
       },
       'summernote.blur': (we, event) => {
         if (event.originalEvent && event.originalEvent.relatedTarget) {
-          if (!this.$popover[0].contains(event.originalEvent.relatedTarget)) {
+          if (!this.popoverEl.contains(event.originalEvent.relatedTarget)) {
             this.hide();
           }
         } else {
@@ -37,23 +36,24 @@ export default class TablePopover {
   }
 
   initialize() {
-    this.$popover = this.ui.popover({
+    this.popoverEl = this.ui.popover({
       className: 'note-table-popover',
-    }).render().appendTo(this.options.container);
-    const $content = this.$popover.find('.popover-content,.note-popover-content');
+    }).render2();
+    func.jqueryToHtmlElement(this.options.container).appendChild(this.popoverEl);
+    const contentEl = this.popoverEl.querySelector('.popover-content, .note-popover-content');
 
-    this.context.invoke('buttons.build', func.jqueryToHtmlElement($content), this.options.popover.table);
+    this.context.invoke('buttons.build', contentEl, this.options.popover.table);
 
     // [workaround] Disable Firefox's default table editor
     if (env.isFF) {
       document.execCommand('enableInlineTableEditing', false, false);
     }
 
-    this.$popover.on('mousedown', (event) => { event.preventDefault(); });
+    this.popoverEl.addEventListener('mousedown', (event) => { event.preventDefault(); });
   }
 
   destroy() {
-    this.$popover.remove();
+    this.popoverEl.remove();
   }
 
   update(target) {
@@ -65,15 +65,13 @@ export default class TablePopover {
 
     if (isCell) {
       const pos = dom.posFromPlaceholder(target);
-      const containerOffset = $(this.options.container).offset();
+      const containerOffset = func.getElementOffset(func.jqueryToHtmlElement(this.options.container));
       pos.top -= containerOffset.top;
       pos.left -= containerOffset.left;
 
-      this.$popover.css({
-        display: 'block',
-        left: pos.left,
-        top: pos.top,
-      });
+      this.popoverEl.style.display = 'block';
+      this.popoverEl.style.left = pos.left + 'px';
+      this.popoverEl.style.top = pos.top + 'px';
     } else {
       this.hide();
     }
@@ -82,6 +80,6 @@ export default class TablePopover {
   }
 
   hide() {
-    this.$popover.hide();
+    this.popoverEl.style.display = 'none';
   }
 }

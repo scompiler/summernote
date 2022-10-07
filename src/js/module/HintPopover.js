@@ -19,7 +19,7 @@ export default class HintPopover {
 
     this.events = {
       'summernote.keyup': (we, event) => {
-        if (!event.isDefaultPrevented()) {
+        if (!event.defaultPrevented) {
           this.handleKeyup(event);
         }
       },

@@ -55,7 +55,7 @@ export default class Dropzone {
         this.editorEl.classList.add('dragover');
         this.dropzoneEl.style.width = this.editorEl.offsetWidth + 'px';
         this.dropzoneEl.style.height = this.editorEl.offsetHeight + 'px';
-        dropzoneMessageEl.innerText = this.lang.image.dragImageHere;
+        dropzoneMessageEl.textContent = this.lang.image.dragImageHere;
       }
       collection.push(e.target);
     };
@@ -84,11 +84,11 @@ export default class Dropzone {
     // change dropzone's message on hover.
     this.dropzoneEl.addEventListener('dragenter', () => {
       this.dropzoneEl.classList.add('hover');
-      dropzoneMessageEl.innerText = this.lang.image.dropImage;
+      dropzoneMessageEl.textContent = this.lang.image.dropImage;
     });
     this.dropzoneEl.addEventListener('dragleave', () => {
       this.dropzoneEl.classList.remove('hover');
-      dropzoneMessageEl.innerText = this.lang.image.dragImageHere;
+      dropzoneMessageEl.textContent = this.lang.image.dragImageHere;
     });
 
     // attach dropImage

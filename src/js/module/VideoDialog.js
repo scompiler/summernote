@@ -1,20 +1,19 @@
-import $ from 'jquery';
 import env from '../core/env';
 import key from '../core/key';
+import func from "../core/func";
 
 export default class VideoDialog {
   constructor(context) {
     this.context = context;
 
-    this.ui = $.summernote.ui;
-    this.$body = $(document.body);
-    this.$editor = context.layoutInfo.editor;
+    this.ui = func.getJquery().summernote.ui;
+    this.bodyEl = document.body;
     this.options = context.options;
     this.lang = this.options.langInfo;
   }
 
   initialize() {
-    const $container = this.options.dialogsInBody ? this.$body : this.options.container;
+    const containerEl = this.options.dialogsInBody ? this.bodyEl : func.jqueryToHtmlElement(this.options.container);
     const body = [
       '<div class="form-group note-form-group row-fluid">',
         `<label for="note-dialog-video-url-${this.options.id}" class="note-form-label">${this.lang.video.url} <small class="text-muted">${this.lang.video.providers}</small></label>`,
@@ -24,26 +23,18 @@ export default class VideoDialog {
     const buttonClass = 'btn btn-primary note-btn note-btn-primary note-video-btn';
     const footer = `<input type="button" href="#" class="${buttonClass}" value="${this.lang.video.insert}" disabled>`;
 
-    this.$dialog = this.ui.dialog({
+    this.dialogEl = this.ui.dialog({
       title: this.lang.video.insert,
       fade: this.options.dialogsFade,
       body: body,
       footer: footer,
-    }).render().appendTo($container);
+    }).render2();
+    containerEl.appendChild(this.dialogEl);
   }
 
   destroy() {
-    this.ui.hideDialog(this.$dialog);
-    this.$dialog.remove();
-  }
-
-  bindEnterKey($input, $btn) {
-    $input.on('keypress', (event) => {
-      if (event.keyCode === key.code.ENTER) {
-        event.preventDefault();
-        $btn.trigger('click');
-      }
-    });
+    this.ui.hideDialog(func.htmlElementToJquery(this.dialogEl));
+    this.dialogEl.remove();
   }
 
   createVideoNode(url) {
@@ -70,7 +61,7 @@ export default class VideoDialog {
     const youkuRegExp = /\/\/v\.youku\.com\/v_show\/id_(\w+)=*\.html/;
     const youkuMatch = url.match(youkuRegExp);
 
-    const peerTubeRegExp =/\/\/(.*)\/videos\/watch\/([^?]*)(?:\?(?:start=(\w*))?(?:&stop=(\w*))?(?:&loop=([10]))?(?:&autoplay=([10]))?(?:&muted=([10]))?)?/; 
+    const peerTubeRegExp =/\/\/(.*)\/videos\/watch\/([^?]*)(?:\?(?:start=(\w*))?(?:&stop=(\w*))?(?:&loop=([10]))?(?:&autoplay=([10]))?(?:&muted=([10]))?)?/;
     const peerTubeMatch = url.match(peerTubeRegExp);
 
     const qqRegExp = /\/\/v\.qq\.com.*?vid=(.+)/;
@@ -91,99 +82,109 @@ export default class VideoDialog {
     const fbRegExp = /(?:www\.|\/\/)facebook\.com\/([^\/]+)\/videos\/([0-9]+)/;
     const fbMatch = url.match(fbRegExp);
 
-    let $video;
+    let videoEl;
+
     if (ytMatch && ytMatch[1].length === 11) {
       const youtubeId = ytMatch[1];
-      var start = 0;
+      let start = 0;
       if (typeof ytMatch[2] !== 'undefined') {
         const ytMatchForStart = ytMatch[2].match(ytRegExpForStart);
         if (ytMatchForStart) {
-          for (var n = [3600, 60, 1], i = 0, r = n.length; i < r; i++) {
+          for (let n = [3600, 60, 1], i = 0, r = n.length; i < r; i++) {
             start += (typeof ytMatchForStart[i + 1] !== 'undefined' ? n[i] * parseInt(ytMatchForStart[i + 1], 10) : 0);
           }
         }
       }
-      $video = $('<iframe>')
-        .attr('frameborder', 0)
-        .attr('src', '//www.youtube.com/embed/' + youtubeId + (start > 0 ? '?start=' + start : ''))
-        .attr('width', '640').attr('height', '360');
+      videoEl = func.makeElement('<iframe>');
+      videoEl.setAttribute('frameborder', '0');
+      videoEl.setAttribute('src', '//www.youtube.com/embed/' + youtubeId + (start > 0 ? '?start=' + start : ''));
+      videoEl.setAttribute('width', '640');
+      videoEl.setAttribute('height', '360');
     } else if (gdMatch && gdMatch[0].length) {
-      $video = $('<iframe>')
-        .attr('frameborder', 0)
-        .attr('src', 'https://drive.google.com/file/d/' + gdMatch[1] + '/preview')
-        .attr('width', '640').attr('height', '480');
+      videoEl = func.makeElement('<iframe>');
+      videoEl.setAttribute('frameborder', '0');
+      videoEl.setAttribute('src', 'https://drive.google.com/file/d/' + gdMatch[1] + '/preview');
+      videoEl.setAttribute('width', '640');
+      videoEl.setAttribute('height', '360');
     } else if (igMatch && igMatch[0].length) {
-      $video = $('<iframe>')
-        .attr('frameborder', 0)
-        .attr('src', 'https://instagram.com/p/' + igMatch[1] + '/embed/')
-        .attr('width', '612').attr('height', '710')
-        .attr('scrolling', 'no')
-        .attr('allowtransparency', 'true');
+      videoEl = func.makeElement('<iframe>');
+      videoEl.setAttribute('frameborder', '0');
+      videoEl.setAttribute('src', 'https://instagram.com/p/' + igMatch[1] + '/embed/');
+      videoEl.setAttribute('width', '612');
+      videoEl.setAttribute('height', '710');
+      videoEl.setAttribute('scrolling', 'no');
+      videoEl.setAttribute('allowtransparency', 'true');
     } else if (vMatch && vMatch[0].length) {
-      $video = $('<iframe>')
-        .attr('frameborder', 0)
-        .attr('src', vMatch[0] + '/embed/simple')
-        .attr('width', '600').attr('height', '600')
-        .attr('class', 'vine-embed');
+      videoEl = func.makeElement('<iframe>');
+      videoEl.setAttribute('frameborder', '0');
+      videoEl.setAttribute('src', vMatch[0] + '/embed/simple');
+      videoEl.setAttribute('width', '600');
+      videoEl.setAttribute('height', '600');
+      videoEl.setAttribute('class', 'vine-embed');
     } else if (vimMatch && vimMatch[3].length) {
-      $video = $('<iframe webkitallowfullscreen mozallowfullscreen allowfullscreen>')
-        .attr('frameborder', 0)
-        .attr('src', '//player.vimeo.com/video/' + vimMatch[3])
-        .attr('width', '640').attr('height', '360');
+      videoEl = func.makeElement('<iframe webkitallowfullscreen mozallowfullscreen allowfullscreen>');
+      videoEl.setAttribute('frameborder', '0');
+      videoEl.setAttribute('src', '//player.vimeo.com/video/' + vimMatch[3]);
+      videoEl.setAttribute('width', '640');
+      videoEl.setAttribute('height', '360');
     } else if (dmMatch && dmMatch[2].length) {
-      $video = $('<iframe>')
-        .attr('frameborder', 0)
-        .attr('src', '//www.dailymotion.com/embed/video/' + dmMatch[2])
-        .attr('width', '640').attr('height', '360');
+      videoEl = func.makeElement('<iframe>');
+      videoEl.setAttribute('frameborder', '0');
+      videoEl.setAttribute('src', '//www.dailymotion.com/embed/video/' + dmMatch[2]);
+      videoEl.setAttribute('width', '640');
+      videoEl.setAttribute('height', '360');
     } else if (youkuMatch && youkuMatch[1].length) {
-      $video = $('<iframe webkitallowfullscreen mozallowfullscreen allowfullscreen>')
-        .attr('frameborder', 0)
-        .attr('height', '498')
-        .attr('width', '510')
-        .attr('src', '//player.youku.com/embed/' + youkuMatch[1]);
+      videoEl = func.makeElement('<iframe webkitallowfullscreen mozallowfullscreen allowfullscreen>');
+      videoEl.setAttribute('frameborder', '0');
+      videoEl.setAttribute('height', '498');
+      videoEl.setAttribute('width', '510');
+      videoEl.setAttribute('src', '//player.youku.com/embed/' + youkuMatch[1]);
     } else if (peerTubeMatch && peerTubeMatch[0].length){
-      var begin = 0;
+      let begin = 0;
       if (peerTubeMatch[2] !== 'undefined') begin = peerTubeMatch[2];
-      var end =0;
+      let end =0;
       if (peerTubeMatch[3] !== 'undefined') end = peerTubeMatch[3];
-      var loop = 0;
+      let loop = 0;
       if (peerTubeMatch[4] !== 'undefined') loop = peerTubeMatch[4];
-      var autoplay = 0;
+      let autoplay = 0;
       if (peerTubeMatch[5] !== 'undefined') autoplay = peerTubeMatch[5];
-      var muted = 0;
+      let muted = 0;
       if (peerTubeMatch[6] !== 'undefined') muted = peerTubeMatch[6];
-      $video = $('<iframe allowfullscreen sandbox="allow-same-origin allow-scripts allow-popups">')
-        .attr('frameborder', 0)
-        .attr('src', '//'+ peerTubeMatch[1] +'/videos/embed/' + peerTubeMatch[2]+"?loop="+loop
-      +"&autoplay="+autoplay+"&muted="+muted +(begin > 0 ? '&start=' + begin : '')+(end > 0 ? '&end=' + start : ''))
-        .attr('width', '560')
-        .attr('height', '315');
+
+      videoEl = func.makeElement('<iframe allowfullscreen sandbox="allow-same-origin allow-scripts allow-popups">');
+      videoEl.setAttribute('frameborder', '0');
+      videoEl.setAttribute('src', '//'+ peerTubeMatch[1] +'/videos/embed/' + peerTubeMatch[2]+"?loop="+loop+"&autoplay="+autoplay+"&muted="+muted +(begin > 0 ? '&start=' + begin : '')+(end > 0 ? '&end=' + end : ''));
+      videoEl.setAttribute('width', '560');
+      videoEl.setAttribute('height', '315');
     }else if ((qqMatch && qqMatch[1].length) || (qqMatch2 && qqMatch2[2].length)) {
       const vid = ((qqMatch && qqMatch[1].length) ? qqMatch[1] : qqMatch2[2]);
-      $video = $('<iframe webkitallowfullscreen mozallowfullscreen allowfullscreen>')
-        .attr('frameborder', 0)
-        .attr('height', '310')
-        .attr('width', '500')
-        .attr('src', 'https://v.qq.com/txp/iframe/player.html?vid=' + vid + '&amp;auto=0');
+
+      videoEl = func.makeElement('<iframe webkitallowfullscreen mozallowfullscreen allowfullscreen>');
+      videoEl.setAttribute('frameborder', '0');
+      videoEl.setAttribute('height', '310');
+      videoEl.setAttribute('width', '500');
+      videoEl.setAttribute('src', 'https://v.qq.com/txp/iframe/player.html?vid=' + vid + '&amp;auto=0');
     } else if (mp4Match || oggMatch || webmMatch) {
-      $video = $('<video controls>')
-        .attr('src', url)
-        .attr('width', '640').attr('height', '360');
+      videoEl = func.makeElement('<video controls>');
+      videoEl.setAttribute('src', url);
+      videoEl.setAttribute('width', '640');
+      videoEl.setAttribute('height', '360');
     } else if (fbMatch && fbMatch[0].length) {
-      $video = $('<iframe>')
-        .attr('frameborder', 0)
-        .attr('src', 'https://www.facebook.com/plugins/video.php?href=' + encodeURIComponent(fbMatch[0]) + '&show_text=0&width=560')
-        .attr('width', '560').attr('height', '301')
-        .attr('scrolling', 'no')
-        .attr('allowtransparency', 'true');
+      videoEl = func.makeElement('<iframe>');
+      videoEl.setAttribute('frameborder', '0');
+      videoEl.setAttribute('src', 'https://www.facebook.com/plugins/video.php?href=' + encodeURIComponent(fbMatch[0]) + '&show_text=0&width=560');
+      videoEl.setAttribute('width', '560');
+      videoEl.setAttribute('height', '301');
+      videoEl.setAttribute('scrolling', 'no');
+      videoEl.setAttribute('allowtransparency', 'true');
     } else {
       // this is not a known video link. Now what, Cat? Now what?
       return false;
     }
 
-    $video.addClass('note-video-clip');
+    videoEl.classList.add('note-video-clip');
 
-    return $video[0];
+    return videoEl;
   }
 
   show() {
@@ -191,17 +192,17 @@ export default class VideoDialog {
     this.context.invoke('editor.saveRange');
     this.showVideoDialog(text).then((url) => {
       // [workaround] hide dialog before restore range for IE range focus
-      this.ui.hideDialog(this.$dialog);
+      this.ui.hideDialog(func.htmlElementToJquery(this.dialogEl));
       this.context.invoke('editor.restoreRange');
 
       // build node
-      const $node = this.createVideoNode(url);
+      const nodeEl = this.createVideoNode(url);
 
-      if ($node) {
+      if (nodeEl) {
         // insert video node
-        this.context.invoke('editor.insertNode', $node);
+        this.context.invoke('editor.insertNode', nodeEl);
       }
-    }).fail(() => {
+    }).catch(() => {
       this.context.invoke('editor.restoreRange');
     });
   }
@@ -209,43 +210,57 @@ export default class VideoDialog {
   /**
    * show video dialog
    *
-   * @param {jQuery} $dialog
    * @return {Promise}
    */
   showVideoDialog(/* text */) {
-    return $.Deferred((deferred) => {
-      const $videoUrl = this.$dialog.find('.note-video-url');
-      const $videoBtn = this.$dialog.find('.note-video-btn');
+    return new Promise((resolve) => {
+      const videoUrlEl = this.dialogEl.querySelector('.note-video-url');
+      const videoBtnEl = this.dialogEl.querySelector('.note-video-btn');
 
-      this.ui.onDialogShown(this.$dialog, () => {
+      let listeners = [];
+
+      const listen = (node, event, callback) => {
+        event.trim().replace(/ +/, ' ').split(' ').forEach((eachEvent) => {
+          node.addEventListener(eachEvent, callback);
+
+          listeners.push({node, event: eachEvent, callback});
+        });
+      };
+
+      const bindEnterKey = (inputEl, btnEl) => {
+        listen(inputEl, 'keypress', (event) => {
+          if (event.keyCode === key.code.ENTER) {
+            event.preventDefault();
+            btnEl.click();
+          }
+        });
+      };
+
+      this.ui.onDialogShown(func.htmlElementToJquery(this.dialogEl), () => {
         this.context.triggerEvent('dialog.shown');
 
-        $videoUrl.on('input paste propertychange', () => {
-          this.ui.toggleBtn($videoBtn, $videoUrl.val());
+        listen(videoUrlEl, 'input paste propertychange', () => {
+          this.ui.toggleBtn(func.htmlElementToJquery(videoBtnEl), videoUrlEl.value);
         });
 
         if (!env.isSupportTouch) {
-          $videoUrl.trigger('focus');
+          videoUrlEl.focus();
         }
 
-        $videoBtn.click((event) => {
+        listen(videoBtnEl, 'click', (event) => {
           event.preventDefault();
-          deferred.resolve($videoUrl.val());
+          resolve(videoUrlEl.value);
         });
 
-        this.bindEnterKey($videoUrl, $videoBtn);
+        bindEnterKey(videoUrlEl, videoBtnEl);
       });
 
-      this.ui.onDialogHidden(this.$dialog, () => {
-        $videoUrl.off();
-        $videoBtn.off();
-
-        if (deferred.state() === 'pending') {
-          deferred.reject();
-        }
+      this.ui.onDialogHidden(func.htmlElementToJquery(this.dialogEl), () => {
+        listeners.forEach(x => x.node.removeEventListener(x.event, x.callback));
+        listeners = [];
       });
 
-      this.ui.showDialog(this.$dialog);
+      this.ui.showDialog(func.htmlElementToJquery(this.dialogEl));
     });
   }
 }

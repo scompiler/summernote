@@ -901,7 +901,7 @@ export default class Buttons {
       });
       const currentFontNameEl = cont.querySelector('.note-current-fontname');
       if (currentFontNameEl) {
-        currentFontNameEl.innerText = fontName;
+        currentFontNameEl.textContent = fontName;
         // currentFontNameEl.style.fontFamily = fontName;
       }
     }
@@ -915,7 +915,7 @@ export default class Buttons {
       });
       const currentFontSizeEl = cont.querySelector('.note-current-fontsize');
       if (currentFontSizeEl) {
-        currentFontSizeEl.innerText = fontSize;
+        currentFontSizeEl.textContent = fontSize;
       }
 
       const fontSizeUnit = styleInfo['font-size-unit'];
@@ -925,7 +925,7 @@ export default class Buttons {
       });
       const currentFontSizeUnitEl = cont.querySelector('.note-current-fontsizeunit');
       if (currentFontSizeUnitEl) {
-        currentFontSizeUnitEl.innerText = fontSizeUnit;
+        currentFontSizeUnitEl.textContent = fontSizeUnit;
       }
     }
 
@@ -938,7 +938,7 @@ export default class Buttons {
       });
       const currentLineHeightEl = cont.querySelector('.note-current-line-height');
       if (currentLineHeightEl) {
-        currentLineHeightEl.innerText = lineHeight;
+        currentLineHeightEl.textContent = lineHeight;
       }
     }
   }
