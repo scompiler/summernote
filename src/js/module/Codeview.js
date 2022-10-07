@@ -98,9 +98,10 @@ export default class CodeView {
    * activate code view
    */
   activate() {
+    const height = this.editableEl.offsetHeight;
     const CodeMirror = this.CodeMirrorConstructor;
     this.codableEl.value = dom.html(this.editableEl, this.options.prettifyHtml);
-    this.codableEl.style.height = this.editableEl.offsetHeight + 'px';
+    this.codableEl.style.height = height + 'px';
 
     this.context.invoke('toolbar.updateCodeview', true);
     this.context.invoke('airPopover.updateCodeview', true);
@@ -129,7 +130,7 @@ export default class CodeView {
       });
 
       // CodeMirror hasn't Padding.
-      cmEditor.setSize(null, this.editableEl.offsetHeight);
+      cmEditor.setSize(null, height);
       func.htmlElementToJquery(this.codableEl).data('cmEditor', cmEditor);
     } else {
       this.codableEl.addEventListener('blur', (event) => {
