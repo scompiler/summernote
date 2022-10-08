@@ -12,6 +12,7 @@ import env from 'src/js/core/env';
 import key from 'src/js/core/key';
 import 'src/styles/bs4/summernote-bs4';
 import spies from "chai-spies";
+import Summernote from "../../../src/js/class";
 
 chai.use(chaidom);
 chai.use(spies);
@@ -30,7 +31,7 @@ describe('HintPopover', () => {
       $note = $('<div><p>hello world</p></div>');
       $note.appendTo('body');
 
-      var options = $.extend({}, $.summernote.options, {
+      var options = $.extend({}, Summernote.meta.options, {
         hint: {
           mentions: ['jayden', 'sam', 'alvin', 'david'],
           match: /\B#(\w*)$/,
@@ -45,7 +46,7 @@ describe('HintPopover', () => {
         },
       });
 
-      context = new Context($note, options);
+      context = new Context($note[0], options);
       editor = context.modules.editor;
       $editable = context.layoutInfo.editable;
 
@@ -96,12 +97,12 @@ describe('HintPopover', () => {
       $editable[0].dispatchEvent(new Event('keyup'));
 
       var onChange = chai.spy();
-      $note.on('summernote.change', onChange);
+      $note[0].addEventListener('summernote.change', onChange);
 
       setTimeout(() => {
-        var e = $.Event('keydown');
-        e.keyCode = key.code.ENTER;
-        $note.trigger('summernote.keydown', e);
+        $note[0].dispatchEvent(new CustomEvent('summernote.keydown', {
+          detail: [new KeyboardEvent('keydown', {keyCode: key.code.ENTER})],
+        }));
 
         setTimeout(() => {
           expectContents(context, '<p>hello #jayden world</p>');
@@ -118,11 +119,12 @@ describe('HintPopover', () => {
       $editable[0].dispatchEvent(new Event('keyup'));
 
       setTimeout(() => {
-        var e = $.Event('keydown');
-        e.keyCode = key.code.DOWN;
-        $note.trigger('summernote.keydown', e);
-        e.keyCode = key.code.ENTER;
-        $note.trigger('summernote.keydown', e);
+        $note[0].dispatchEvent(new CustomEvent('summernote.keydown', {
+          detail: [new KeyboardEvent('keydown', {keyCode: key.code.DOWN})],
+        }));
+        $note[0].dispatchEvent(new CustomEvent('summernote.keydown', {
+          detail: [new KeyboardEvent('keydown', {keyCode: key.code.ENTER})],
+        }));
 
         setTimeout(() => {
           expectContents(context, '<p>hello #sam world</p>');
@@ -138,7 +140,7 @@ describe('HintPopover', () => {
       $note = $('<div><p>hello world</p></div>');
       $note.appendTo('body');
 
-      var options = $.extend({}, $.summernote.options, {
+      var options = $.extend({}, Summernote.meta.options, {
         hintMode: 'words',
         hintSelect: 'next',
         hint: {
@@ -178,7 +180,7 @@ describe('HintPopover', () => {
         },
       });
 
-      context = new Context($note, options);
+      context = new Context($note[0], options);
       editor = context.modules.editor;
       $editable = context.layoutInfo.editable;
 
@@ -213,9 +215,9 @@ describe('HintPopover', () => {
 
       setTimeout(() => {
         // alvin should be activated
-        var e = $.Event('keydown');
-        e.keyCode = key.code.ENTER;
-        $note.trigger('summernote.keydown', e);
+        $note[0].dispatchEvent(new CustomEvent('summernote.keydown', {
+          detail: [new KeyboardEvent('keydown', {keyCode: key.code.ENTER})],
+        }));
 
         setTimeout(() => {
           expectContents(context, '<p>hello <a href="http://example.org/person/david-summer">@David Summer</a> world</p>');

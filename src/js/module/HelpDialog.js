@@ -1,11 +1,12 @@
 import env from '../core/env';
 import func from "../core/func";
+import Summernote from "../class";
 
 export default class HelpDialog {
   constructor(context) {
     this.context = context;
 
-    this.ui = func.getJquery().summernote.ui;
+    this.ui = Summernote.meta.ui;
     this.bodyEl = document.body;
     this.options = context.options;
     this.lang = this.options.langInfo;
@@ -40,7 +41,7 @@ export default class HelpDialog {
   }
 
   destroy() {
-    this.ui.hideDialog(func.htmlElementToJquery(this.dialogEl));
+    this.ui.hideDialog(this.dialogEl);
     this.dialogEl.remove();
   }
 
@@ -73,11 +74,11 @@ export default class HelpDialog {
    */
   showHelpDialog() {
     return new Promise((resolve) => {
-      this.ui.onDialogShown(func.htmlElementToJquery(this.dialogEl), () => {
+      this.ui.onDialogShown(this.dialogEl, () => {
         this.context.triggerEvent('dialog.shown');
         resolve();
       });
-      this.ui.showDialog(func.htmlElementToJquery(this.dialogEl));
+      this.ui.showDialog(this.dialogEl);
     });
   }
 

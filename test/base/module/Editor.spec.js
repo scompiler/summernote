@@ -13,6 +13,7 @@ import range from 'src/js/core/range';
 import Context from 'src/js/Context';
 import 'src/styles/bs4/summernote-bs4';
 import func from "../../../src/js/core/func";
+import Summernote from "../../../src/js/class";
 
 describe('Editor', () => {
   var expect = chai.expect;
@@ -46,9 +47,9 @@ describe('Editor', () => {
 
   beforeEach(function() {
     $('body').empty(); // important !
-    var options = $.extend({}, $.summernote.options);
+    var options = $.extend({}, Summernote.meta.options);
     options.historyLimit = 5;
-    context = new Context($('<div><p>hello</p></div>'), options);
+    context = new Context($('<div><p>hello</p></div>')[0], options);
 
     editor = context.modules.editor;
     $editable = context.layoutInfo.editable;
@@ -218,9 +219,9 @@ describe('Editor', () => {
     });
 
     it('should be limited', (done) => {
-      var options = $.extend({}, $.summernote.options);
+      var options = $.extend({}, Summernote.meta.options);
       options.maxTextLength = 5;
-      context = new Context($('<div><p>hello</p></div>'), options);
+      context = new Context($('<div><p>hello</p></div>')[0], options);
       editor = context.modules.editor;
 
       editor.insertNode($('<span> world</span>')[0]);
@@ -256,9 +257,9 @@ describe('Editor', () => {
     });
 
     it('should be limited', (done) => {
-      var options = $.extend({}, $.summernote.options);
+      var options = $.extend({}, Summernote.meta.options);
       options.maxTextLength = 5;
-      context = new Context($('<div><p>hello</p></div>'), options);
+      context = new Context($('<div><p>hello</p></div>')[0], options);
       editor = context.modules.editor;
 
       editor.insertText(' world');
@@ -314,16 +315,16 @@ describe('Editor', () => {
       };
       var $note = context.layoutInfo.note;
       var spy = chai.spy();
-      $note.on('summernote.change', spy);
+      $note[0].addEventListener('summernote.change', spy);
       var html = generateLargeHtml();
       editor.pasteHTML(html);
       expect(spy).to.have.been.called.once;
     });
 
     it('should be limited', (done) => {
-      var options = $.extend({}, $.summernote.options);
+      var options = $.extend({}, Summernote.meta.options);
       options.maxTextLength = 5;
-      context = new Context($('<div><p>hello</p></div>'), options);
+      context = new Context($('<div><p>hello</p></div>')[0], options);
       editor = context.modules.editor;
 
       editor.pasteHTML('<span> world</span>');
@@ -369,11 +370,11 @@ describe('Editor', () => {
     });
 
     it('should style with CSS when it is true', (done) => {
-      var options = $.extend({}, $.summernote.options);
+      var options = $.extend({}, Summernote.meta.options);
       options.styleWithCSS = true;
 
       $('body').empty();
-      context = new Context($('<div><p>hello</p></div>').appendTo('body'), options);
+      context = new Context($('<div><p>hello</p></div>').appendTo('body')[0], options);
       editor = context.modules.editor;
       $editable = context.layoutInfo.editable;
       $editable.appendTo('body');
@@ -392,7 +393,7 @@ describe('Editor', () => {
       editor.setLastRange(range.create(textNode, 0, textNode, 0).select());
 
       setTimeout(() => {
-        editor.formatBlock2('h1');
+        editor.formatBlock('h1');
         expectContentsAwait(context, '<h1>hello</h1>', done);
       }, 10);
     });
@@ -432,7 +433,7 @@ describe('Editor', () => {
       // all p tags is wrapped
       range.create(startNode, 0, endNode, 1).normalize().select();
 
-      editor.formatBlock2('h3');
+      editor.formatBlock('h3');
 
       var nodeName = $editable.children()[0].nodeName;
       expect(nodeName).to.equalsIgnoreCase('h3');
@@ -445,7 +446,7 @@ describe('Editor', () => {
       var $target = $('<h4 class="customH4Class"></h4>');
       $editable.appendTo('body');
       range.createFromNode($editable.find('p')[0]).normalize().select();
-      editor.formatBlock2('h4', func.jqueryToHtmlElement($target));
+      editor.formatBlock('h4', func.jqueryToHtmlElement($target));
 
       // start <p>hello</p> => <h4 class="h4">hello</h4>
       expectContentsAwait(context, '<h4 class="customH4Class">hello</h4>', done);
@@ -455,7 +456,7 @@ describe('Editor', () => {
       var $target = $('<a class="dropdown-item" href="#" data-value="h6" role="listitem" aria-label="h6"><h6 class="customH6Class">H6</h6></a>');
       $editable.appendTo('body');
       range.createFromNode($editable.find('p')[0]).normalize().select();
-      editor.formatBlock2('h6', func.jqueryToHtmlElement($target));
+      editor.formatBlock('h6', func.jqueryToHtmlElement($target));
 
       // start <p>hello</p> => <h6 class="h6">hello</h6>
       expectContentsAwait(context, '<h6 class="customH6Class">hello</h6>', done);
@@ -465,9 +466,9 @@ describe('Editor', () => {
       const $target1 = $('<p class="old"></p>');
       $editable.appendTo('body');
       range.createFromNode($editable.find('p')[0]).normalize().select();
-      editor.formatBlock2('p', func.jqueryToHtmlElement($target1));
+      editor.formatBlock('p', func.jqueryToHtmlElement($target1));
       const $target2 = $('<p class="new"></p>');
-      editor.formatBlock2('p', func.jqueryToHtmlElement($target2));
+      editor.formatBlock('p', func.jqueryToHtmlElement($target2));
 
       // start <p class="old">hello</p> => <p class="new">hello</p>
       expectContentsAwait(context, '<p class="new">hello</p>', done);
@@ -477,9 +478,9 @@ describe('Editor', () => {
       const $target1 = $('<p class="customClass" />');
       $editable.appendTo('body');
       range.createFromNode($editable.find('p')[0]).normalize().select();
-      editor.formatBlock2('p', func.jqueryToHtmlElement($target1));
+      editor.formatBlock('p', func.jqueryToHtmlElement($target1));
       const $target2 = $('<p />');
-      editor.formatBlock2('p', func.jqueryToHtmlElement($target2));
+      editor.formatBlock('p', func.jqueryToHtmlElement($target2));
 
       // start <p class="customClass">hello</p> => <p>hello</p>
       expectContentsAwait(context, '<p class="">hello</p>', done);
@@ -593,9 +594,9 @@ describe('Editor', () => {
     });
 
     it('should be limited when creating a link', (done) => {
-      var options = $.extend({}, $.summernote.options);
+      var options = $.extend({}, Summernote.meta.options);
       options.maxTextLength = 5;
-      context = new Context($('<div><p>hello</p></div>'), options);
+      context = new Context($('<div><p>hello</p></div>')[0], options);
       editor = context.modules.editor;
 
       editor.createLink({
@@ -606,9 +607,9 @@ describe('Editor', () => {
     });
 
     it('should be limited when modifying a link', (done) => {
-      var options = $.extend({}, $.summernote.options);
+      var options = $.extend({}, Summernote.meta.options);
       options.maxTextLength = 5;
-      context = new Context($('<p><a href="http://summernote.org">hello</a></p>'), options);
+      context = new Context($('<p><a href="http://summernote.org">hello</a></p>')[0], options);
 
       var editable = context.layoutInfo.editable;
       var anchorNode = editable.find('a')[0];

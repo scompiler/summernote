@@ -9,13 +9,17 @@ export default class AutoLink {
     this.context = context;
     this.options = context.options;
     this.events = {
-      'summernote.keyup': (we, event) => {
-        if (!event.defaultPrevented) {
-          this.handleKeyup(event);
+      'summernote.keyup': (customEvent) => {
+        const domEvent = customEvent.detail[0];
+
+        if (!domEvent.defaultPrevented) {
+          this.handleKeyup(domEvent);
         }
       },
-      'summernote.keydown': (we, event) => {
-        this.handleKeydown(event);
+      'summernote.keydown': (customEvent) => {
+        const domEvent = customEvent.detail[0];
+
+        this.handleKeydown(domEvent);
       },
     };
   }
@@ -56,15 +60,15 @@ export default class AutoLink {
     }
   }
 
-  handleKeydown(event) {
-    if (lists.contains([key.code.ENTER, key.code.SPACE], event.keyCode)) {
+  handleKeydown(domEvent) {
+    if (lists.contains([key.code.ENTER, key.code.SPACE], domEvent.keyCode)) {
       const wordRange = this.context.invoke('editor.createRange').getWordRange();
       this.lastWordRange = wordRange;
     }
   }
 
-  handleKeyup(event) {
-    if (key.code.SPACE === event.keyCode || (key.code.ENTER === event.keyCode && !event.shiftKey)) {
+  handleKeyup(domEvent) {
+    if (key.code.SPACE === domEvent.keyCode || (key.code.ENTER === domEvent.keyCode && !domEvent.shiftKey)) {
       this.replace();
     }
   }

@@ -1,10 +1,7 @@
-import $ from 'jquery';
+import Summernote from "../js/class";
+import merge from 'lodash.merge';
 
-$.summernote = $.summernote || {
-  lang: {},
-};
-
-$.extend(true, $.summernote.lang, {
+Summernote.languages = merge(true, Summernote.languages, {
   'en-US': {
     font: {
       bold: 'Bold',

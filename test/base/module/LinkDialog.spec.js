@@ -9,13 +9,14 @@ import range from 'src/js/core/range';
 import Context from 'src/js/Context';
 import LinkDialog from 'src/js/module/LinkDialog';
 import 'src/styles/bs4/summernote-bs4';
+import Summernote from "../../../src/js/class";
 
 describe('LinkDialog', () => {
   var expect = chai.expect;
   var context, dialog, $editable;
 
   beforeEach(() => {
-    var options = $.extend({}, $.summernote.options);
+    var options = $.extend({}, Summernote.meta.options);
     options.toolbar = [
       ['insert', ['link']],
     ];
@@ -26,7 +27,7 @@ describe('LinkDialog', () => {
         '<p><a href="summernote.org/">summer</a></p>' +
         '<p>summer</p>' +
         '<p>http://summer</p>' +
-        '</div>'),
+        '</div>')[0],
       options
     );
     context.initialize();

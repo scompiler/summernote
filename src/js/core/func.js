@@ -1,5 +1,3 @@
-import $ from 'jquery';
-
 /**
  * @class core.func
  *
@@ -181,18 +179,6 @@ function jqueryToHtmlElement(jquery) {
 }
 
 /**
- * @param {HTMLElement} element
- * @returns {jQuery}
- */
-function htmlElementToJquery(element) {
-  return $(element);
-}
-
-function getJquery() {
-  return $;
-}
-
-/**
  * @param {Element} element
  */
 function getElementRect(element) {
@@ -244,8 +230,6 @@ export default {
   debounce,
   isValidUrl,
   jqueryToHtmlElement,
-  htmlElementToJquery,
-  getJquery,
   getElementRect,
   getElementOffset,
   makeElement,

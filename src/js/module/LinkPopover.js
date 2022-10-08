@@ -1,6 +1,7 @@
 import lists from '../core/lists';
 import dom from '../core/dom';
 import func from "../core/func";
+import Summernote from '../class';
 
 export default class LinkPopover {
   constructor(context) {
@@ -8,7 +9,7 @@ export default class LinkPopover {
 
     /** @type {HTMLElement|null} */
     this.popoverEl = null;
-    this.ui = func.getJquery().summernote.ui;
+    this.ui = Summernote.meta.ui;
     this.options = context.options;
     this.events = {
       'summernote.keyup summernote.mouseup summernote.change summernote.scroll': () => {
@@ -17,9 +18,11 @@ export default class LinkPopover {
       'summernote.disable summernote.dialog.shown': () => {
         this.hide();
       },
-      'summernote.blur': (we, event) => {
-        if (event.originalEvent && event.originalEvent.relatedTarget) {
-          if (!this.popoverEl.contains(event.originalEvent.relatedTarget)) {
+      'summernote.blur': (customEvent) => {
+        const domEvent = customEvent.detail[0];
+
+        if (domEvent && domEvent.relatedTarget) {
+          if (!this.popoverEl.contains(domEvent.relatedTarget)) {
             this.hide();
           }
         } else {
@@ -53,8 +56,8 @@ export default class LinkPopover {
 
     this.context.invoke('buttons.build', contentEl, this.options.popover.link);
 
-    this.popoverEl.addEventListener('mousedown', (event) => {
-      event.preventDefault();
+    this.popoverEl.addEventListener('mousedown', (domEvent) => {
+      domEvent.preventDefault();
     });
   }
 

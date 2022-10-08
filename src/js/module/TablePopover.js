@@ -2,16 +2,19 @@ import env from '../core/env';
 import lists from '../core/lists';
 import dom from '../core/dom';
 import func from "../core/func";
+import Summernote from "../class";
 
 export default class TablePopover {
   constructor(context) {
     this.context = context;
 
-    this.ui = func.getJquery().summernote.ui;
+    this.ui = Summernote.meta.ui;
     this.options = context.options;
     this.events = {
-      'summernote.mousedown': (we, event) => {
-        this.update(event.target);
+      'summernote.mousedown': (customEvent) => {
+        const domEvent = customEvent.detail[0];
+
+        this.update(domEvent.target);
       },
       'summernote.keyup summernote.scroll summernote.change': () => {
         this.update();
@@ -19,9 +22,11 @@ export default class TablePopover {
       'summernote.disable summernote.dialog.shown': () => {
         this.hide();
       },
-      'summernote.blur': (we, event) => {
-        if (event.originalEvent && event.originalEvent.relatedTarget) {
-          if (!this.popoverEl.contains(event.originalEvent.relatedTarget)) {
+      'summernote.blur': (customEvent) => {
+        const domEvent = customEvent.detail[0];
+
+        if (domEvent && domEvent.relatedTarget) {
+          if (!this.popoverEl.contains(domEvent.relatedTarget)) {
             this.hide();
           }
         } else {
@@ -49,7 +54,7 @@ export default class TablePopover {
       document.execCommand('enableInlineTableEditing', false, false);
     }
 
-    this.popoverEl.addEventListener('mousedown', (event) => { event.preventDefault(); });
+    this.popoverEl.addEventListener('mousedown', (domEvent) => { domEvent.preventDefault(); });
   }
 
   destroy() {

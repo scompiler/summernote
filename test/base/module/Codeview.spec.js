@@ -9,6 +9,7 @@ import chaidom from 'test/chaidom';
 import Context from 'src/js/Context';
 import Codeview from 'src/js/module/Codeview';
 import 'src/styles/bs4/summernote-bs4';
+import Summernote from "../../../src/js/class";
 
 chai.use(chaidom);
 
@@ -32,11 +33,11 @@ describe('Codeview', () => {
 
   beforeEach(() => {
     $('body').empty(); // important !
-    options = $.extend({}, $.summernote.options);
+    options = $.extend({}, Summernote.meta.options);
     options.codeviewFilter = true;
 
     var $note = $('<div><p>hello</p></div>').appendTo('body');
-    context = new Context($note, options);
+    context = new Context($note[0], options);
     codeview = new Codeview(context);
   });
 

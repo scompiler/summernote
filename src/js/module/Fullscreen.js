@@ -26,8 +26,8 @@ export default class Fullscreen {
     this.editableEl.style.height = size.h;
     this.codableEl.style.height = size.h;
 
-    if (func.htmlElementToJquery(this.codableEl).data('cmeditor')) {
-      func.htmlElementToJquery(this.codableEl).data('cmeditor').setsize(null, size.h);
+    if (this.codableEl.__cmEditorInstance) {
+      this.codableEl.__cmEditorInstance.setsize(null, size.h);
     }
   }
 

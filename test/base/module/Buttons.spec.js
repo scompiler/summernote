@@ -11,6 +11,7 @@ import env from 'src/js/core/env';
 import range from 'src/js/core/range';
 import Context from 'src/js/Context';
 import 'src/styles/bs4/summernote-bs4';
+import Summernote from "../../../src/js/class";
 
 chai.use(chaidom);
 
@@ -29,7 +30,7 @@ describe('Buttons', () => {
     $('body').empty(); // important !
     var $note = $('<div><p>hello</p></div>').appendTo('body');
 
-    var options = $.extend({}, $.summernote.options);
+    var options = $.extend({}, Summernote.meta.options);
     options.toolbar = [
       ['font1', ['style', 'clear']],
       ['font2', ['bold', 'underline', 'italic', 'superscript', 'subscript', 'strikethrough']],
@@ -40,7 +41,7 @@ describe('Buttons', () => {
       ['insert', ['link', 'picture', 'video']],
       ['view', ['fullscreen', 'codeview', 'help']],
     ];
-    context = new Context($note, options);
+    context = new Context($note[0], options);
     context.initialize();
 
     $toolbar = context.layoutInfo.toolbar;

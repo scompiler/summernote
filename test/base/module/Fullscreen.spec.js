@@ -9,14 +9,15 @@ import $ from 'jquery';
 import Context from 'src/js/Context';
 import Fullscreen from 'src/js/module/Fullscreen';
 import 'src/styles/bs4/summernote-bs4';
+import Summernote from "../../../src/js/class";
 
 describe('Fullscreen', () => {
   var expect = chai.expect;
   var fullscreen, context;
 
   beforeEach(() => {
-    var options = $.extend({}, $.summernote.options);
-    context = new Context($('<div><p>hello</p></div>'), options);
+    var options = $.extend({}, Summernote.meta.options);
+    context = new Context($('<div><p>hello</p></div>')[0], options);
     fullscreen = new Fullscreen(context);
   });
 

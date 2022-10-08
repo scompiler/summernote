@@ -2,6 +2,7 @@ import $ from 'jquery';
 import '/js/settings.js';
 import renderer from '/js/renderer';
 import './summernote-bs4.scss';
+import Summernote from "../../js/class";
 
 const editor = renderer.create('<div class="note-editor note-frame card"></div>');
 const toolbar = renderer.create('<div class="note-toolbar card-header" role="toolbar"></div>');
@@ -200,32 +201,39 @@ const ui = function(editorOptions) {
       })($node, options);
     },
 
-    toggleBtn: function($btn, isEnable) {
+    toggleBtn: function(btnEl, isEnable) {
+      const $btn = $(btnEl);
       $btn.toggleClass('disabled', !isEnable);
       $btn.attr('disabled', !isEnable);
     },
 
-    toggleBtnActive: function($btn, isActive) {
+    toggleBtnActive: function(btnEl, isActive) {
+      const $btn = $(btnEl);
       $btn.toggleClass('active', isActive);
     },
 
-    onDialogShown: function($dialog, handler) {
+    onDialogShown: function(dialogEl, handler) {
+      const $dialog = $(dialogEl);
       $dialog.one('shown.bs.modal', handler);
     },
 
-    onDialogHidden: function($dialog, handler) {
+    onDialogHidden: function(dialogEl, handler) {
+      const $dialog = $(dialogEl);
       $dialog.one('hidden.bs.modal', handler);
     },
 
-    showDialog: function($dialog) {
+    showDialog: function(dialogEl) {
+      const $dialog = $(dialogEl);
       $dialog.modal('show');
     },
 
-    hideDialog: function($dialog) {
+    hideDialog: function(dialogEl) {
+      const $dialog = $(dialogEl);
       $dialog.modal('hide');
     },
 
-    createLayout: function($note) {
+    createLayout: function(noteEl) {
+      const $note = $(noteEl);
       const $editor = $((editorOptions.airMode ? airEditor([
         editingArea([
           codable(),
@@ -263,7 +271,8 @@ const ui = function(editorOptions) {
       };
     },
 
-    removeLayout: function($note, layoutInfo) {
+    removeLayout: function(noteEl, layoutInfo) {
+      const $note = $(noteEl);
       $note.html(layoutInfo.editable.html());
       layoutInfo.editor.remove();
       $note.show();
@@ -271,12 +280,12 @@ const ui = function(editorOptions) {
   };
 };
 
-$.summernote = $.extend($.summernote, {
+Summernote.meta = Object.assign(Summernote.meta, {
   ui_template: ui,
   interface: 'bs4',
 });
 
-$.summernote.options.styleTags = [
+Summernote.meta.options.styleTags = [
   'p',
   { title: 'Blockquote', tag: 'blockquote', className: 'blockquote', value: 'blockquote' },
   'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',

@@ -10,9 +10,11 @@ export default class Handle {
     this.lang = this.options.langInfo;
 
     this.events = {
-      'summernote.mousedown': (we, e) => {
-        if (this.update(e.target, e)) {
-          e.preventDefault();
+      'summernote.mousedown': (customEvent) => {
+        const domEvent = customEvent.detail[0];
+
+        if (this.update(domEvent.target, domEvent)) {
+          domEvent.preventDefault();
         }
       },
       'summernote.keyup summernote.scroll summernote.change summernote.dialog.shown': () => {
@@ -50,26 +52,26 @@ export default class Handle {
     })();
     this.editingAreaEl.insertBefore(this.handleEl, this.editingAreaEl.firstChild);
 
-    this.handleEl.addEventListener('mousedown', (event) => {
-      if (dom.isControlSizing(event.target)) {
-        event.preventDefault();
-        event.stopPropagation();
+    this.handleEl.addEventListener('mousedown', (domEvent) => {
+      if (dom.isControlSizing(domEvent.target)) {
+        domEvent.preventDefault();
+        domEvent.stopPropagation();
 
         const targetEl = this.handleEl.querySelector('.note-control-selection').__target;
         const posStart = func.getElementOffset(targetEl);
         const scrollTop = this.documentEl.scrollingElement.scrollTop;
 
-        const onMouseMove = (event) => {
+        const onMouseMove = (domEventMove) => {
           this.context.invoke('editor.resizeTo', {
-            x: event.clientX - posStart.left,
-            y: event.clientY - (posStart.top - scrollTop),
-          }, targetEl, !event.shiftKey);
+            x: domEventMove.clientX - posStart.left,
+            y: domEventMove.clientY - (posStart.top - scrollTop),
+          }, targetEl, !domEventMove.shiftKey);
 
-          this.update(targetEl, event);
+          this.update(targetEl, domEventMove);
         };
 
-        const onMouseUp = (event) => {
-          event.preventDefault();
+        const onMouseUp = (domEventUp) => {
+          domEventUp.preventDefault();
 
           this.documentEl.removeEventListener('mousemove', onMouseMove);
           this.documentEl.removeEventListener('mouseup', onMouseUp);
@@ -86,8 +88,8 @@ export default class Handle {
     });
 
     // Listen for scrolling on the handle overlay.
-    this.handleEl.addEventListener('wheel', (event) => {
-      event.preventDefault();
+    this.handleEl.addEventListener('wheel', (domEvent) => {
+      domEvent.preventDefault();
       this.update();
     });
   }
@@ -96,7 +98,7 @@ export default class Handle {
     this.handleEl.remove();
   }
 
-  update(target, event) {
+  update(target, domEvent) {
     if (this.context.isDisabled()) {
       return false;
     }
@@ -105,7 +107,7 @@ export default class Handle {
     const isImage = dom.isImg(imageEl);
     const selectionEl = this.handleEl.querySelector('.note-control-selection');
 
-    this.context.invoke('imagePopover.update', imageEl, event);
+    this.context.invoke('imagePopover.update', imageEl, domEvent);
 
     if (isImage) {
       const areaRect = this.editingAreaEl.getBoundingClientRect();

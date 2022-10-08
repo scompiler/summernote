@@ -1,10 +1,11 @@
 import func from '../core/func';
 import lists from '../core/lists';
 import env from '../core/env';
+import Summernote from "../class";
 
 export default class Buttons {
   constructor(context) {
-    this.ui = func.getJquery().summernote.ui;
+    this.ui = Summernote.meta.ui;
     this.context = context;
     this.toolbarEl = func.jqueryToHtmlElement(context.layoutInfo.toolbar);
     this.options = context.options;
@@ -952,21 +953,21 @@ export default class Buttons {
   updateBtnStates(containerEl, infos) {
     for (const selector in infos) {
       const pred = infos[selector];
-      this.ui.toggleBtnActive(func.htmlElementToJquery(containerEl.querySelector(selector)), pred());
+      this.ui.toggleBtnActive(containerEl.querySelector(selector), pred());
     }
   }
 
-  tableMoveHandler(event) {
+  tableMoveHandler(domEvent) {
     const PX_PER_EM = 18;
-    const pickerEl = event.target.parentNode; // target is mousecatcher
+    const pickerEl = domEvent.target.parentNode; // target is mousecatcher
     const dimensionDisplayEl = pickerEl.nextElementSibling;
     const catcherEl = pickerEl.querySelector('.note-dimension-picker-mousecatcher');
     const highlightedEl = pickerEl.querySelector('.note-dimension-picker-highlighted');
     const unhighlightedEl = pickerEl.querySelector('.note-dimension-picker-unhighlighted');
 
     const dim = {
-      c: Math.ceil(event.offsetX / PX_PER_EM) || 1,
-      r: Math.ceil(event.offsetY / PX_PER_EM) || 1,
+      c: Math.ceil(domEvent.offsetX / PX_PER_EM) || 1,
+      r: Math.ceil(domEvent.offsetY / PX_PER_EM) || 1,
     };
 
     highlightedEl.style.width = dim.c + 'em';

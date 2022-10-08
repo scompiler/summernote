@@ -8,6 +8,7 @@ import $ from 'jquery';
 import Context from 'src/js/Context';
 import VideoDialog from 'src/js/module/VideoDialog';
 import 'src/styles/bs4/summernote-bs4';
+import Summernote from "../../../src/js/class";
 
 describe('VideoDialog', () => {
   var expect = chai.expect;
@@ -22,11 +23,11 @@ describe('VideoDialog', () => {
 
   beforeEach(() => {
     var $note = $('<div></div>').appendTo('body');
-    var options = $.extend({}, $.summernote.options);
+    var options = $.extend({}, Summernote.meta.options);
     options.toolbar = [
       ['video', ['video']],
     ];
-    context = new Context($note, options);
+    context = new Context($note[0], options);
     context.initialize();
 
     $video = new VideoDialog(context);

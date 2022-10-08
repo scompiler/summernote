@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import '../lang/summernote-en-US';
 import './summernote';
 import dom from './core/dom';
@@ -26,8 +25,9 @@ import VideoDialog from './module/VideoDialog';
 import HelpDialog from './module/HelpDialog';
 import AirPopover from './module/AirPopover';
 import HintPopover from './module/HintPopover';
+import Summernote from "./class";
 
-$.summernote = $.extend($.summernote, {
+Summernote.meta = Object.assign(Summernote.meta, {
   version: '@@VERSION@@',
   plugins: {},
 
@@ -36,7 +36,7 @@ $.summernote = $.extend($.summernote, {
   lists: lists,
 
   options: {
-    langInfo: $.summernote.lang['en-US'],
+    langInfo: Summernote.languages['en-US'],
     editing: true,
     modules: {
       'editor': Editor,

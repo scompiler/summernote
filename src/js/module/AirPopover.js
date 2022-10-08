@@ -1,5 +1,6 @@
 import lists from '../core/lists';
 import func from '../core/func';
+import Summernote from "../class";
 
 const AIRMODE_POPOVER_X_OFFSET = -5;
 const AIRMODE_POPOVER_Y_OFFSET = 5;
@@ -7,7 +8,7 @@ const AIRMODE_POPOVER_Y_OFFSET = 5;
 export default class AirPopover {
   constructor(context) {
     this.context = context;
-    this.ui = func.getJquery().summernote.ui;
+    this.ui = Summernote.meta.ui;
     this.options = context.options;
     /** @type {HTMLElement | null} */
     this.popoverEl = null;
@@ -18,29 +19,35 @@ export default class AirPopover {
     this.pageY = null;
 
     this.events = {
-      'summernote.contextmenu': (event) => {
+      'summernote.contextmenu': (customEvent) => {
+        const domEvent = customEvent.detail[0];
+
         if (this.options.editing) {
-          event.preventDefault();
-          event.stopPropagation();
+          domEvent.preventDefault();
+          domEvent.stopPropagation();
           this.onContextmenu = true;
           this.update(true);
         }
       },
-      'summernote.mousedown': (we, event) => {
-        this.pageX = event.pageX;
-        this.pageY = event.pageY;
+      'summernote.mousedown': (customEvent) => {
+        const domEvent = customEvent.detail[0];
+
+        this.pageX = domEvent.pageX;
+        this.pageY = domEvent.pageY;
       },
-      'summernote.keyup summernote.mouseup summernote.scroll': (we, event) => {
+      'summernote.keyup summernote.mouseup summernote.scroll': (customEvent) => {
+        const domEvent = customEvent.detail[0];
+
         if (this.options.editing && !this.onContextmenu) {
-          if (event.type == 'keyup') {
+          if (domEvent.type == 'keyup') {
             let range = this.context.invoke('editor.getLastRange');
             let wordRange = range.getWordRange();
             const bnd = func.rect2bnd(lists.last(wordRange.getClientRects()));
             this.pageX = bnd.left;
             this.pageY = bnd.top;
           } else {
-            this.pageX = event.pageX;
-            this.pageY = event.pageY;
+            this.pageX = domEvent.pageX;
+            this.pageY = domEvent.pageY;
           }
           this.update();
         }
@@ -112,7 +119,7 @@ export default class AirPopover {
   }
 
   updateCodeview(isCodeview) {
-    this.ui.toggleBtnActive(func.htmlElementToJquery(this.popoverEl.querySelector('.btn-codeview')), isCodeview);
+    this.ui.toggleBtnActive(this.popoverEl.querySelector('.btn-codeview'), isCodeview);
     if (isCodeview) {
       this.hide();
     }

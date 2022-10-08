@@ -11,6 +11,7 @@ import chaidom from 'test/chaidom';
 import env from 'src/js/core/env';
 import Context from 'src/js/Context';
 import 'src/styles/bs4/summernote-bs4';
+import Summernote from "../../src/js/class";
 
 var expect = chai.expect;
 chai.use(spies);
@@ -20,9 +21,9 @@ describe('Context lifecycle', () => {
   it('should be initialized without calling callback', () => {
     var spy = chai.spy();
     var $note = $('<div><p>hello</p></div>');
-    $note.on('summernote.change', spy);
+    $note[0].addEventListener('summernote.change', spy);
 
-    var context = new Context($note, $.summernote.options);
+    var context = new Context($note[0], Summernote.meta.options);
     expect(spy).to.have.not.been.called();
 
     // [workaround]
@@ -36,9 +37,9 @@ describe('Context lifecycle', () => {
   it('should preserve user events handler after destroy', () => {
     var spy = chai.spy();
     var $note = $('<div><p>hello</p></div>');
-    $note.on('click', spy);
+    $note[0].addEventListener('click', spy);
 
-    var context = new Context($note, $.summernote.options);
+    var context = new Context($note[0], Summernote.meta.options);
     context.destroy();
 
     $note.trigger('click');
@@ -49,7 +50,7 @@ describe('Context lifecycle', () => {
 describe('Context', () => {
   var context;
   beforeEach(() => {
-    context = new Context($('<div><p>hello</p></div>'), $.summernote.options);
+    context = new Context($('<div><p>hello</p></div>')[0], Summernote.meta.options);
   });
 
   it('should get or set contents with code', () => {

@@ -14,31 +14,31 @@ export default class Clipboard {
   /**
    * paste by clipboard event
    *
-   * @param {ClipboardEvent} event
+   * @param {ClipboardEvent} domEvent
    */
-  pasteByEvent(event) {
+  pasteByEvent(domEvent) {
     if (this.context.isDisabled()) {
       return;
     }
-    const clipboardData = event.clipboardData;
+    const clipboardData = domEvent.clipboardData;
 
     if (clipboardData && clipboardData.items && clipboardData.items.length) {
       const item = clipboardData.items.length > 1 ? clipboardData.items[1] : lists.head(clipboardData.items);
       if (item.kind === 'file' && item.type.indexOf('image/') !== -1) {
         // paste img file
         this.context.invoke('editor.insertImagesOrCallback', [item.getAsFile()]);
-        event.preventDefault();
+        domEvent.preventDefault();
       } else if (item.kind === 'string') {
         // paste text with maxTextLength check
         if (this.context.invoke('editor.isLimited', clipboardData.getData('Text').length)) {
-          event.preventDefault();
+          domEvent.preventDefault();
         }
       }
     } else if (window.clipboardData) {
       // for IE
       let text = window.clipboardData.getData('text');
       if (this.context.invoke('editor.isLimited', text.length)) {
-        event.preventDefault();
+        domEvent.preventDefault();
       }
     }
     // Call editor.afterCommand after proceeding default event handler

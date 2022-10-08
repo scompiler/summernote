@@ -26,18 +26,18 @@ export default class Statusbar {
     this.statusbarEl.classList.add('locked');
   }
 
-  onMouseDown = (event) => {
+  onMouseDown = (domEvent) => {
     this.removeDocumentListeners();
 
-    event.preventDefault();
-    event.stopPropagation();
+    domEvent.preventDefault();
+    domEvent.stopPropagation();
 
     const editableTop = func.getElementRect(this.editableEl).top - this.document.scrollingElement.scrollTop;
     const editableCodeTop = func.getElementRect(this.codableEl).top - this.document.scrollingElement.scrollTop;
 
-    this.onMouseMove = (event) => {
-      let height = event.clientY - (editableTop + EDITABLE_PADDING);
-      let heightCode = event.clientY - (editableCodeTop + EDITABLE_PADDING);
+    this.onMouseMove = (domEventMove) => {
+      let height = domEventMove.clientY - (editableTop + EDITABLE_PADDING);
+      let heightCode = domEventMove.clientY - (editableCodeTop + EDITABLE_PADDING);
 
       height = (this.options.minheight > 0) ? Math.max(height, this.options.minheight) : height;
       height = (this.options.maxHeight > 0) ? Math.min(height, this.options.maxHeight) : height;

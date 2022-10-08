@@ -25,21 +25,21 @@ export default class CodeView {
     if (isCodeview) {
       if (html) {
         if (CodeMirror) {
-          func.htmlElementToJquery(this.codableEl).data('cmEditor').getDoc().setValue(html);
+          this.codableEl.__cmEditorInstance.getDoc().setValue(html);
         } else {
           this.codableEl.value = html;
         }
       } else {
         if (CodeMirror) {
-          func.htmlElementToJquery(this.codableEl).data('cmEditor').save();
+          this.codableEl.__cmEditorInstance.save();
         }
       }
     }
   }
 
   initialize() {
-    this.codableEl.addEventListener('keyup', (event) => {
-      if (event.key === 'Escape') {
+    this.codableEl.addEventListener('keyup', (domEvent) => {
+      if (domEvent.key === 'Escape') {
         this.deactivate();
       }
     });
@@ -122,8 +122,8 @@ export default class CodeView {
         });
       }
 
-      cmEditor.on('blur', (event) => {
-        this.context.triggerEvent('blur.codeview', cmEditor.getValue(), event);
+      cmEditor.on('blur', (domEvent) => {
+        this.context.triggerEvent('blur.codeview', cmEditor.getValue(), domEvent);
       });
       cmEditor.on('change', () => {
         this.context.triggerEvent('change.codeview', cmEditor.getValue(), cmEditor);
@@ -131,10 +131,10 @@ export default class CodeView {
 
       // CodeMirror hasn't Padding.
       cmEditor.setSize(null, height);
-      func.htmlElementToJquery(this.codableEl).data('cmEditor', cmEditor);
+      this.codableEl.__cmEditorInstance = cmEditor;
     } else {
-      this.codableEl.addEventListener('blur', (event) => {
-        this.context.triggerEvent('blur.codeview', this.codableEl.value, event);
+      this.codableEl.addEventListener('blur', (domEvent) => {
+        this.context.triggerEvent('blur.codeview', this.codableEl.value, domEvent);
       });
       this.codableEl.addEventListener('input', () => {
         this.context.triggerEvent('change.codeview', this.codableEl.value, this.codableEl);
@@ -149,7 +149,7 @@ export default class CodeView {
     const CodeMirror = this.CodeMirrorConstructor;
     // deactivate CodeMirror as codable
     if (CodeMirror) {
-      const cmEditor = func.htmlElementToJquery(this.codableEl).data('cmEditor');
+      const cmEditor = this.codableEl.__cmEditorInstance;
       this.codableEl.value = cmEditor.getValue();
       cmEditor.toTextArea();
     }
@@ -162,7 +162,7 @@ export default class CodeView {
     this.editorEl.classList.remove('codeview');
 
     if (isChange) {
-      this.context.triggerEvent('change', this.editableEl.innerHTML, func.htmlElementToJquery(this.editableEl));
+      this.context.triggerEvent('change', this.editableEl.innerHTML, this.editableEl);
     }
 
     this.editableEl.focus();

@@ -30,8 +30,8 @@ export default class Dropzone {
   initialize() {
     if (this.options.disableDragAndDrop) {
       // prevent default drop event
-      this.documentEventHandlers.onDrop = (e) => {
-        e.preventDefault();
+      this.documentEventHandlers.onDrop = (domEvent) => {
+        domEvent.preventDefault();
       };
       // do not consider outside of dropzone
       this.eventListenerEl = this.dropzoneEl;
@@ -48,7 +48,7 @@ export default class Dropzone {
     let collection = [];
     const dropzoneMessageEl = this.dropzoneEl.querySelector('.note-dropzone-message');
 
-    this.documentEventHandlers.onDragenter = (e) => {
+    this.documentEventHandlers.onDragenter = (domEvent) => {
       const isCodeview = this.context.invoke('codeview.isActivated');
       const hasEditorSize = this.editorEl.offsetWidth > 0 && this.editorEl.offsetHeight > 0;
       if (!isCodeview && !collection.length && hasEditorSize) {
@@ -57,14 +57,14 @@ export default class Dropzone {
         this.dropzoneEl.style.height = this.editorEl.offsetHeight + 'px';
         dropzoneMessageEl.textContent = this.lang.image.dragImageHere;
       }
-      collection.push(e.target);
+      collection.push(domEvent.target);
     };
 
-    this.documentEventHandlers.onDragleave = (e) => {
-      collection = collection.filter(x => x !== e.target);
+    this.documentEventHandlers.onDragleave = (domEvent) => {
+      collection = collection.filter(x => x !== domEvent.target);
 
       // If nodeName is BODY, then just make it over (fix for IE)
-      if (!collection.length || e.target.nodeName === 'BODY') {
+      if (!collection.length || domEvent.target.nodeName === 'BODY') {
         collection = [];
         this.editorEl.classList.remove('dragover');
       }
@@ -92,11 +92,11 @@ export default class Dropzone {
     });
 
     // attach dropImage
-    this.dropzoneEl.addEventListener('drop', (event) => {
-      const dataTransfer = event.dataTransfer;
+    this.dropzoneEl.addEventListener('drop', (domEvent) => {
+      const dataTransfer = domEvent.dataTransfer;
 
       // stop the browser from opening the dropped content
-      event.preventDefault();
+      domEvent.preventDefault();
 
       if (dataTransfer && dataTransfer.files && dataTransfer.files.length) {
         this.editableEl.focus();
@@ -125,8 +125,8 @@ export default class Dropzone {
         });
       }
     });
-    this.dropzoneEl.addEventListener('dragover', (event) => { // prevent default dragover event
-      event.preventDefault();
+    this.dropzoneEl.addEventListener('dragover', (domEvent) => { // prevent default dragover event
+      domEvent.preventDefault();
     });
   }
 

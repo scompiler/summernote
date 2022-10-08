@@ -1,12 +1,13 @@
 import env from '../core/env';
 import key from '../core/key';
 import func from "../core/func";
+import Summernote from "../class";
 
 export default class VideoDialog {
   constructor(context) {
     this.context = context;
 
-    this.ui = func.getJquery().summernote.ui;
+    this.ui = Summernote.meta.ui;
     this.bodyEl = document.body;
     this.options = context.options;
     this.lang = this.options.langInfo;
@@ -33,7 +34,7 @@ export default class VideoDialog {
   }
 
   destroy() {
-    this.ui.hideDialog(func.htmlElementToJquery(this.dialogEl));
+    this.ui.hideDialog(this.dialogEl);
     this.dialogEl.remove();
   }
 
@@ -192,7 +193,7 @@ export default class VideoDialog {
     this.context.invoke('editor.saveRange');
     this.showVideoDialog(text).then((url) => {
       // [workaround] hide dialog before restore range for IE range focus
-      this.ui.hideDialog(func.htmlElementToJquery(this.dialogEl));
+      this.ui.hideDialog(this.dialogEl);
       this.context.invoke('editor.restoreRange');
 
       // build node
@@ -219,48 +220,48 @@ export default class VideoDialog {
 
       let listeners = [];
 
-      const listen = (node, event, callback) => {
-        event.trim().replace(/ +/, ' ').split(' ').forEach((eachEvent) => {
-          node.addEventListener(eachEvent, callback);
+      const listen = (node, types, callback) => {
+        types.trim().replace(/ +/, ' ').split(' ').forEach((type) => {
+          node.addEventListener(type, callback);
 
-          listeners.push({node, event: eachEvent, callback});
+          listeners.push({node, type, callback});
         });
       };
 
       const bindEnterKey = (inputEl, btnEl) => {
-        listen(inputEl, 'keypress', (event) => {
-          if (event.keyCode === key.code.ENTER) {
-            event.preventDefault();
+        listen(inputEl, 'keypress', (domEvent) => {
+          if (domEvent.keyCode === key.code.ENTER) {
+            domEvent.preventDefault();
             btnEl.click();
           }
         });
       };
 
-      this.ui.onDialogShown(func.htmlElementToJquery(this.dialogEl), () => {
+      this.ui.onDialogShown(this.dialogEl, () => {
         this.context.triggerEvent('dialog.shown');
 
         listen(videoUrlEl, 'input paste propertychange', () => {
-          this.ui.toggleBtn(func.htmlElementToJquery(videoBtnEl), videoUrlEl.value);
+          this.ui.toggleBtn(videoBtnEl, videoUrlEl.value);
         });
 
         if (!env.isSupportTouch) {
           videoUrlEl.focus();
         }
 
-        listen(videoBtnEl, 'click', (event) => {
-          event.preventDefault();
+        listen(videoBtnEl, 'click', (domEvent) => {
+          domEvent.preventDefault();
           resolve(videoUrlEl.value);
         });
 
         bindEnterKey(videoUrlEl, videoBtnEl);
       });
 
-      this.ui.onDialogHidden(func.htmlElementToJquery(this.dialogEl), () => {
-        listeners.forEach(x => x.node.removeEventListener(x.event, x.callback));
+      this.ui.onDialogHidden(this.dialogEl, () => {
+        listeners.forEach(x => x.node.removeEventListener(x.type, x.callback));
         listeners = [];
       });
 
-      this.ui.showDialog(func.htmlElementToJquery(this.dialogEl));
+      this.ui.showDialog(this.dialogEl);
     });
   }
 }

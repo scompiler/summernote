@@ -86,7 +86,7 @@ export default class Editor {
     for (let idx = 1; idx <= 6; idx++) {
       this['formatH' + idx] = ((idx) => {
         return () => {
-          this.formatBlock2('H' + idx);
+          this.formatBlock('H' + idx);
         };
       })(idx);
       this.context.memo('help.formatH' + idx, this.lang.help['formatH' + idx]);
@@ -157,7 +157,7 @@ export default class Editor {
      *
      * @param {String} tagName
      */
-    this.formatBlock2 = this.wrapCommand((tagName, targetEl) => {
+    this.formatBlock = this.wrapCommand((tagName, targetEl) => {
       const onApplyCustomStyle = this.options.callbacks.onApplyCustomStyle;
       if (onApplyCustomStyle) {
         onApplyCustomStyle.call(this, targetEl, this.context, this.onFormatBlock);
@@ -346,11 +346,11 @@ export default class Editor {
     });
   }
 
-  listen(node, type, callback) {
-    type.trim().replace(/ +/, ' ').split(' ').forEach((eachType) => {
-      node.addEventListener(eachType, callback);
+  listen(node, types, callback) {
+    types.trim().replace(/ +/, ' ').split(' ').forEach((type) => {
+      node.addEventListener(type, callback);
 
-      this.listeners.push({node, event: eachType, callback});
+      this.listeners.push({node, type, callback});
     });
   }
 
@@ -431,7 +431,7 @@ export default class Editor {
     this.editableEl.innerHTML = dom.html(this.noteEl) || dom.emptyPara;
 
     this.listen(this.editableEl, env.inputEventName, func.debounce(() => {
-      this.context.triggerEvent('change', this.editableEl.innerHTML, func.htmlElementToJquery(this.editableEl));
+      this.context.triggerEvent('change', this.editableEl.innerHTML, this.editableEl);
     }, 10));
 
     this.listen(this.editableEl, 'focusin', (domEvent) => {
@@ -468,19 +468,19 @@ export default class Editor {
   }
 
   destroy() {
-    this.listeners.forEach(x => x.node.removeEventListener(x.event, x.callback));
+    this.listeners.forEach(x => x.node.removeEventListener(x.type, x.callback));
     this.listeners = [];
   }
 
-  handleKeyMap(event) {
+  handleKeyMap(domEvent) {
     const keyMap = this.options.keyMap[env.isMac ? 'mac' : 'pc'];
     const keys = [];
 
-    if (event.metaKey) { keys.push('CMD'); }
-    if (event.ctrlKey && !event.altKey) { keys.push('CTRL'); }
-    if (event.shiftKey) { keys.push('SHIFT'); }
+    if (domEvent.metaKey) { keys.push('CMD'); }
+    if (domEvent.ctrlKey && !domEvent.altKey) { keys.push('CTRL'); }
+    if (domEvent.shiftKey) { keys.push('SHIFT'); }
 
-    const keyName = key.nameFromCode[event.keyCode];
+    const keyName = key.nameFromCode[domEvent.keyCode];
     if (keyName) {
       keys.push(keyName);
     }
@@ -491,12 +491,12 @@ export default class Editor {
       this.afterCommand();
     } else if (eventName) {
       if (this.context.invoke(eventName) !== false) {
-        event.preventDefault();
+        domEvent.preventDefault();
         // if keyMap action was invoked
         return true;
       }
-    } else if (key.isEdit(event.keyCode)) {
-      if (key.isRemove(event.keyCode)) {
+    } else if (key.isEdit(domEvent.keyCode)) {
+      if (key.isRemove(domEvent.keyCode)) {
         this.context.invoke('removed');
       }
       this.afterCommand();
@@ -504,22 +504,22 @@ export default class Editor {
     return false;
   }
 
-  preventDefaultEditableShortCuts(event) {
+  preventDefaultEditableShortCuts(domEvent) {
     // B(Bold, 66) / I(Italic, 73) / U(Underline, 85)
-    if ((event.ctrlKey || event.metaKey) &&
-      lists.contains([66, 73, 85], event.keyCode)) {
-      event.preventDefault();
+    if ((domEvent.ctrlKey || domEvent.metaKey) &&
+      lists.contains([66, 73, 85], domEvent.keyCode)) {
+      domEvent.preventDefault();
     }
   }
 
-  isLimited(pad, event) {
+  isLimited(pad, domEvent) {
     pad = pad || 0;
 
-    if (typeof event !== 'undefined') {
-      if (key.isMove(event.keyCode) ||
-          key.isNavigation(event.keyCode) ||
-          (event.ctrlKey || event.metaKey) ||
-          lists.contains([key.code.BACKSPACE, key.code.DELETE], event.keyCode)) {
+    if (typeof domEvent !== 'undefined') {
+      if (key.isMove(domEvent.keyCode) ||
+          key.isNavigation(domEvent.keyCode) ||
+          (domEvent.ctrlKey || domEvent.metaKey) ||
+          lists.contains([key.code.BACKSPACE, key.code.DELETE], domEvent.keyCode)) {
         return false;
       }
     }
@@ -657,7 +657,7 @@ export default class Editor {
    * @return {Object}
    */
   styleFromNode(nodeEl) {
-    return this.style.fromNode(func.htmlElementToJquery(nodeEl));
+    return this.style.fromNode(nodeEl);
   }
 
   /**
@@ -666,7 +666,7 @@ export default class Editor {
   undo() {
     this.context.triggerEvent('before.command', this.editableEl.innerHTML);
     this.history.undo();
-    this.context.triggerEvent('change', this.editableEl.innerHTML, func.htmlElementToJquery(this.editableEl));
+    this.context.triggerEvent('change', this.editableEl.innerHTML, this.editableEl);
   }
 
   /*
@@ -675,7 +675,7 @@ export default class Editor {
   commit() {
     this.context.triggerEvent('before.command', this.editableEl.innerHTML);
     this.history.commit();
-    this.context.triggerEvent('change', this.editableEl.innerHTML, func.htmlElementToJquery(this.editableEl));
+    this.context.triggerEvent('change', this.editableEl.innerHTML, this.editableEl);
   }
 
   /**
@@ -684,7 +684,7 @@ export default class Editor {
   redo() {
     this.context.triggerEvent('before.command', this.editableEl.innerHTML);
     this.history.redo();
-    this.context.triggerEvent('change', this.editableEl.innerHTML, func.htmlElementToJquery(this.editableEl));
+    this.context.triggerEvent('change', this.editableEl.innerHTML, this.editableEl);
   }
 
   /**
@@ -708,7 +708,7 @@ export default class Editor {
     this.normalizeContent();
     this.history.recordUndo();
     if (!isPreventTrigger) {
-      this.context.triggerEvent('change', this.editableEl.innerHTML, func.htmlElementToJquery(this.editableEl));
+      this.context.triggerEvent('change', this.editableEl.innerHTML, this.editableEl);
     }
   }
 
@@ -886,7 +886,7 @@ export default class Editor {
   }
 
   formatPara() {
-    this.formatBlock2('P');
+    this.formatBlock('P');
   }
 
   fontStyling(target, value) {

@@ -1,4 +1,6 @@
 import func from "../core/func";
+import Summernote from "../class";
+
 export default class Toolbar {
   constructor(context) {
     this.context = context;
@@ -6,7 +8,7 @@ export default class Toolbar {
     this.window = window;
     this.document = document;
 
-    this.ui = func.getJquery().summernote.ui;
+    this.ui = Summernote.meta.ui;
     this.noteEl = func.jqueryToHtmlElement(context.layoutInfo.note);
     this.editorEl = func.jqueryToHtmlElement(context.layoutInfo.editor);
     this.toolbarEl = func.jqueryToHtmlElement(context.layoutInfo.toolbar);
@@ -115,14 +117,14 @@ export default class Toolbar {
 
   updateFullscreen(isFullscreen) {
     const btnEl = this.toolbarEl.querySelector('.btn-fullscreen');
-    this.ui.toggleBtnActive(func.htmlElementToJquery(btnEl), isFullscreen);
+    this.ui.toggleBtnActive(btnEl, isFullscreen);
 
     this.changeContainer(isFullscreen);
   }
 
   updateCodeview(isCodeview) {
     const btnEl = this.toolbarEl.querySelector('.btn-codeview');
-    this.ui.toggleBtnActive(func.htmlElementToJquery(btnEl), isCodeview);
+    this.ui.toggleBtnActive(btnEl, isCodeview);
     if (isCodeview) {
       this.deactivate();
     } else {
@@ -135,7 +137,7 @@ export default class Toolbar {
     if (!isIncludeCodeview) {
       btnEls = btnEls.filter((btnEl) => !btnEl.classList.contains('note-codeview-keep'));
     }
-    btnEls.forEach((btnEl) => this.ui.toggleBtn(func.htmlElementToJquery(btnEl), true));
+    btnEls.forEach((btnEl) => this.ui.toggleBtn(btnEl, true));
   }
 
   deactivate(isIncludeCodeview) {
@@ -143,6 +145,6 @@ export default class Toolbar {
     if (!isIncludeCodeview) {
       btnEls = btnEls.filter((btnEl) => !btnEl.classList.contains('note-codeview-keep'));
     }
-    btnEls.forEach((btnEl) => this.ui.toggleBtn(func.htmlElementToJquery(btnEl), false));
+    btnEls.forEach((btnEl) => this.ui.toggleBtn(btnEl, false));
   }
 }

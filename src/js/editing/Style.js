@@ -28,7 +28,7 @@ export default class Style {
   /**
    * returns style object from node
    *
-   * @param {HTMLElement|jQuery} nodeEl
+   * @param {HTMLElement} nodeEl
    * @return {Object}
    */
   fromNode(nodeEl) {

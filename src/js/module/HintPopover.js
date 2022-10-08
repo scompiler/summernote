@@ -3,6 +3,7 @@ import lists from '../core/lists';
 import dom from '../core/dom';
 import range from '../core/range';
 import key from '../core/key';
+import Summernote from "../class";
 
 const POPOVER_DIST = 5;
 
@@ -10,7 +11,7 @@ export default class HintPopover {
   constructor(context) {
     this.context = context;
 
-    this.ui = func.getJquery().summernote.ui;
+    this.ui = Summernote.meta.ui;
     this.editableEl = func.jqueryToHtmlElement(context.layoutInfo.editable);
     this.options = context.options;
     this.hint = this.options.hint || [];
@@ -18,13 +19,17 @@ export default class HintPopover {
     this.hints = Array.isArray(this.hint) ? this.hint : [this.hint];
 
     this.events = {
-      'summernote.keyup': (we, event) => {
-        if (!event.defaultPrevented) {
-          this.handleKeyup(event);
+      'summernote.keyup': (customEvent) => {
+        const domEvent = customEvent.detail[0];
+
+        if (!domEvent.defaultPrevented) {
+          this.handleKeyup(domEvent);
         }
       },
-      'summernote.keydown': (we, event) => {
-        this.handleKeydown(event);
+      'summernote.keydown': (customEvent) => {
+        const domEvent = customEvent.detail[0];
+
+        this.handleKeydown(domEvent);
       },
       'summernote.disable summernote.dialog.shown summernote.blur': () => {
         this.hide();
@@ -48,8 +53,8 @@ export default class HintPopover {
 
     this.popoverEl.style.display = 'none';
     this.contentEl = this.popoverEl.querySelector('.popover-content, .note-popover-content');
-    this.contentEl.addEventListener('click', (event) => {
-      const itemEl = event.target.closest('.note-hint-item');
+    this.contentEl.addEventListener('click', (domEvent) => {
+      const itemEl = domEvent.target.closest('.note-hint-item');
 
       if (!itemEl) {
         return;
@@ -66,7 +71,7 @@ export default class HintPopover {
       this.replace();
     });
 
-    this.popoverEl.addEventListener('mousedown', (event) => { event.preventDefault(); });
+    this.popoverEl.addEventListener('mousedown', (domEvent) => { domEvent.preventDefault(); });
   }
 
   destroy() {
@@ -150,7 +155,7 @@ export default class HintPopover {
       this.lastWordRange = null;
       this.hide();
       this.context.invoke('editor.focus');
-      this.context.triggerEvent('change', this.editableEl.innerHTML, func.htmlElementToJquery(this.editableEl));
+      this.context.triggerEvent('change', this.editableEl.innerHTML, this.editableEl);
     }
   }
 
@@ -181,20 +186,20 @@ export default class HintPopover {
     });
   }
 
-  handleKeydown(event) {
+  handleKeydown(domEvent) {
     const isVisible = !!(this.popoverEl.offsetWidth || this.popoverEl.offsetHeight || this.popoverEl.getClientRects().length);
     if (!isVisible) {
       return;
     }
 
-    if (event.keyCode === key.code.ENTER) {
-      event.preventDefault();
+    if (domEvent.keyCode === key.code.ENTER) {
+      domEvent.preventDefault();
       this.replace();
-    } else if (event.keyCode === key.code.UP) {
-      event.preventDefault();
+    } else if (domEvent.keyCode === key.code.UP) {
+      domEvent.preventDefault();
       this.moveUp();
-    } else if (event.keyCode === key.code.DOWN) {
-      event.preventDefault();
+    } else if (domEvent.keyCode === key.code.DOWN) {
+      domEvent.preventDefault();
       this.moveDown();
     }
   }
@@ -225,8 +230,8 @@ export default class HintPopover {
     return groupEl;
   }
 
-  handleKeyup(event) {
-    if (!lists.contains([key.code.ENTER, key.code.UP, key.code.DOWN], event.keyCode)) {
+  handleKeyup(domEvent) {
+    if (!lists.contains([key.code.ENTER, key.code.UP, key.code.DOWN], domEvent.keyCode)) {
       let range = this.context.invoke('editor.getLastRange');
       let wordRange, keyword;
       if (this.options.hintMode === 'words') {
@@ -264,7 +269,7 @@ export default class HintPopover {
           this.lastWordRange = wordRange;
           this.hints.forEach((hint, idx) => {
             if (hint.match.test(keyword)) {
-              func.htmlElementToJquery(this.createGroup(idx, keyword)).appendTo(this.contentEl);
+              this.contentEl.appendChild(this.createGroup(idx, keyword));
             }
           });
           // select first .note-hint-item

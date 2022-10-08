@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import '/js/settings';
 import renderer from '/js/renderer';
+import Summernote from "../../js/class";
 
 import './summernote-lite.scss';
 import TooltipUI from './js/TooltipUI';
@@ -568,12 +569,14 @@ const ui = function(editorOptions) {
     icon: icon,
     options: editorOptions,
 
-    toggleBtn: function($btn, isEnable) {
+    toggleBtn: function(btnEl, isEnable) {
+      const $btn = $(btnEl);
       $btn.toggleClass('disabled', !isEnable);
       $btn.attr('disabled', !isEnable);
     },
 
-    toggleBtnActive: function($btn, isActive) {
+    toggleBtnActive: function(btnEl, isActive) {
+      const $btn = $(btnEl);
       $btn.toggleClass('active', isActive);
     },
 
@@ -582,19 +585,23 @@ const ui = function(editorOptions) {
       $dom.find('[data-value="' + value + '"]').addClass('checked');
     },
 
-    onDialogShown: function($dialog, handler) {
+    onDialogShown: function(dialogEl, handler) {
+      const $dialog = $(dialogEl);
       $dialog.one('note.modal.show', handler);
     },
 
-    onDialogHidden: function($dialog, handler) {
+    onDialogHidden: function(dialogEl, handler) {
+      const $dialog = $(dialogEl);
       $dialog.one('note.modal.hide', handler);
     },
 
-    showDialog: function($dialog) {
+    showDialog: function(dialogEl) {
+      const $dialog = $(dialogEl);
       $dialog.data('modal').show();
     },
 
-    hideDialog: function($dialog) {
+    hideDialog: function(dialogEl) {
+      const $dialog = $(dialogEl);
       $dialog.data('modal').hide();
     },
 
@@ -618,7 +625,8 @@ const ui = function(editorOptions) {
       return $dialog.find('.note-modal-body');
     },
 
-    createLayout: function($note) {
+    createLayout: function(noteEl) {
+      const $note = $(noteEl);
       const $editor = $((editorOptions.airMode ? airEditor([
         editingArea([
           codable(),
@@ -656,7 +664,8 @@ const ui = function(editorOptions) {
       };
     },
 
-    removeLayout: function($note, layoutInfo) {
+    removeLayout: function(noteEl, layoutInfo) {
+      const $note = $(noteEl);
       $note.html(layoutInfo.editable.html());
       layoutInfo.editor.remove();
       $note.off('summernote'); // remove summernote custom event
@@ -665,7 +674,7 @@ const ui = function(editorOptions) {
   };
 };
 
-$.summernote = $.extend($.summernote, {
+Summernote.meta = Object.assign(Summernote.meta, {
   ui_template: ui,
   interface: 'lite',
 });

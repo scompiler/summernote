@@ -7,22 +7,23 @@ import chai from 'chai';
 import $ from 'jquery';
 import Context from 'src/js/Context';
 import 'src/styles/bs4/summernote-bs4';
+import Summernote from "../../../src/js/class";
 
 describe('Placeholder', () => {
   var assert = chai.assert;
 
   it('should not be initialized by placeholder attribute without inheritPlaceHolder', () => {
-    var options = $.extend({}, $.summernote.options);
-    var context = new Context($('<textarea placeholder="custom_placeholder"><p>hello</p></textarea>'), options);
+    var options = $.extend({}, Summernote.meta.options);
+    var context = new Context($('<textarea placeholder="custom_placeholder"><p>hello</p></textarea>')[0], options);
     var $editor = context.layoutInfo.editor;
 
     assert.isTrue($editor.find('.note-placeholder').length === 0);
   });
 
   it('should be initialized by placeholder attribute with inheritPlaceHolder', () => {
-    var options = $.extend({}, $.summernote.options);
+    var options = $.extend({}, Summernote.meta.options);
     options.inheritPlaceholder = true;
-    var context = new Context($('<textarea placeholder="custom_placeholder"><p>hello</p></textarea>'), options);
+    var context = new Context($('<textarea placeholder="custom_placeholder"><p>hello</p></textarea>')[0], options);
     var $editor = context.layoutInfo.editor;
 
     assert.isTrue($editor.find('.note-placeholder').length === 1);

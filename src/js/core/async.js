@@ -10,8 +10,8 @@ export function readFileAsDataURL(file) {
   return new Promise((resolve, reject) => {
     const fileReader = new FileReader();
 
-    fileReader.addEventListener('load', (event) => {
-      const dataURL = event.target.result;
+    fileReader.addEventListener('load', (domEvent) => {
+      const dataURL = domEvent.target.result;
       resolve(dataURL);
     });
     fileReader.addEventListener('error', (err) => {

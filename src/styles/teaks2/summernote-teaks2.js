@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import '/js/settings';
 import renderer from '/js/renderer';
+import Summernote from "../../js/class";
 
 import './summernote-teaks2.scss';
 import TooltipUI from './js/TooltipUI';
@@ -585,12 +586,14 @@ const ui = function(editorOptions) {
     icon: icon,
     options: editorOptions,
 
-    toggleBtn: function($btn, isEnable) {
+    toggleBtn: function(btnEl, isEnable) {
+      const $btn = $(btnEl);
       $btn.toggleClass('disabled', !isEnable);
       $btn.attr('disabled', !isEnable);
     },
 
-    toggleBtnActive: function($btn, isActive) {
+    toggleBtnActive: function(btnEl, isActive) {
+      const $btn = $(btnEl);
       $btn.toggleClass('active', isActive);
     },
 
@@ -599,19 +602,23 @@ const ui = function(editorOptions) {
       $dom.find('[data-value="' + value + '"]').addClass('checked');
     },
 
-    onDialogShown: function($dialog, handler) {
+    onDialogShown: function(dialogEl, handler) {
+      const $dialog = $(dialogEl);
       $dialog.one('note.modal.show', handler);
     },
 
-    onDialogHidden: function($dialog, handler) {
+    onDialogHidden: function(dialogEl, handler) {
+      const $dialog = $(dialogEl);
       $dialog.one('note.modal.hide', handler);
     },
 
-    showDialog: function($dialog) {
+    showDialog: function(dialogEl) {
+      const $dialog = $(dialogEl);
       $dialog.data('modal').show();
     },
 
-    hideDialog: function($dialog) {
+    hideDialog: function(dialogEl) {
+      const $dialog = $(dialogEl);
       $dialog.data('modal').hide();
     },
 
@@ -635,7 +642,8 @@ const ui = function(editorOptions) {
       return $dialog.find('.note-modal-body');
     },
 
-    createLayout: function($note) {
+    createLayout: function(noteEl) {
+      const $note = $(noteEl);
       const $editor = $((editorOptions.airMode ? airEditor([
         editingArea([
           codable(),
@@ -660,7 +668,7 @@ const ui = function(editorOptions) {
           ])
       )).render2());
 
-      $editor.insertAfter($note);
+      $editor.insertAfter(noteEl);
 
       return {
         note: $note,
@@ -674,7 +682,8 @@ const ui = function(editorOptions) {
       };
     },
 
-    removeLayout: function($note, layoutInfo) {
+    removeLayout: function(noteEl, layoutInfo) {
+      const $note = $(noteEl);
       $note.html(layoutInfo.editable.html());
       layoutInfo.editor.remove();
       $note.off('summernote'); // remove summernote custom event
@@ -683,12 +692,12 @@ const ui = function(editorOptions) {
   };
 };
 
-$.summernote = $.extend($.summernote, {
+Summernote.meta = Object.assign(Summernote.meta, {
   ui_template: ui,
   interface: 'teaks2',
 });
 
-$.summernote.options.icons = $.extend($.summernote.options.icons, {
+Summernote.meta.options.icons = Object.assign(Summernote.meta.options.icons, {
   bold: [
     '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="currentColor">',
     '<path d="M9.31983 5.57812C9.67675 5.14215 9.8969 4.61044 9.95265 4.04977C10.1256 2.26148 8.72241 0.75 6.97444 0.75H2.30054C2.20108 0.75 2.1057 0.789509 2.03537 0.859835C1.96505 0.930161 1.92554 1.02554 1.92554 1.125V2.25C1.92554 2.34946 1.96505 2.44484 2.03537 2.51516C2.1057 2.58549 2.20108 2.625 2.30054 2.625H3.04749V9.375H2.30054C2.20108 9.375 2.1057 9.41451 2.03537 9.48483C1.96505 9.55516 1.92554 9.65054 1.92554 9.75V10.875C1.92554 10.9745 1.96505 11.0698 2.03537 11.1402C2.1057 11.2105 2.20108 11.25 2.30054 11.25H7.20647C8.86585 11.25 10.3504 10.0371 10.5112 8.38125C10.6223 7.2457 10.127 6.22359 9.31983 5.57812ZM4.91757 2.625H6.97444C7.27281 2.625 7.55896 2.74353 7.76994 2.9545C7.98092 3.16548 8.09944 3.45163 8.09944 3.75C8.09944 4.04837 7.98092 4.33452 7.76994 4.5455C7.55896 4.75647 7.27281 4.875 6.97444 4.875H4.91757V2.625ZM6.97444 9.375H4.91757V6.75H6.97444C7.32254 6.75 7.65638 6.88828 7.90252 7.13442C8.14866 7.38056 8.28694 7.7144 8.28694 8.0625C8.28694 8.4106 8.14866 8.74444 7.90252 8.99058C7.65638 9.23672 7.32254 9.375 6.97444 9.375Z" />',

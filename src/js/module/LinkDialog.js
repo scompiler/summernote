@@ -1,12 +1,13 @@
 import env from '../core/env';
 import key from '../core/key';
 import func from '../core/func';
+import Summernote from "../class";
 
 export default class LinkDialog {
   constructor(context) {
     this.context = context;
 
-    this.ui = func.getJquery().summernote.ui;
+    this.ui = Summernote.meta.ui;
     this.bodyEl = document.body;
     this.options = context.options;
     this.lang = this.options.langInfo;
@@ -67,7 +68,7 @@ export default class LinkDialog {
   }
 
   destroy() {
-    this.ui.hideDialog(func.htmlElementToJquery(this.dialogEl));
+    this.ui.hideDialog(this.dialogEl);
     this.dialogEl.remove();
   }
 
@@ -75,7 +76,7 @@ export default class LinkDialog {
    * toggle update button
    */
   toggleLinkBtn(linkBtnEl, linkTextEl, linkUrlEl) {
-    this.ui.toggleBtn(func.htmlElementToJquery(linkBtnEl), linkTextEl.value && linkUrlEl.value);
+    this.ui.toggleBtn(linkBtnEl, linkTextEl.value && linkUrlEl.value);
   }
 
   /**
@@ -94,38 +95,38 @@ export default class LinkDialog {
 
       let listeners = [];
 
-      const listen = (node, event, callback, once) => {
+      const listen = (node, types, callback, once) => {
         once = !!once;
         const originalCallback = callback;
 
-        event.trim().replace(/ +/, ' ').split(' ').forEach((eachEvent) => {
-          const callback = (event) => {
+        types.trim().replace(/ +/, ' ').split(' ').forEach((type) => {
+          const callback = (domEvent) => {
             if (once) {
-              node.removeEventListener(eachEvent, callback);
+              node.removeEventListener(type, callback);
 
               listeners = listeners.filter(x => x !== entry);
             }
 
-            return originalCallback(event);
+            return originalCallback(domEvent);
           };
-          const entry = {node, event: eachEvent, callback};
+          const entry = {node, type, callback};
 
-          node.addEventListener(eachEvent, callback);
+          node.addEventListener(type, callback);
 
           listeners.push(entry);
         });
       };
 
       const bindEnterKey = (inputEl, btnEl) => {
-        listen(inputEl, 'keypress', (event) => {
-          if (event.keyCode === key.code.ENTER) {
-            event.preventDefault();
+        listen(inputEl, 'keypress', (domEvent) => {
+          if (domEvent.keyCode === key.code.ENTER) {
+            domEvent.preventDefault();
             btnEl.click();
           }
         });
       };
 
-      this.ui.onDialogShown(func.htmlElementToJquery(this.dialogEl), () => {
+      this.ui.onDialogShown(this.dialogEl, () => {
         this.context.triggerEvent('dialog.shown');
 
         // If no url was given and given text is valid URL then copy that into URL Field
@@ -166,8 +167,8 @@ export default class LinkDialog {
         useProtocolEl.checked = linkInfo.url
           ? false : this.context.options.useProtocol;
 
-        const onBtnClick = (event) => {
-          event.preventDefault();
+        const onBtnClick = (domEvent) => {
+          domEvent.preventDefault();
 
           resolve({
             range: linkInfo.range,
@@ -176,17 +177,17 @@ export default class LinkDialog {
             isNewWindow: openInNewWindowEl.checked,
             checkProtocol: useProtocolEl.checked,
           });
-          this.ui.hideDialog(func.htmlElementToJquery(this.dialogEl));
+          this.ui.hideDialog(this.dialogEl);
         };
         listen(linkBtnEl, 'click', onBtnClick, true);
       });
 
-      this.ui.onDialogHidden(func.htmlElementToJquery(this.dialogEl), () => {
-        listeners.forEach(x => x.node.removeEventListener(x.event, x.callback));
+      this.ui.onDialogHidden(this.dialogEl, () => {
+        listeners.forEach(x => x.node.removeEventListener(x.type, x.callback));
         listeners = [];
       });
 
-      this.ui.showDialog(func.htmlElementToJquery(this.dialogEl));
+      this.ui.showDialog(this.dialogEl);
     });
   }
 

@@ -1124,15 +1124,19 @@ function posFromPlaceholder(placeholder) {
   };
 }
 
-function attachEvents($node, events) {
+function attachEvents(nodeEl, events) {
   Object.keys(events).forEach(function(key) {
-    $node.on(key, events[key]);
+    key.trim().replace(/ +/, ' ').split(' ').forEach((type) => {
+      nodeEl.addEventListener(type, events[key]);
+    });
   });
 }
 
-function detachEvents($node, events) {
+function detachEvents(nodeEl, events) {
   Object.keys(events).forEach(function(key) {
-    $node.off(key, events[key]);
+    key.trim().replace(/ +/, ' ').split(' ').forEach((type) => {
+      nodeEl.removeEventListener(type, events[key]);
+    });
   });
 }
 

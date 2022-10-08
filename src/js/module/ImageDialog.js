@@ -1,10 +1,11 @@
 import key from '../core/key';
 import func from "../core/func";
+import Summernote from "../class";
 
 export default class ImageDialog {
   constructor(context) {
     this.context = context;
-    this.ui = func.getJquery().summernote.ui;
+    this.ui = Summernote.meta.ui;
     this.bodyEl = document.body;
     this.options = context.options;
     this.lang = this.options.langInfo;
@@ -45,7 +46,7 @@ export default class ImageDialog {
   }
 
   destroy() {
-    this.ui.hideDialog(func.htmlElementToJquery(this.dialogEl));
+    this.ui.hideDialog(this.dialogEl);
     this.dialogEl.remove();
   }
 
@@ -53,7 +54,7 @@ export default class ImageDialog {
     this.context.invoke('editor.saveRange');
     this.showImageDialog().then((data) => {
       // [workaround] hide dialog before restore range for IE range focus
-      this.ui.hideDialog(func.htmlElementToJquery(this.dialogEl));
+      this.ui.hideDialog(this.dialogEl);
       this.context.invoke('editor.restoreRange');
 
       if (typeof data === 'string') { // image url
@@ -84,57 +85,57 @@ export default class ImageDialog {
 
       let listeners = [];
 
-      const listen = (node, event, callback) => {
-        event.trim().replace(/ +/, ' ').split(' ').forEach((eachEvent) => {
-          node.addEventListener(eachEvent, callback);
+      const listen = (node, types, callback) => {
+        types.trim().replace(/ +/, ' ').split(' ').forEach((type) => {
+          node.addEventListener(type, callback);
 
-          listeners.push({node, event: eachEvent, callback});
+          listeners.push({node, type, callback});
         });
       };
 
       const bindEnterKey = (inputEl, btnEl) => {
-        listen(inputEl, 'keypress', (event) => {
-          if (event.keyCode === key.code.ENTER) {
-            event.preventDefault();
+        listen(inputEl, 'keypress', (domEvent) => {
+          if (domEvent.keyCode === key.code.ENTER) {
+            domEvent.preventDefault();
             btnEl.click();
           }
         });
       };
 
-      this.ui.onDialogShown(func.htmlElementToJquery(this.dialogEl), () => {
+      this.ui.onDialogShown(this.dialogEl, () => {
         this.context.triggerEvent('dialog.shown');
 
         const newImageInputEl = imageInputEl.cloneNode();
 
         newImageInputEl.value = '';
 
-        listen(newImageInputEl, 'change', (event) => {
-          resolve(event.target.files || event.target.value);
+        listen(newImageInputEl, 'change', (domEvent) => {
+          resolve(domEvent.target.files || domEvent.target.value);
         });
 
         // Cloning imageInput to clear element.
         imageInputEl.parentNode.replaceChild(newImageInputEl, imageInputEl);
 
         listen(imageUrlEl, 'input paste propertychange', () => {
-          this.ui.toggleBtn(func.htmlElementToJquery(imageBtnEl), imageUrlEl.value);
+          this.ui.toggleBtn(imageBtnEl, imageUrlEl.value);
         });
         imageUrlEl.value = '';
         imageUrlEl.focus();
 
-        listen(imageBtnEl, 'click', (event) => {
-          event.preventDefault();
+        listen(imageBtnEl, 'click', (domEvent) => {
+          domEvent.preventDefault();
           resolve(imageUrlEl.value);
         });
 
         bindEnterKey(imageUrlEl, imageBtnEl);
       });
 
-      this.ui.onDialogHidden(func.htmlElementToJquery(this.dialogEl), () => {
-        listeners.forEach(x => x.node.removeEventListener(x.event, x.callback));
+      this.ui.onDialogHidden(this.dialogEl, () => {
+        listeners.forEach(x => x.node.removeEventListener(x.type, x.callback));
         listeners = [];
       });
 
-      this.ui.showDialog(func.htmlElementToJquery(this.dialogEl));
+      this.ui.showDialog(this.dialogEl);
     });
   }
 }

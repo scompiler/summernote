@@ -1,25 +1,25 @@
-import $ from 'jquery';
 import func from './core/func';
 import lists from './core/lists';
 import dom from './core/dom';
+import merge from 'lodash.merge';
+import Summernote from "./class";
 
 export default class Context {
   /**
-   * @param {jQuery} $note
+   * @param {HTMLElement} noteEl
    * @param {Object} options
    */
-  constructor($note, options) {
-    this.$note = $note;
-    this.noteEl = func.jqueryToHtmlElement($note);
+  constructor(noteEl, options) {
+    this.noteEl = noteEl;
 
     this.memos = {};
     this.modules = {};
     this.layoutInfo = {};
-    this.options = $.extend(true, {}, options);
+    this.options = merge({}, options);
 
     // init ui with options
-    $.summernote.ui = $.summernote.ui_template(this.options);
-    this.ui = $.summernote.ui;
+    Summernote.meta.ui = Summernote.meta.ui_template(this.options);
+    this.ui = Summernote.meta.ui;
 
     this.initialize();
   }
@@ -28,9 +28,9 @@ export default class Context {
    * create layout and initialize modules and other resources
    */
   initialize() {
-    this.layoutInfo = this.ui.createLayout(this.$note);
+    this.layoutInfo = this.ui.createLayout(this.noteEl);
     this._initialize();
-    this.$note.hide();
+    this.noteEl.style.display = 'none';
     return this;
   }
 
@@ -39,8 +39,8 @@ export default class Context {
    */
   destroy() {
     this._destroy();
-    this.$note.removeData('summernote');
-    this.ui.removeLayout(this.$note, this.layoutInfo);
+    delete this.noteEl.__summernoteInstance;
+    this.ui.removeLayout(this.noteEl, this.layoutInfo);
   }
 
   /**
@@ -59,17 +59,17 @@ export default class Context {
 
   _initialize() {
     // set own id
-    this.options.id = func.uniqueId($.now());
+    this.options.id = func.uniqueId((new Date()).getTime().toString());
     // set default container for tooltips, popovers, and dialogs
     this.options.container = this.options.container || this.layoutInfo.editor;
 
     // add optional buttons
-    const buttons = $.extend({}, this.options.buttons);
+    const buttons = Object.assign({}, this.options.buttons);
     Object.keys(buttons).forEach((key) => {
       this.memo('button.' + key, buttons[key]);
     });
 
-    const modules = $.extend({}, this.options.modules, $.summernote.plugins || {});
+    const modules = Object.assign({}, this.options.modules, Summernote.meta.plugins || {});
 
     // add and initialize modules
     Object.keys(modules).forEach((key) => {
@@ -106,7 +106,7 @@ export default class Context {
       } else {
         this.layoutInfo.editable.html(html);
       }
-      this.$note.val(html);
+      this.noteEl.value = html;
       this.triggerEvent('change', html, this.layoutInfo.editable);
     }
   }
@@ -140,10 +140,9 @@ export default class Context {
 
     const callback = this.options.callbacks[func.namespaceToCamel(namespace, 'on')];
     if (callback) {
-      callback.apply(this.$note[0], args);
+      callback.apply(this.noteEl, args);
     }
-    this.$note.trigger('summernote.' + namespace, args);
-    this.$note[0].dispatchEvent(new CustomEvent('summernote.' + namespace, {
+    this.noteEl.dispatchEvent(new CustomEvent('summernote.' + namespace, {
       detail: args,
     }));
   }
@@ -162,7 +161,7 @@ export default class Context {
 
     // attach events
     if (module.events) {
-      dom.attachEvents(this.$note, module.events);
+      dom.attachEvents(this.noteEl, module.events);
     }
   }
 
@@ -182,7 +181,7 @@ export default class Context {
     const module = this.modules[key];
     if (module.shouldInitialize()) {
       if (module.events) {
-        dom.detachEvents(this.$note, module.events);
+        dom.detachEvents(this.noteEl, module.events);
       }
 
       if (module.destroy) {
@@ -212,21 +211,19 @@ export default class Context {
    * Some buttons need to change their visual style immediately once they get pressed
    */
   createInvokeHandlerAndUpdateState(namespace, value) {
-    return (event) => {
-      this.createInvokeHandler(namespace, value)(event);
+    return (domEvent) => {
+      this.createInvokeHandler(namespace, value)(domEvent);
       this.invoke('buttons.updateCurrentStyle');
     };
   }
 
   createInvokeHandler(namespace, value) {
-    return (event) => {
-      event.preventDefault();
-      const targetEl = event.target;
+    return (domEvent) => {
+      domEvent.preventDefault();
+      const targetEl = domEvent.target;
       const dataValueEl = targetEl.closest('[data-value]');
       const dataValue = dataValueEl && dataValueEl.getAttribute('data-value');
-      const $target = $(targetEl);
-      this.invoke(namespace, value || dataValue, $target);
-      this.invoke2(namespace, value || dataValue, targetEl);
+      this.invoke(namespace, value || dataValue, targetEl);
     };
   }
 
@@ -238,23 +235,6 @@ export default class Context {
     const hasSeparator = splits.length > 1;
     const moduleName = hasSeparator && lists.head(splits);
     const methodName = hasSeparator ? lists.last(splits) : lists.head(splits);
-
-    const module = this.modules[moduleName || 'editor'];
-    if (!moduleName && this[methodName]) {
-      return this[methodName].apply(this, args);
-    } else if (module && module[methodName] && module.shouldInitialize()) {
-      return module[methodName].apply(module, args);
-    }
-  }
-
-  invoke2() {
-    const namespace = lists.head(arguments);
-    const args = lists.tail(lists.from(arguments));
-
-    const splits = namespace.split('.');
-    const hasSeparator = splits.length > 1;
-    const moduleName = hasSeparator && lists.head(splits);
-    const methodName = (hasSeparator ? lists.last(splits) : lists.head(splits)) + '2';
 
     const module = this.modules[moduleName || 'editor'];
     if (!moduleName && this[methodName]) {
