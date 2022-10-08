@@ -36,13 +36,13 @@ export default class LinkPopover {
   initialize() {
     this.popoverEl = this.ui.popover({
       className: 'note-link-popover',
-      callback2: (rootEl) => {
-        const contentEl = rootEl.querySelector('.popover-content,.note-popover-content');
+      callback2: (rootEls) => {
+        const contentEls = rootEls.map(x => x.querySelector('.popover-content,.note-popover-content')).filter(x => x);
         const spanEl = document.createElement('span');
 
         spanEl.innerHTML = '<a target="_blank"></a>&nbsp;';
 
-        contentEl.insertBefore(spanEl, contentEl.firstChild);
+        contentEls.forEach((contentEl) => contentEl.insertBefore(spanEl, contentEl.firstChild));
       },
     }).render2();
     const containerEl = func.jqueryToHtmlElement(this.options.container);

@@ -15,7 +15,7 @@ const ZERO_WIDTH_NBSP_CHAR = '\ufeff';
  * @return {Boolean}
  */
 function isEditable(node) {
-  return node && $(node).hasClass('note-editable');
+  return node && node instanceof Element && node.classList.contains('note-editable');
 }
 
 /**
@@ -27,7 +27,7 @@ function isEditable(node) {
  * @return {Boolean}
  */
 function isControlSizing(node) {
-  return node && $(node).hasClass('note-control-sizing');
+  return node && node instanceof Element && node.classList.contains('note-control-sizing');
 }
 
 /**
@@ -389,7 +389,7 @@ function listDescendant(node, pred) {
  */
 function wrap(node, wrapperName) {
   const parent = node.parentNode;
-  const wrapper = $('<' + wrapperName + '>')[0];
+  const wrapper = document.createElement(wrapperName.toLowerCase());
 
   parent.insertBefore(wrapper, node);
   wrapper.appendChild(node);
@@ -421,7 +421,7 @@ function insertAfter(node, preceding) {
  * @param {Collection} aChild
  */
 function appendChildNodes(node, aChild) {
-  $.each(aChild, function(idx, child) {
+  aChild.forEach((child) => {
     node.appendChild(child);
   });
   return node;
@@ -1079,8 +1079,7 @@ const isTextarea = makePredByNodeName('TEXTAREA');
  * @param {Boolean} [stripLinebreaks] - default: false
  */
 function value(node, stripLinebreaks) {
-  const $node = $(node);
-  const val = isTextarea($node[0]) ? $node.val() : $node.html();
+  const val = isTextarea(node) ? node.value : node.innerHTML;
   if (stripLinebreaks) {
     return val.replace(/[\n\r]/g, '');
   }
@@ -1096,8 +1095,7 @@ function value(node, stripLinebreaks) {
  * @param {Boolean} [isNewlineOnBlock]
  */
 function html(node, isNewlineOnBlock) {
-  const $node = $(node);
-  let markup = value($node);
+  let markup = value(node);
 
   if (isNewlineOnBlock) {
     const regexTag = /<(\/?)(\b(?!!)[^>\s]*)(.*?)(\s*\/?>)/g;

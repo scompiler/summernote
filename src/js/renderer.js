@@ -1,6 +1,3 @@
-import $ from 'jquery';
-import func from "./core/func";
-
 class Renderer {
   constructor(markup, children, options, callback) {
     this.markup = markup;
@@ -9,54 +6,76 @@ class Renderer {
     this.callback = callback;
   }
 
-  render($parent) {
-    const $node = $(this.markup);
+  render2(parentEls) {
+    const templateEl = document.createElement('template');
+    templateEl.innerHTML = this.markup;
+    const nodeEls = [].slice.call(templateEl.content.childNodes);
 
     if (this.options && this.options.contents) {
-      $node.html(this.options.contents);
+      nodeEls.forEach(x => {
+        if (x instanceof Element) {
+          x.innerHTML = this.options.contents;
+        }
+      });
     }
 
     if (this.options && this.options.className) {
-      $node.addClass(this.options.className);
+      nodeEls.forEach(nodeEl => {
+        if (nodeEl instanceof Element) {
+          this.options.className.trim().replace(/ +/, ' ').split(' ').forEach(className => {
+            nodeEl.classList.add(className);
+          });
+        }
+      });
     }
 
     if (this.options && this.options.data) {
-      $.each(this.options.data, (k, v) => {
-        $node.attr('data-' + k, v);
+      nodeEls.forEach(nodeEl => {
+        if (nodeEl instanceof Element) {
+          for (let attribute in this.options.data) {
+            nodeEl.setAttribute('data-' + attribute, this.options.data[attribute]);
+          }
+        }
       });
     }
 
     if (this.options && this.options.click) {
-      $node.on('click', this.options.click);
+      nodeEls.forEach(nodeEl => {
+        if (nodeEl instanceof Element) {
+          nodeEl.addEventListener('click', this.options.click);
+        }
+      });
     }
 
     if (this.children) {
-      const $container = $node.find('.note-children-container');
+      const containerEl = nodeEls.map((nodeEl) => {
+        if (nodeEl instanceof Element) {
+          return nodeEl.querySelector('.note-children-container');
+        }
+
+        return null;
+      }).filter(x => x)[0];
+
       this.children.forEach((child) => {
-        child.render($container.length ? $container : $node);
+        child.render2(containerEl ? [containerEl] : nodeEls);
       });
     }
 
     if (this.callback) {
-      this.callback($node, this.options);
+      this.callback(nodeEls, this.options);
     }
 
-    if (this.options && this.options.callback) {
-      this.options.callback($node);
-    }
     if (this.options && this.options.callback2) {
-      this.options.callback2(func.jqueryToHtmlElement($node));
+      this.options.callback2(nodeEls);
     }
 
-    if ($parent) {
-      $parent.append($node);
+    if (parentEls) {
+      parentEls.forEach((parentEl) => {
+        nodeEls.forEach((nodeEl) => parentEl.appendChild(nodeEl));
+      });
     }
 
-    return $node;
-  }
-
-  render2(parentEl) {
-    return func.jqueryToHtmlElement(this.render(func.htmlElementToJquery(parentEl)));
+    return nodeEls[0];
   }
 }
 

@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import func from '../core/func';
 import lists from '../core/lists';
 import dom from '../core/dom';
@@ -13,14 +12,15 @@ export default class Style {
    * (compability with version < 1.9)
    *
    * @private
-   * @param  {jQuery} $obj
+   * @param  {HTMLElement} objEl
    * @param  {Array} propertyNames - An array of one or more CSS properties.
    * @return {Object}
    */
-  jQueryCSS($obj, propertyNames) {
+  jQueryCSS(objEl, propertyNames) {
     const result = {};
-    $.each(propertyNames, (idx, propertyName) => {
-      result[propertyName] = $obj.css(propertyName);
+    const style = getComputedStyle(objEl);
+    propertyNames.forEach((propertyName) => {
+      result[propertyName] = style.getPropertyValue(propertyName);
     });
     return result;
   }
@@ -28,15 +28,14 @@ export default class Style {
   /**
    * returns style object from node
    *
-   * @param {HTMLElement|jQuery} node
+   * @param {HTMLElement|jQuery} nodeEl
    * @return {Object}
    */
-  fromNode(node) {
-    const $node = $(node);
+  fromNode(nodeEl) {
     const properties = ['font-family', 'font-size', 'text-align', 'list-style-type', 'line-height'];
-    const styleInfo = this.jQueryCSS($node, properties) || {};
+    const styleInfo = this.jQueryCSS(nodeEl, properties) || {};
 
-    const fontSize = $node[0].style.fontSize || styleInfo['font-size'];
+    const fontSize = nodeEl.style.fontSize || styleInfo['font-size'];
 
     styleInfo['font-size'] = parseInt(fontSize, 10);
     styleInfo['font-size-unit'] = fontSize.match(/[a-z%]+$/);
@@ -51,10 +50,12 @@ export default class Style {
    * @param {Object} styleInfo
    */
   stylePara(rng, styleInfo) {
-    $.each(rng.nodes(dom.isPara, {
+    rng.nodes(dom.isPara, {
       includeAncestor: true,
-    }), (idx, para) => {
-      $(para).css(styleInfo);
+    }).forEach((para) => {
+      for (let property in styleInfo) {
+        para.style[property] = styleInfo[property];
+      }
     });
   }
 
@@ -99,7 +100,7 @@ export default class Style {
         const siblings = dom.withClosestSiblings(node, pred);
         const head = lists.head(siblings);
         const tails = lists.tail(siblings);
-        $.each(tails, (idx, elem) => {
+        tails.forEach((elem) => {
           dom.appendChildNodes(head, elem.childNodes);
           dom.remove(elem);
         });
@@ -117,13 +118,13 @@ export default class Style {
    * @return {Object} - object contains style properties.
    */
   current(rng) {
-    const $cont = $(!dom.isElement(rng.sc) ? rng.sc.parentNode : rng.sc);
-    let styleInfo = this.fromNode($cont);
+    const contEl = !dom.isElement(rng.sc) ? rng.sc.parentNode : rng.sc;
+    let styleInfo = this.fromNode(contEl);
 
     // document.queryCommandState for toggle state
     // [workaround] prevent Firefox nsresult: "0x80004005 (NS_ERROR_FAILURE)"
     try {
-      styleInfo = $.extend(styleInfo, {
+      styleInfo = Object.assign(styleInfo, {
         'font-bold': document.queryCommandState('bold') ? 'bold' : 'normal',
         'font-italic': document.queryCommandState('italic') ? 'italic' : 'normal',
         'font-underline': document.queryCommandState('underline') ? 'underline' : 'normal',

@@ -28,7 +28,7 @@
         contents: self.icon,
         tooltip: lang.databasic.insert,
         click: context.createInvokeHandler('databasic.showDialog'),
-      }).render();
+      }).render2();
     });
 
     // add popover edit button
@@ -37,7 +37,7 @@
         contents: self.icon,
         tooltip: lang.databasic.edit,
         click: context.createInvokeHandler('databasic.showDialog'),
-      }).render();
+      }).render2();
     });
 
     //  add popover size buttons
@@ -46,21 +46,21 @@
         contents: '<span class="note-fontsize-10">100%</span>',
         tooltip: lang.image.resizeFull,
         click: context.createInvokeHandler('editor.resize', '1'),
-      }).render();
+      }).render2();
     });
     context.memo('button.databasicSize50', function() {
       return ui.button({
         contents: '<span class="note-fontsize-10">50%</span>',
         tooltip: lang.image.resizeHalf,
         click: context.createInvokeHandler('editor.resize', '0.5'),
-      }).render();
+      }).render2();
     });
     context.memo('button.databasicSize25', function() {
       return ui.button({
         contents: '<span class="note-fontsize-10">25%</span>',
         tooltip: lang.image.resizeQuarter,
         click: context.createInvokeHandler('editor.resize', '0.25'),
-      }).render();
+      }).render2();
     });
 
     self.events = {
@@ -87,17 +87,17 @@
           '</div>';
       var footer = '<button href="#" class="btn btn-primary ext-databasic-save">' + lang.databasic.insert + '</button>';
 
-      self.$dialog = ui.dialog({
+      self.$dialog = $(ui.dialog({
         title: lang.databasic.name,
         fade: options.dialogsFade,
         body: body,
         footer: footer,
-      }).render().appendTo($container);
+      }).render2()).appendTo($container);
 
       // create popover
-      self.$popover = ui.popover({
+      self.$popover = $(ui.popover({
         className: 'ext-databasic-popover',
-      }).render().appendTo('body');
+      }).render2()).appendTo('body');
       var $content = self.$popover.find('.popover-content');
 
       context.invoke('buttons.build', $content, options.popover.databasic);

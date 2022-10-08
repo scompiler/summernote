@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import env from './env';
 import func from './func';
 import lists from './lists';
@@ -205,7 +204,9 @@ class WrappedRange {
    * @return {WrappedRange}
    */
   scrollIntoView(container) {
-    const height = $(container).height();
+    const containerStyle = getComputedStyle(container);
+    const containerPaddingY = parseFloat(containerStyle.paddingTop) + parseFloat(containerStyle.paddingBottom);
+    const height = container.offsetHeight - containerPaddingY;
     if (container.scrollTop + height < this.sc.offsetTop) {
       container.scrollTop += Math.abs(container.scrollTop + height - this.sc.offsetTop);
     }
@@ -438,7 +439,7 @@ class WrappedRange {
     });
 
     const emptyParents = [];
-    $.each(nodes, function(idx, node) {
+    nodes.forEach((node) => {
       // find empty parents
       const parent = node.parentNode;
       if (point.node !== parent && dom.nodeLength(parent) === 1) {
@@ -448,7 +449,7 @@ class WrappedRange {
     });
 
     // remove empty parents
-    $.each(emptyParents, function(idx, node) {
+    emptyParents.forEach((node) => {
       dom.remove(node, false);
     });
 
@@ -569,9 +570,10 @@ class WrappedRange {
    * insert html at current cursor
    */
   pasteHTML(markup) {
-    markup = $.trim(markup);
+    markup = markup.trim();
 
-    const contentsContainer = $('<div></div>').html(markup)[0];
+    const contentsContainer = document.createElement('div');
+    contentsContainer.innerHTML = markup;
     let childNodes = lists.from(contentsContainer.childNodes);
 
     // const rng = this.wrapBodyInlineWithPara().deleteContents();

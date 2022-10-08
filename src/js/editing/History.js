@@ -1,30 +1,30 @@
 import range from '../core/range';
+import func from "../core/func";
 
 export default class History {
   constructor(context) {
     this.stack = [];
     this.stackOffset = -1;
     this.context = context;
-    this.$editable = context.layoutInfo.editable;
-    this.editable = this.$editable[0];
+    this.editableEl = func.jqueryToHtmlElement(context.layoutInfo.editable);
   }
 
   makeSnapshot() {
-    const rng = range.create(this.editable);
+    const rng = range.create(this.editableEl);
     const emptyBookmark = { s: { path: [], offset: 0 }, e: { path: [], offset: 0 } };
 
     return {
-      contents: this.$editable.html(),
-      bookmark: ((rng && rng.isOnEditable()) ? rng.bookmark(this.editable) : emptyBookmark),
+      contents: this.editableEl.innerHTML,
+      bookmark: ((rng && rng.isOnEditable()) ? rng.bookmark(this.editableEl) : emptyBookmark),
     };
   }
 
   applySnapshot(snapshot) {
     if (snapshot.contents !== null) {
-      this.$editable.html(snapshot.contents);
+      this.editableEl.innerHTML = snapshot.contents;
     }
     if (snapshot.bookmark !== null) {
-      range.createFromBookmark(this.editable, snapshot.bookmark).select();
+      range.createFromBookmark(this.editableEl, snapshot.bookmark).select();
     }
   }
 
@@ -35,7 +35,7 @@ export default class History {
   */
   rewind() {
     // Create snap shot if not yet recorded
-    if (this.$editable.html() !== this.stack[this.stackOffset].contents) {
+    if (this.editableEl.innerHTML !== this.stack[this.stackOffset].contents) {
       this.recordUndo();
     }
 
@@ -73,7 +73,7 @@ export default class History {
     this.stackOffset = -1;
 
     // Clear the editable area.
-    this.$editable.html('');
+    this.editableEl.innerHTML = '';
 
     // Record our first snapshot (of nothing).
     this.recordUndo();
@@ -84,7 +84,7 @@ export default class History {
    */
   undo() {
     // Create snap shot if not yet recorded
-    if (this.$editable.html() !== this.stack[this.stackOffset].contents) {
+    if (this.editableEl.innerHTML !== this.stack[this.stackOffset].contents) {
       this.recordUndo();
     }
 

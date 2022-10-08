@@ -27,7 +27,8 @@ const airEditable = renderer.create([
 
 const buttonGroup = renderer.create('<div class="note-btn-group btn-group">');
 
-const dropdown = renderer.create('<div class="note-dropdown-menu dropdown-menu" role="list">', function($node, options) {
+const dropdown = renderer.create('<div class="note-dropdown-menu dropdown-menu" role="list">', function(nodeEls, options) {
+  const $node = $(nodeEls);
   const markup = Array.isArray(options.items) ? options.items.map(function(item) {
     const value = (typeof item === 'string') ? item : (item.value || '');
     const content = options.template ? options.template(item) : item;
@@ -49,20 +50,22 @@ const dropdownButtonContents = function(contents) {
   return contents;
 };
 
-const dropdownCheck = renderer.create('<div class="note-dropdown-menu dropdown-menu note-check" role="list">', function($node, options) {
+const dropdownCheck = renderer.create('<div class="note-dropdown-menu dropdown-menu note-check" role="list">', function(nodeEls, options) {
+  const $node = $(nodeEls);
   const markup = Array.isArray(options.items) ? options.items.map(function(item) {
     const value = (typeof item === 'string') ? item : (item.value || '');
     const content = options.template ? options.template(item) : item;
     return '<a class="dropdown-item" href="#" data-value="' + value + '" role="listitem" aria-label="' + item + '">' + icon(options.checkClassName) + ' ' + content + '</a>';
   }).join('') : options.items;
-  $node.html(markup).attr({ 'aria-label': options.title });
+  $node.html(markup).attr({'aria-label': options.title});
 
   if (options && options.codeviewKeepButton) {
     $node.addClass('note-codeview-keep');
   }
 });
 
-const dialog = renderer.create('<div class="modal note-modal" aria-hidden="false" tabindex="-1" role="dialog"/>', function($node, options) {
+const dialog = renderer.create('<div class="modal note-modal" aria-hidden="false" tabindex="-1" role="dialog"/>', function(nodeEls, options) {
+  const $node = $(nodeEls);
   if (options.fade) {
     $node.addClass('fade');
   }
@@ -71,14 +74,14 @@ const dialog = renderer.create('<div class="modal note-modal" aria-hidden="false
   });
   $node.html([
     '<div class="modal-dialog">',
-      '<div class="modal-content">',
-        (options.title ? '<div class="modal-header">' +
-          '<h4 class="modal-title">' + options.title + '</h4>' +
-          '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" aria-hidden="true"></button>' +
-        '</div>' : ''),
-        '<div class="modal-body">' + options.body + '</div>',
-        (options.footer ? '<div class="modal-footer">' + options.footer + '</div>' : ''),
-      '</div>',
+    '<div class="modal-content">',
+    (options.title ? '<div class="modal-header">' +
+      '<h4 class="modal-title">' + options.title + '</h4>' +
+      '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" aria-hidden="true"></button>' +
+      '</div>' : ''),
+    '<div class="modal-body">' + options.body + '</div>',
+    (options.footer ? '<div class="modal-footer">' + options.footer + '</div>' : ''),
+    '</div>',
     '</div>',
   ].join(''));
 });
@@ -88,7 +91,8 @@ const popover = renderer.create([
     '<div class="popover-arrow"></div>',
     '<div class="popover-body note-popover-content note-children-container"></div>',
   '</div>',
-].join(''), function($node, options) {
+].join(''), function(nodeEls, options) {
+  const $node = $(nodeEls);
   const direction = typeof options.direction !== 'undefined' ? options.direction : 'bottom';
 
   $node.attr('data-popper-placement', direction);
@@ -98,14 +102,15 @@ const popover = renderer.create([
   }
 });
 
-const checkbox = renderer.create('<div class="form-check"></div>', function($node, options) {
+const checkbox = renderer.create('<div class="form-check"></div>', function(nodeEls, options) {
+  const $node = $(nodeEls);
   $node.html([
     '<label class="form-check-label"' + (options.id ? ' for="note-' + options.id + '"' : '') + '>',
-      '<input type="checkbox" class="form-check-input"' + (options.id ? ' id="note-' + options.id + '"' : ''),
-        (options.checked ? ' checked' : ''),
-        ' aria-label="' + (options.text ? options.text : '') + '"',
-        ' aria-checked="' + (options.checked ? 'true' : 'false') + '"/>',
-      ' ' + (options.text ? options.text : '') +
+    '<input type="checkbox" class="form-check-input"' + (options.id ? ' id="note-' + options.id + '"' : ''),
+    (options.checked ? ' checked' : ''),
+    ' aria-label="' + (options.text ? options.text : '') + '"',
+    ' aria-checked="' + (options.checked ? 'true' : 'false') + '"/>',
+    ' ' + (options.text ? options.text : '') +
     '</label>',
   ].join(''));
 });
@@ -139,7 +144,8 @@ const ui = function(editorOptions) {
     options: editorOptions,
 
     palette: function($node, options) {
-      return renderer.create('<div class="note-color-palette"/>', function($node, options) {
+      return renderer.create('<div class="note-color-palette"/>', function(nodeEls, options) {
+        const $node = $(nodeEls);
         const contents = [];
         for (let row = 0, rowSize = options.colors.length; row < rowSize; row++) {
           const eventName = options.eventName;
@@ -174,7 +180,8 @@ const ui = function(editorOptions) {
     },
 
     button: function($node, options) {
-      return renderer.create('<button type="button" class="note-btn btn btn-outline-secondary btn-sm" tabindex="-1">', function($node, options) {
+      return renderer.create('<button type="button" class="note-btn btn btn-outline-secondary btn-sm" tabindex="-1">', function(nodeEls, options) {
+        const $node = $(nodeEls);
         if (options && options.data && options.data.toggle === 'dropdown') {
           $node.removeAttr('data-toggle');
           $node.attr('data-bs-toggle', 'dropdown');
@@ -228,29 +235,29 @@ const ui = function(editorOptions) {
     },
 
     createLayout: function($note) {
-      const $editor = (editorOptions.airMode ? airEditor([
+      const $editor = $((editorOptions.airMode ? airEditor([
         editingArea([
           codable(),
           airEditable(),
         ]),
       ]) : (editorOptions.toolbarPosition === 'bottom'
-        ? editor([
-          editingArea([
-            codable(),
-            editable(),
-          ]),
-          toolbar(),
-          statusbar(),
-        ])
-        : editor([
-          toolbar(),
-          editingArea([
-            codable(),
-            editable(),
-          ]),
-          statusbar(),
-        ])
-      )).render();
+          ? editor([
+            editingArea([
+              codable(),
+              editable(),
+            ]),
+            toolbar(),
+            statusbar(),
+          ])
+          : editor([
+            toolbar(),
+            editingArea([
+              codable(),
+              editable(),
+            ]),
+            statusbar(),
+          ])
+      )).render2());
 
       $editor.insertAfter($note);
 

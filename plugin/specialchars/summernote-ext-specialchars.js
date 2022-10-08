@@ -70,7 +70,7 @@
           click: function() {
             self.show();
           },
-        }).render();
+        }).render2();
       });
 
       /**
@@ -86,8 +86,9 @@
           var $td = $('<td></td>').addClass('note-specialchar-node');
           var $tr = (idx % COLUMN_LENGTH === 0) ? $('<tr></tr>') : $table.find('tr').last();
 
-          var $button = ui.button({
-            callback: function($node) {
+          var buttonEl = ui.button({
+            callback2: function(nodeEls) {
+              const $node = $(nodeEls);
               $node.html(text);
               $node.attr('title', text);
               $node.attr('data-value', encodeURIComponent(text));
@@ -97,9 +98,9 @@
                 'margin-bottom': '2px',
               });
             },
-          }).render();
+          }).render2();
 
-          $td.append($button);
+          $td.append(buttonEl);
 
           $tr.append($td);
           if (idx % COLUMN_LENGTH === 0) {
@@ -118,10 +119,10 @@
 
         var body = '<div class="form-group row-fluid">' + this.makeSpecialCharSetTable()[0].outerHTML + '</div>';
 
-        this.$dialog = ui.dialog({
+        this.$dialog = $(ui.dialog({
           title: lang.specialChar.select,
           body: body,
-        }).render().appendTo($container);
+        }).render2()).appendTo($container);
       };
 
       this.show = function() {

@@ -1,7 +1,7 @@
-import $ from 'jquery';
 import dom from '../core/dom';
 import range from '../core/range';
 import Bullet from '../editing/Bullet';
+import func from "../core/func";
 
 /**
  * @class editing.Typing
@@ -34,7 +34,7 @@ export default class Typing {
   /**
    * insert paragraph
    *
-   * @param {jQuery} $editable
+   * @param {jQuery} editable
    * @param {WrappedRange} rng Can be used in unit tests to "mock" the range
    *
    * blockquoteBreakingLevel
@@ -72,11 +72,11 @@ export default class Typing {
 
         if (blockquote) {
           // We're inside a blockquote and options ask us to break it
-          nextPara = $(dom.emptyPara)[0];
+          nextPara = func.makeElement(dom.emptyPara);
           // If the split is right before a <br>, remove it so that there's no "empty line"
           // after the split in the new blockquote created
           if (dom.isRightEdgePoint(rng.getStartPoint()) && dom.isBR(rng.sc.nextSibling)) {
-            $(rng.sc.nextSibling).remove();
+            rng.sc.nextSibling.remove();
           }
           const split = dom.splitTree(blockquote, rng.getStartPoint(), { isDiscardEmptySplits: true });
           if (split) {
@@ -91,7 +91,7 @@ export default class Typing {
           let emptyAnchors = dom.listDescendant(splitRoot, dom.isEmptyAnchor);
           emptyAnchors = emptyAnchors.concat(dom.listDescendant(nextPara, dom.isEmptyAnchor));
 
-          $.each(emptyAnchors, (idx, anchor) => {
+          emptyAnchors.forEach((anchor) => {
             dom.remove(anchor);
           });
 
@@ -104,7 +104,7 @@ export default class Typing {
     // no paragraph: insert empty paragraph
     } else {
       const next = rng.sc.childNodes[rng.so];
-      nextPara = $(dom.emptyPara)[0];
+      nextPara = func.makeElement(dom.emptyPara);
       if (next) {
         rng.sc.insertBefore(nextPara, next);
       } else {

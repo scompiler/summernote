@@ -28,7 +28,7 @@ export function readFileAsDataURL(file) {
  * create `<image>` from url string
  *
  * @param {String} url
- * @return {Promise} - then: $image
+ * @return {Promise} - then: imgEl
  */
 export function createImage(url) {
   return new Promise((resolve, reject) => {

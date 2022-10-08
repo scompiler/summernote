@@ -26,10 +26,12 @@ export default class HelpDialog {
       fade: this.options.dialogsFade,
       body: this.createShortcutList(),
       footer: body,
-      callback2: (nodeEl) => {
-        [].slice.call(nodeEl.querySelectorAll('.modal-body, .note-modal-body')).forEach((item) => {
-          item.style.maxHeight = 300 + 'px';
-          item.style.overflow = 'scroll';
+      callback2: (nodeEls) => {
+        nodeEls.forEach((nodeEl) => {
+          [].slice.call(nodeEl.querySelectorAll('.modal-body, .note-modal-body')).forEach((item) => {
+            item.style.maxHeight = 300 + 'px';
+            item.style.overflow = 'scroll';
+          });
         });
       },
     }).render2();

@@ -187,7 +187,7 @@ describe('Buttons', () => {
       var $span = $toolbar.find('span.note-current-fontname');
       assert.isTrue($li.length === 1);
       assert.isTrue($span.text() !== 'Courier New');
-      $li.click();
+      $li[0].click();
       expect($editable.find('p').children().first()).await(done).to.be.equalsStyle('"Courier New"', 'font-family');
     });
     it('should change font family (Arial) when it is clicked', (done) => {
@@ -195,7 +195,7 @@ describe('Buttons', () => {
       var $span = $toolbar.find('span.note-current-fontname');
       assert.isTrue($li.length === 1);
       assert.isTrue($span.text() !== 'Arial');
-      $li.click();
+      $li[0].click();
       expect($editable.find('p').children().first()).await(done).to.be.equalsStyle('"Arial"', 'font-family');
     });
     it('should change font family (Helvetica) when it is clicked', (done) => {
@@ -203,7 +203,7 @@ describe('Buttons', () => {
       var $span = $toolbar.find('span.note-current-fontname');
       assert.isTrue($li.length === 1);
       assert.isTrue($span.text() !== 'Helvetica');
-      $li.click();
+      $li[0].click();
       expect($editable.find('p').children().first()).await(done).to.be.equalsStyle('"Helvetica"', 'font-family');
     });
   });
@@ -256,8 +256,9 @@ describe('Buttons', () => {
 
       // click on dropdown button
       $fontSizeButton.trigger('click');
+      $fontSizeButton[0].click();
       // select a font size
-      $fontSizeList.filter('[data-value="' + selectedSize + '"]').trigger('click');
+      $fontSizeList.filter('[data-value="' + selectedSize + '"]')[0].click();
 
       expect($fontSizeButton.text().trim()).await(done).to.equal(selectedSize);
     });

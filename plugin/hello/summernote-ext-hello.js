@@ -38,8 +38,7 @@
         });
 
         // create jQuery object from button instance.
-        var $hello = button.render();
-        return $hello;
+        return button.render2();
       });
 
       // This events will be attached when editor is initialized.

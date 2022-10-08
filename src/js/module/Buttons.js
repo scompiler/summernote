@@ -73,8 +73,8 @@ export default class Buttons {
           className: 'tea-editor__button--current-color note-current-color-button',
           contents: this.ui.icon(this.options.icons.font),
           tooltip: tooltip,
-          click: (event) => {
-            const buttonEl = event.currentTarget;
+          click: (domEvent) => {
+            const buttonEl = domEvent.currentTarget;
             if (backColor && foreColor) {
               this.context.invoke('editor.color', {
                 backColor: buttonEl.getAttribute('data-backColor'),
@@ -91,29 +91,31 @@ export default class Buttons {
             }
           },
           /**
-           * @param {HTMLElement} buttonEl
+           * @param {HTMLElement[]} buttonEls
            */
-          callback2: (buttonEl) => {
-            /** @type {HTMLElement} */
-            const recentColorEl = buttonEl.querySelector('.note-recent-color');
+          callback2: (buttonEls) => {
+            buttonEls.forEach((buttonEl) => {
+              /** @type {HTMLElement} */
+              const recentColorEl = buttonEl.querySelector('.note-recent-color');
 
-            if (backColor) {
-              if (recentColorEl) {
-                recentColorEl.style.backgroundColor = this.options.colorButton.backColor;
+              if (backColor) {
+                if (recentColorEl) {
+                  recentColorEl.style.backgroundColor = this.options.colorButton.backColor;
+                }
+                buttonEl.setAttribute('data-backColor', this.options.colorButton.backColor);
+                buttonEl.style.setProperty('--background-color', this.options.colorButton.backColor);
               }
-              buttonEl.setAttribute('data-backColor', this.options.colorButton.backColor);
-              buttonEl.style.setProperty('--background-color', this.options.colorButton.backColor);
-            }
-            if (foreColor) {
-              if (recentColorEl) {
-                recentColorEl.style.color = this.options.colorButton.foreColor;
+              if (foreColor) {
+                if (recentColorEl) {
+                  recentColorEl.style.color = this.options.colorButton.foreColor;
+                }
+                buttonEl.setAttribute('data-foreColor', this.options.colorButton.foreColor);
+              } else {
+                if (recentColorEl) {
+                  recentColorEl.style.color = 'transparent';
+                }
               }
-              buttonEl.setAttribute('data-foreColor', this.options.colorButton.foreColor);
-            } else {
-              if (recentColorEl) {
-                recentColorEl.style.color = 'transparent';
-              }
-            }
+            });
           },
         }),
         this.button({
@@ -161,49 +163,51 @@ export default class Buttons {
               '<div class="note-holder-custom" id="foreColorPalette-'+this.options.id+'" data-event="foreColor"></div>',
             '</div>',
           ].join('') : ''),
-          callback2: (dropdownEl) => {
-            [].slice.call(dropdownEl.querySelectorAll('.note-holder')).forEach((item) => {
-              item.appendChild(this.ui.palette({
-                colors: this.options.colors,
-                colorsName: this.options.colorsName,
-                eventName: item.getAttribute('data-event'),
-                container: this.options.container,
-                tooltip: this.options.tooltip,
-              }).render2());
-            });
-            /* TODO: do we have to record recent custom colors within cookies? */
-            const customColors = [
-              ['#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF'],
-            ];
-            [].slice.call(dropdownEl.querySelectorAll('.note-holder-custom')).forEach((item) => {
-              item.appendChild(this.ui.palette({
-                colors: customColors,
-                colorsName: customColors,
-                eventName: item.getAttribute('data-event'),
-                container: this.options.container,
-                tooltip: this.options.tooltip,
-              }).render2());
-            });
-            [].slice.call(dropdownEl.querySelectorAll('input[type=color]')).forEach((item) => {
-              item.addEventListener('change', function() {
-                const chipEl = dropdownEl
-                  .querySelector('#' + this.getAttribute('data-event'))
-                  .querySelector('.note-color-btn');
-                const color = this.value.toUpperCase();
+          callback2: (dropdownEls) => {
+            dropdownEls.forEach((dropdownEl) => {
+              [].slice.call(dropdownEl.querySelectorAll('.note-holder')).forEach((item) => {
+                item.appendChild(this.ui.palette({
+                  colors: this.options.colors,
+                  colorsName: this.options.colorsName,
+                  eventName: item.getAttribute('data-event'),
+                  container: this.options.container,
+                  tooltip: this.options.tooltip,
+                }).render2());
+              });
+              /* TODO: do we have to record recent custom colors within cookies? */
+              const customColors = [
+                ['#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF'],
+              ];
+              [].slice.call(dropdownEl.querySelectorAll('.note-holder-custom')).forEach((item) => {
+                item.appendChild(this.ui.palette({
+                  colors: customColors,
+                  colorsName: customColors,
+                  eventName: item.getAttribute('data-event'),
+                  container: this.options.container,
+                  tooltip: this.options.tooltip,
+                }).render2());
+              });
+              [].slice.call(dropdownEl.querySelectorAll('input[type=color]')).forEach((item) => {
+                item.addEventListener('change', function() {
+                  const chipEl = dropdownEl
+                    .querySelector('#' + this.getAttribute('data-event'))
+                    .querySelector('.note-color-btn');
+                  const color = this.value.toUpperCase();
 
-                chipEl.style.backgroundColor = color;
-                chipEl.setAttribute('aria-label', color);
-                chipEl.setAttribute('data-value', color);
-                chipEl.setAttribute('data-original-title', color);
-                chipEl.click();
+                  chipEl.style.backgroundColor = color;
+                  chipEl.setAttribute('aria-label', color);
+                  chipEl.setAttribute('data-value', color);
+                  chipEl.setAttribute('data-original-title', color);
+                  chipEl.click();
+                });
               });
             });
           },
-          click: (event) => {
-            event.stopPropagation();
+          click: (domEvent) => {
+            domEvent.stopPropagation();
 
-            const buttonEl = event.target;
-            const parentEl = event.target.closest('.note-dropdown-menu');
+            const buttonEl = domEvent.target;
+            const parentEl = domEvent.target.closest('.note-dropdown-menu');
             const eventName = buttonEl.getAttribute('data-event');
             const value = buttonEl.getAttribute('data-value');
 
@@ -591,14 +595,16 @@ export default class Buttons {
           ].join(''),
         }),
       ], {
-        callback2: (nodeEl) => {
-          const catcherEl = nodeEl.querySelector('.note-dimension-picker-mousecatcher');
+        callback2: (nodeEls) => {
+          nodeEls.forEach((nodeEl) => {
+            const catcherEl = nodeEl.querySelector('.note-dimension-picker-mousecatcher');
 
-          catcherEl.style.width = this.options.insertTableMaxSize.col + 'em';
-          catcherEl.style.height = this.options.insertTableMaxSize.row + 'em';
+            catcherEl.style.width = this.options.insertTableMaxSize.col + 'em';
+            catcherEl.style.height = this.options.insertTableMaxSize.row + 'em';
 
-          catcherEl.addEventListener('mousedown', this.context.createInvokeHandler('editor.insertTable'));
-          catcherEl.addEventListener('mousemove', this.tableMoveHandler.bind(this));
+            catcherEl.addEventListener('mousedown', this.context.createInvokeHandler('editor.insertTable'));
+            catcherEl.addEventListener('mousemove', this.tableMoveHandler.bind(this));
+          });
         },
       }).render2();
     });

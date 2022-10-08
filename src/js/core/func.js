@@ -88,10 +88,9 @@ function uniqueId(prefix) {
  * @return {Number} bounds.height
  */
 function rect2bnd(rect) {
-  const $document = $(document);
   return {
-    top: rect.top + $document.scrollTop(),
-    left: rect.left + $document.scrollLeft(),
+    top: rect.top + document.scrollingElement.scrollTop,
+    left: rect.left + document.scrollingElement.scrollLeft,
     width: rect.right - rect.left,
     height: rect.bottom - rect.top,
   };
@@ -219,8 +218,8 @@ function getElementOffset(element) {
   };
 }
 
-function makeElement(markup) {
-  const div = document.createElement('div');
+function makeElement(markup, parent) {
+  const div = document.createElement(parent || 'div');
 
   div.innerHTML = markup;
 
