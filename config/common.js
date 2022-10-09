@@ -2,7 +2,7 @@ const { readdirSync, readFileSync } = require('fs');
 const glob = require('glob');
 const path = require('path');
 
-const defaultStyle = 'teaks2';
+const defaultStyle = 'teaks';
 
 module.exports = {
   defaultStyle,

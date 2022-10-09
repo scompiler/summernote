@@ -3,7 +3,7 @@ import '/js/settings';
 import renderer from '/js/renderer';
 import Summernote from "../../js/class";
 
-import './summernote-teaks2.scss';
+import './summernote-teaks.scss';
 import TooltipUI from './js/TooltipUI';
 import DropdownUI from './js/DropdownUI';
 import ModalUI from './js/ModalUI';
@@ -694,7 +694,7 @@ const ui = function(editorOptions) {
 
 Summernote.meta = Object.assign(Summernote.meta, {
   ui_template: ui,
-  interface: 'teaks2',
+  interface: 'teaks',
 });
 
 Summernote.meta.options.icons = Object.assign(Summernote.meta.options.icons, {
