@@ -15,7 +15,7 @@
       var self = this;
       var ui = $.summernote.ui;
 
-      var $editor = context.layoutInfo.editor;
+      var $editor = $(context.layoutInfo.editorEl);
       var options = context.options;
       var lang = options.langInfo;
 

@@ -15,7 +15,7 @@ describe('Placeholder', () => {
   it('should not be initialized by placeholder attribute without inheritPlaceHolder', () => {
     var options = $.extend({}, Summernote.meta.options);
     var context = new Context($('<textarea placeholder="custom_placeholder"><p>hello</p></textarea>')[0], options);
-    var $editor = context.layoutInfo.editor;
+    var $editor = $(context.layoutInfo.editorEl);
 
     assert.isTrue($editor.find('.note-placeholder').length === 0);
   });
@@ -24,7 +24,7 @@ describe('Placeholder', () => {
     var options = $.extend({}, Summernote.meta.options);
     options.inheritPlaceholder = true;
     var context = new Context($('<textarea placeholder="custom_placeholder"><p>hello</p></textarea>')[0], options);
-    var $editor = context.layoutInfo.editor;
+    var $editor = $(context.layoutInfo.editorEl);
 
     assert.isTrue($editor.find('.note-placeholder').length === 1);
     assert.isTrue($editor.find('.note-placeholder').html() === 'custom_placeholder');

@@ -41,7 +41,7 @@ export default class ImagePopover {
     this.popoverEl = this.ui.popover({
       className: 'note-image-popover',
     }).render2();
-    func.jqueryToHtmlElement(this.options.container).appendChild(this.popoverEl);
+    this.options.container.appendChild(this.popoverEl);
     const contentEl = this.popoverEl.querySelector('.popover-content, .note-popover-content');
     this.context.invoke('buttons.build', contentEl, this.options.popover.image);
 
@@ -55,7 +55,7 @@ export default class ImagePopover {
   update(target, domEvent) {
     if (dom.isImg(target)) {
       const position = func.getElementOffset(target);
-      const containerOffset = func.getElementOffset(func.jqueryToHtmlElement(this.options.container));
+      const containerOffset = func.getElementOffset(this.options.container);
       let pos = {};
       if (this.options.popatmouse) {
         pos.left = domEvent.pageX - 20;

@@ -1,12 +1,11 @@
 import range from '../core/range';
-import func from "../core/func";
 
 export default class History {
   constructor(context) {
     this.stack = [];
     this.stackOffset = -1;
     this.context = context;
-    this.editableEl = func.jqueryToHtmlElement(context.layoutInfo.editable);
+    this.editableEl = context.layoutInfo.editableEl;
   }
 
   makeSnapshot() {

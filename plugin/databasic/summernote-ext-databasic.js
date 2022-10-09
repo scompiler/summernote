@@ -66,7 +66,7 @@
     self.events = {
       'summernote.init': function(we, e) {
         // update existing containers
-        $('data.ext-databasic', e.editable).each(function() { self.setContent($(this)); });
+        $('data.ext-databasic', e.editableEl).each(function() { self.setContent($(this)); });
         // TODO: make this an undo snapshot...
       },
       'summernote.keyup summernote.mouseup summernote.change summernote.scroll': function() {
@@ -79,7 +79,7 @@
 
     self.initialize = function() {
       // create dialog markup
-      var $container = options.dialogsInBody ? $(document.body) : context.layoutInfo.editor;
+      var $container = options.dialogsInBody ? $(document.body) : $(context.layoutInfo.editorEl);
 
       var body = '<div class="form-group row-fluid">' +
           '<label>' + lang.databasic.testLabel + '</label>' +

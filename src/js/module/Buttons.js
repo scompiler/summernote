@@ -7,7 +7,7 @@ export default class Buttons {
   constructor(context) {
     this.ui = Summernote.meta.ui;
     this.context = context;
-    this.toolbarEl = func.jqueryToHtmlElement(context.layoutInfo.toolbar);
+    this.toolbarEl = context.layoutInfo.toolbarEl;
     this.options = context.options;
     this.lang = this.options.langInfo;
     this.invertedKeyMap = func.invertObject(
@@ -953,7 +953,11 @@ export default class Buttons {
   updateBtnStates(containerEl, infos) {
     for (const selector in infos) {
       const pred = infos[selector];
-      this.ui.toggleBtnActive(containerEl.querySelector(selector), pred());
+      const buttonEl = containerEl.querySelector(selector);
+
+      if (buttonEl) {
+        this.ui.toggleBtnActive(buttonEl, pred());
+      }
     }
   }
 

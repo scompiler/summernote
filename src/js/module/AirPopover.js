@@ -75,7 +75,7 @@ export default class AirPopover {
       className: 'note-air-popover',
     }).render2();
 
-    func.jqueryToHtmlElement(this.options.container).appendChild(this.popoverEl);
+    this.options.container.appendChild(this.popoverEl);
 
     const contentEl = this.popoverEl.querySelector('.popover-content');
 
@@ -99,7 +99,7 @@ export default class AirPopover {
         top: this.pageY,
       };
 
-      const containerEl = func.jqueryToHtmlElement(this.options.container);
+      const containerEl = this.options.container;
       const containerRect = containerEl.getBoundingClientRect();
       const containerOffset = {
         top: containerRect.top + containerEl.ownerDocument.defaultView.scrollY,
@@ -119,7 +119,11 @@ export default class AirPopover {
   }
 
   updateCodeview(isCodeview) {
-    this.ui.toggleBtnActive(this.popoverEl.querySelector('.btn-codeview'), isCodeview);
+    const buttonEl = this.popoverEl.querySelector('.btn-codeview');
+
+    if (buttonEl) {
+      this.ui.toggleBtnActive(buttonEl, isCodeview);
+    }
     if (isCodeview) {
       this.hide();
     }

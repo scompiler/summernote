@@ -1,9 +1,10 @@
-import $ from 'jquery';
+import func from "../../../js/core/func";
 
 class TooltipUI {
-  constructor($node, options) {
-    this.$node = $node;
-    this.options = $.extend({}, {
+  constructor(nodeEl, options) {
+    this.nodeEl = nodeEl;
+
+    this.options = Object.assign({}, {
       title: '',
       target: options.container,
       trigger: 'hover focus',
@@ -11,12 +12,13 @@ class TooltipUI {
     }, options);
 
     // create tooltip node
-    this.$tooltip = $([
+    this.tooltipEl = func.makeElement([
       '<div class="note-tooltip">',
         '<div class="note-tooltip-arrow"></div>',
         '<div class="note-tooltip-content"></div>',
       '</div>',
     ].join(''));
+    this.tooltipContentEl = this.tooltipEl.querySelector('.note-tooltip-content');
 
     // define event
     if (this.options.trigger !== 'manual') {
@@ -24,73 +26,65 @@ class TooltipUI {
       const hideCallback = this.hide.bind(this);
       const toggleCallback = this.toggle.bind(this);
 
-      this.options.trigger.split(' ').forEach(function(eventName) {
+      this.options.trigger.split(' ').forEach((eventName) => {
         if (eventName === 'hover') {
-          $node.off('mouseenter mouseleave');
-          $node.on('mouseenter', showCallback).on('mouseleave', hideCallback);
+          this.nodeEl.addEventListener('mouseenter', showCallback);
+          this.nodeEl.addEventListener('mouseleave', hideCallback);
         } else if (eventName === 'click') {
-          $node.on('click', toggleCallback);
+          this.nodeEl.addEventListener('click', toggleCallback);
         } else if (eventName === 'focus') {
-          $node.on('focus', showCallback).on('blur', hideCallback);
+          this.nodeEl.addEventListener('focus', showCallback);
+          this.nodeEl.addEventListener('blur', hideCallback);
         }
       });
     }
   }
 
   show() {
-    const $node = this.$node;
-    const offset = $node.offset();
-    const targetOffset = $(this.options.target).offset();
+    const offset = func.getElementOffset(this.nodeEl);
+    const targetOffset = func.getElementOffset(this.options.target);
     offset.top -= targetOffset.top;
     offset.left -= targetOffset.left;
 
-    const $tooltip = this.$tooltip;
-    const title = this.options.title || $node.attr('title') || $node.data('title');
-    const placement = this.options.placement || $node.data('placement');
+    const title = this.options.title || this.nodeEl.getAttribute('title') || this.nodeEl.getAttribute('data-title');
+    const placement = this.options.placement || this.nodeEl.getAttribute('data-placement');
 
-    $tooltip.addClass(placement);
-    $tooltip.find('.note-tooltip-content').text(title);
-    $tooltip.appendTo(this.options.target);
+    this.tooltipEl.classList.add(placement);
+    this.tooltipContentEl.textContent = title;
+    this.options.target.appendChild(this.tooltipEl);
 
-    const nodeWidth = $node.outerWidth();
-    const nodeHeight = $node.outerHeight();
-    const tooltipWidth = $tooltip.outerWidth();
-    const tooltipHeight = $tooltip.outerHeight();
+    const nodeWidth = this.nodeEl.offsetWidth;
+    const nodeHeight = this.nodeEl.offsetHeight;
+    const tooltipWidth = this.tooltipEl.offsetWidth;
+    const tooltipHeight = this.tooltipEl.offsetHeight;
 
     if (placement === 'bottom') {
-      $tooltip.css({
-        top: offset.top + nodeHeight,
-        left: offset.left + (nodeWidth / 2 - tooltipWidth / 2),
-      });
+      this.tooltipEl.style.top = (offset.top + nodeHeight) + 'px';
+      this.tooltipEl.style.left = (offset.left + (nodeWidth / 2 - tooltipWidth / 2)) + 'px';
     } else if (placement === 'top') {
-      $tooltip.css({
-        top: offset.top - tooltipHeight,
-        left: offset.left + (nodeWidth / 2 - tooltipWidth / 2),
-      });
+      this.tooltipEl.style.top = (offset.top - tooltipHeight) + 'px';
+      this.tooltipEl.style.left = (offset.left + (nodeWidth / 2 - tooltipWidth / 2)) + 'px';
     } else if (placement === 'left') {
-      $tooltip.css({
-        top: offset.top + (nodeHeight / 2 - tooltipHeight / 2),
-        left: offset.left - tooltipWidth,
-      });
+      this.tooltipEl.style.top = (offset.top + (nodeHeight / 2 - tooltipHeight / 2)) + 'px';
+      this.tooltipEl.style.left = (offset.left - tooltipWidth) + 'px';
     } else if (placement === 'right') {
-      $tooltip.css({
-        top: offset.top + (nodeHeight / 2 - tooltipHeight / 2),
-        left: offset.left + nodeWidth,
-      });
+      this.tooltipEl.style.top = (offset.top + (nodeHeight / 2 - tooltipHeight / 2)) + 'px';
+      this.tooltipEl.style.left = (offset.left + nodeWidth) + 'px';
     }
 
-    $tooltip.addClass('in');
+    this.tooltipEl.classList.add('in');
   }
 
   hide() {
-    this.$tooltip.removeClass('in');
+    this.tooltipEl.classList.remove('in');
+
     setTimeout(() => {
-      this.$tooltip.remove();
+      this.tooltipEl.remove();
     }, 200);
   }
 
   toggle() {
-    if (this.$tooltip.hasClass('in')) {
+    if (this.tooltipEl.classList.contains('in')) {
       this.hide();
     } else {
       this.show();

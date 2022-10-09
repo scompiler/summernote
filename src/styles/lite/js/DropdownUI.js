@@ -1,51 +1,56 @@
-import $ from 'jquery';
+import func from "../../../js/core/func";
 
 class DropdownUI {
-  constructor($node, options) {
-    this.$button = $node;
-    this.options = $.extend({}, {
+  constructor(nodeEl, options) {
+    this.buttonEl = nodeEl;
+    this.options = Object.assign({}, {
       target: options.container,
     }, options);
     this.setEvent();
   }
 
   setEvent() {
-    this.$button.on('click', (e) => {
+    this.buttonEl.addEventListener('click', (domEvent) => {
       this.toggle();
-      e.stopImmediatePropagation();
+      domEvent.stopImmediatePropagation();
     });
   }
 
   clear() {
-    var $parent = $('.note-btn-group.open');
-    $parent.find('.note-btn.active').removeClass('active');
-    $parent.removeClass('open');
+    const parentEls = [].slice.call(document.querySelectorAll('.note-btn-group.open'));
+
+    parentEls.forEach((parentEl) => {
+      const activeBtnEls = [].slice.call(parentEl.querySelectorAll('.note-btn.active'));
+
+      activeBtnEls.forEach(x => x.classList.remove('active'));
+
+      parentEl.classList.remove('open');
+    });
   }
 
   show() {
-    this.$button.addClass('active');
-    this.$button.parent().addClass('open');
+    this.buttonEl.classList.add('active');
+    this.buttonEl.parentElement.classList.add('open');
 
-    var $dropdown = this.$button.next();
-    var offset = $dropdown.offset();
-    var width = $dropdown.outerWidth();
-    var windowWidth = $(window).width();
-    var targetMarginRight = parseFloat($(this.options.target).css('margin-right'));
+    const dropDownEl = this.buttonEl.nextElementSibling;
+    const offset = func.getElementOffset(this.buttonEl);
+    const width = dropDownEl.offsetWidth;
+    const containerWidth = document.scrollingElement.clientWidth;
 
-    if (offset.left + width > windowWidth - targetMarginRight) {
-      $dropdown.css('margin-left', windowWidth - targetMarginRight - (offset.left + width));
+    if (offset.left + width > containerWidth) {
+      dropDownEl.style.marginLeft = (containerWidth - (offset.left + width)) + 'px';
     } else {
-      $dropdown.css('margin-left', '');
+      dropDownEl.style.marginLeft = '';
     }
   }
 
   hide() {
-    this.$button.removeClass('active');
-    this.$button.parent().removeClass('open');
+    this.buttonEl.classList.remove('active');
+    this.buttonEl.parentElement.classList.remove('open');
   }
 
   toggle() {
-    var isOpened = this.$button.parent().hasClass('open');
+    const isOpened = this.buttonEl.parentElement.classList.contains('open');
 
     this.clear();
 
@@ -57,16 +62,27 @@ class DropdownUI {
   }
 }
 
-$(document).on('click.note-dropdown-menu', function(e) {
-  if (!$(e.target).closest('.note-btn-group').length) {
-    $('.note-btn-group.open .note-btn.active').removeClass('active');
-    $('.note-btn-group.open').removeClass('open');
-  }
-});
+document.addEventListener('click', (e) => {
+  const btnGroupEl = e.target.closest('.note-btn-group');
 
-$(document).on('click.note-dropdown-menu', function(e) {
-  $(e.target).closest('.note-dropdown-menu').parent().removeClass('open');
-  $(e.target).closest('.note-dropdown-menu').parent().find('.note-btn.active').removeClass('active');
+  if (!btnGroupEl) {
+    [].slice.call(document.querySelectorAll('.note-btn-group.open .note-btn.active')).forEach((el) => {
+      el.classList.remove('active');
+    });
+    [].slice.call(document.querySelectorAll('.note-btn-group.open')).forEach((el) => {
+      el.classList.remove('open');
+    });
+  }
+
+  const dropdownMenuEl = e.target.closest('.note-dropdown-menu');
+
+  if (dropdownMenuEl && dropdownMenuEl.parentElement) {
+    dropdownMenuEl.parentElement.classList.remove('open');
+
+    const activeBtnEls = [].slice.call(dropdownMenuEl.parentElement.querySelectorAll('.note-btn.active'));
+
+    activeBtnEls.forEach(x => x.classList.remove('active'));
+  }
 });
 
 export default DropdownUI;

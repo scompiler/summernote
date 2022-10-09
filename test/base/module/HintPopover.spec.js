@@ -22,7 +22,7 @@ describe('HintPopover', () => {
   var $note, editor, context, $editable;
 
   function expectContents(context, markup) {
-    expect(context.layoutInfo.editable.html()).to.equalsIgnoreCase(markup);
+    expect(context.layoutInfo.editableEl.innerHTML).to.equalsIgnoreCase(markup);
   }
 
   describe('Single word hint', () => {
@@ -48,7 +48,7 @@ describe('HintPopover', () => {
 
       context = new Context($note[0], options);
       editor = context.modules.editor;
-      $editable = context.layoutInfo.editable;
+      $editable = $(context.layoutInfo.editableEl);
 
       // [workaround]
       //  - Safari does not popup hintpopover
@@ -182,7 +182,7 @@ describe('HintPopover', () => {
 
       context = new Context($note[0], options);
       editor = context.modules.editor;
-      $editable = context.layoutInfo.editable;
+      $editable = $(context.layoutInfo.editableEl);
 
       // [workaround]
       //  - Safari does not popup hintpopover

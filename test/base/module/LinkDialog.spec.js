@@ -35,7 +35,7 @@ describe('LinkDialog', () => {
     dialog = new LinkDialog(context);
     dialog.initialize();
 
-    $editable = context.layoutInfo.editable;
+    $editable = $(context.layoutInfo.editableEl);
     $editable.appendTo('body');
   });
 

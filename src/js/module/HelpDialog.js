@@ -13,7 +13,7 @@ export default class HelpDialog {
   }
 
   initialize() {
-    const containerEl = this.options.dialogsInBody ? this.bodyEl : func.jqueryToHtmlElement(this.options.container);
+    const containerEl = this.options.dialogsInBody ? this.bodyEl : this.options.container;
     const body = [
       '<p class="text-center">',
         '<a href="http://summernote.org/" target="_blank" rel="noopener noreferrer">Summernote @@VERSION@@</a> · ',

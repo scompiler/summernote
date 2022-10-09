@@ -20,9 +20,9 @@ export default class Editor {
   constructor(context) {
     this.context = context;
 
-    this.noteEl = func.jqueryToHtmlElement(context.layoutInfo.note);
-    this.editorEl = func.jqueryToHtmlElement(context.layoutInfo.editor);
-    this.editableEl = func.jqueryToHtmlElement(context.layoutInfo.editable);
+    this.noteEl = context.layoutInfo.noteEl;
+    this.editorEl = context.layoutInfo.editorEl;
+    this.editableEl = context.layoutInfo.editableEl;
     this.options = context.options;
     this.lang = this.options.langInfo;
 
@@ -161,7 +161,7 @@ export default class Editor {
       const onApplyCustomStyle = this.options.callbacks.onApplyCustomStyle;
       if (onApplyCustomStyle) {
         onApplyCustomStyle.call(this, targetEl, this.context, this.onFormatBlock);
-      } else {
+      } else if (tagName) {
         this.onFormatBlock(tagName, targetEl);
       }
     });

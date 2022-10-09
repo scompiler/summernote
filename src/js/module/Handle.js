@@ -5,7 +5,7 @@ export default class Handle {
   constructor(context) {
     this.context = context;
     this.documentEl = document;
-    this.editingAreaEl = func.jqueryToHtmlElement(context.layoutInfo.editingArea);
+    this.editingAreaEl = context.layoutInfo.editingAreaEl;
     this.options = context.options;
     this.lang = this.options.langInfo;
 

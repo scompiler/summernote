@@ -12,7 +12,7 @@ export default class HintPopover {
     this.context = context;
 
     this.ui = Summernote.meta.ui;
-    this.editableEl = func.jqueryToHtmlElement(context.layoutInfo.editable);
+    this.editableEl = context.layoutInfo.editableEl;
     this.options = context.options;
     this.hint = this.options.hint || [];
     this.direction = this.options.hintDirection || 'bottom';
@@ -49,7 +49,7 @@ export default class HintPopover {
       hideArrow: true,
       direction: '',
     }).render2();
-    func.jqueryToHtmlElement(this.options.container).appendChild(this.popoverEl);
+    this.options.container.appendChild(this.popoverEl);
 
     this.popoverEl.style.display = 'none';
     this.contentEl = this.popoverEl.querySelector('.popover-content, .note-popover-content');
@@ -260,7 +260,7 @@ export default class HintPopover {
         this.contentEl.innerHTML = '';
 
         const bnd = func.rect2bnd(lists.last(wordRange.getClientRects()));
-        const containerOffset = func.getElementOffset(func.jqueryToHtmlElement(this.options.container));
+        const containerOffset = func.getElementOffset(this.options.container);
         if (bnd) {
           bnd.top -= containerOffset.top;
           bnd.left -= containerOffset.left;

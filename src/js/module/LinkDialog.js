@@ -16,7 +16,7 @@ export default class LinkDialog {
   }
 
   initialize() {
-    const containerEl = this.options.dialogsInBody ? this.bodyEl : func.jqueryToHtmlElement(this.options.container);
+    const containerEl = this.options.dialogsInBody ? this.bodyEl : this.options.container;
     const body = [
       '<div class="form-group note-form-group">',
         `<label for="note-dialog-link-txt-${this.options.id}" class="note-form-label">${this.lang.link.textToDisplay}</label>`,

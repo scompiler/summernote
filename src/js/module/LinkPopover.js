@@ -1,6 +1,5 @@
 import lists from '../core/lists';
 import dom from '../core/dom';
-import func from "../core/func";
 import Summernote from '../class';
 
 export default class LinkPopover {
@@ -48,7 +47,7 @@ export default class LinkPopover {
         contentEls.forEach((contentEl) => contentEl.insertBefore(spanEl, contentEl.firstChild));
       },
     }).render2();
-    const containerEl = func.jqueryToHtmlElement(this.options.container);
+    const containerEl = this.options.container;
 
     containerEl.appendChild(this.popoverEl);
 
@@ -83,7 +82,7 @@ export default class LinkPopover {
       a.textContent = href;
 
       const pos = dom.posFromPlaceholder(anchor);
-      const containerEl = func.jqueryToHtmlElement(this.options.container);
+      const containerEl = this.options.container;
       const containerRect = containerEl.getBoundingClientRect();
       const containerOffset = {
         top: containerRect.top + containerEl.ownerDocument.defaultView.scrollY,

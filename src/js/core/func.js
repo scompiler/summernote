@@ -162,23 +162,6 @@ function isValidUrl(url) {
 }
 
 /**
- *
- * @param {jQuery} jquery
- * @returns {HTMLElement|null}
- */
-function jqueryToHtmlElement(jquery) {
-  if (!jquery) {
-    return null;
-  }
-
-  if (jquery.length > 1) {
-    throw new Error('Elements is more than 1');
-  }
-
-  return jquery.get(0) || null;
-}
-
-/**
  * @param {Element} element
  */
 function getElementRect(element) {
@@ -229,7 +212,6 @@ export default {
   namespaceToCamel,
   debounce,
   isValidUrl,
-  jqueryToHtmlElement,
   getElementRect,
   getElementOffset,
   makeElement,

@@ -1,11 +1,9 @@
-import func from "../core/func";
-
 export default class Dropzone {
   constructor(context) {
     this.context = context;
     this.eventListenerEl = document;
-    this.editorEl = func.jqueryToHtmlElement(context.layoutInfo.editor);
-    this.editableEl = func.jqueryToHtmlElement(context.layoutInfo.editable);
+    this.editorEl = context.layoutInfo.editorEl;
+    this.editableEl = context.layoutInfo.editableEl;
     this.options = context.options;
     this.lang = this.options.langInfo;
     this.documentEventHandlers = {};

@@ -1,10 +1,9 @@
 import lists from '../core/lists';
-import func from "../core/func";
 
 export default class Clipboard {
   constructor(context) {
     this.context = context;
-    this.editableEl = func.jqueryToHtmlElement(context.layoutInfo.editable);
+    this.editableEl = context.layoutInfo.editableEl;
   }
 
   initialize() {

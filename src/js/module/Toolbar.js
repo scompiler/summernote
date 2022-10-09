@@ -9,12 +9,12 @@ export default class Toolbar {
     this.document = document;
 
     this.ui = Summernote.meta.ui;
-    this.noteEl = func.jqueryToHtmlElement(context.layoutInfo.note);
-    this.editorEl = func.jqueryToHtmlElement(context.layoutInfo.editor);
-    this.toolbarEl = func.jqueryToHtmlElement(context.layoutInfo.toolbar);
-    this.toolbarContentEl = func.jqueryToHtmlElement(context.layoutInfo.toolbarContent);
-    this.editableEl = func.jqueryToHtmlElement(context.layoutInfo.editable);
-    this.statusbarEl = func.jqueryToHtmlElement(context.layoutInfo.statusbar);
+    this.noteEl = context.layoutInfo.noteEl;
+    this.editorEl = context.layoutInfo.editorEl;
+    this.toolbarEl = context.layoutInfo.toolbarEl;
+    this.toolbarContentEl = context.layoutInfo.toolbarContentEl;
+    this.editableEl = context.layoutInfo.editableEl;
+    this.statusbarEl = context.layoutInfo.statusbarEl;
     this.options = context.options;
 
     this.isFollowing = false;
@@ -32,10 +32,6 @@ export default class Toolbar {
       this.toolbarEl.style.display = 'none';
     } else {
       this.context.invoke('buttons.build', this.toolbarContentEl || this.toolbarEl, this.options.toolbar);
-    }
-
-    if (this.options.toolbarContainer) {
-      func.jqueryToHtmlElement(this.options.toolbarContainer).appendChild(this.toolbarEl);
     }
 
     this.changeContainer(false);
@@ -74,7 +70,7 @@ export default class Toolbar {
     // check if the web app is currently using another static bar
     let otherBarHeight = 0;
     if (this.options.otherStaticBar) {
-      otherBarHeight = func.jqueryToHtmlElement(this.options.otherStaticBar).offsetHeight;
+      otherBarHeight = this.options.otherStaticBar.offsetHeight;
     }
 
     const currentOffset = this.document.scrollingElement.scrollTop;
@@ -106,9 +102,7 @@ export default class Toolbar {
     if (isFullscreen) {
       this.editorEl.insertBefore(this.toolbarEl, this.editorEl.firstChild);
     } else {
-      if (this.options.toolbarContainer) {
-        func.jqueryToHtmlElement(this.options.toolbarContainer).appendChild(this.toolbarEl);
-      }
+      this.moveToToolbarContainer();
     }
     if (this.options.followingToolbar) {
       this.followScroll();
@@ -146,5 +140,21 @@ export default class Toolbar {
       btnEls = btnEls.filter((btnEl) => !btnEl.classList.contains('note-codeview-keep'));
     }
     btnEls.forEach((btnEl) => this.ui.toggleBtn(btnEl, false));
+  }
+
+  moveToToolbarContainer() {
+    if (!this.options.toolbarContainer) {
+      return;
+    }
+
+    const toolbarContainerEl = typeof this.options.toolbarContainer === 'string'
+      ? document.querySelector(this.options.toolbarContainer)
+      : this.options.toolbarContainer;
+
+    if (!toolbarContainerEl) {
+      return;
+    }
+
+    toolbarContainerEl.appendChild(this.toolbarEl);
   }
 }

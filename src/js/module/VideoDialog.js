@@ -14,7 +14,7 @@ export default class VideoDialog {
   }
 
   initialize() {
-    const containerEl = this.options.dialogsInBody ? this.bodyEl : func.jqueryToHtmlElement(this.options.container);
+    const containerEl = this.options.dialogsInBody ? this.bodyEl : this.options.container;
     const body = [
       '<div class="form-group note-form-group row-fluid">',
         `<label for="note-dialog-video-url-${this.options.id}" class="note-form-label">${this.lang.video.url} <small class="text-muted">${this.lang.video.providers}</small></label>`,

@@ -1,5 +1,4 @@
 import dom from '../core/dom';
-import func from "../core/func";
 
 /**
  * @class Codeview
@@ -7,9 +6,9 @@ import func from "../core/func";
 export default class CodeView {
   constructor(context) {
     this.context = context;
-    this.editorEl = func.jqueryToHtmlElement(context.layoutInfo.editor);
-    this.editableEl = func.jqueryToHtmlElement(context.layoutInfo.editable);
-    this.codableEl = func.jqueryToHtmlElement(context.layoutInfo.codable);
+    this.editorEl = context.layoutInfo.editorEl;
+    this.editableEl = context.layoutInfo.editableEl;
+    this.codableEl = context.layoutInfo.codableEl;
     this.options = context.options;
     this.CodeMirrorConstructor = window.CodeMirror;
 

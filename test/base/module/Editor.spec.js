@@ -12,7 +12,6 @@ import env from 'src/js/core/env';
 import range from 'src/js/core/range';
 import Context from 'src/js/Context';
 import 'src/styles/bs4/summernote-bs4';
-import func from "../../../src/js/core/func";
 import Summernote from "../../../src/js/class";
 
 describe('Editor', () => {
@@ -23,22 +22,22 @@ describe('Editor', () => {
   var editor, context, $editable;
 
   function expectContents(context, markup) {
-    expect(context.layoutInfo.editable.html()).to.equalsIgnoreCase(markup);
+    expect(context.layoutInfo.editableEl.innerHTML).to.equalsIgnoreCase(markup);
   }
 
   function expectContentsChain(context, markup, next) {
     setTimeout(() => {
-      expect(context.layoutInfo.editable.html()).to.equalsIgnoreCase(markup);
+      expect(context.layoutInfo.editableEl.innerHTML).to.equalsIgnoreCase(markup);
       next();
     }, 10);
   }
 
   function expectContentsAwait(context, markup, done) {
-    expect(context.layoutInfo.editable.html()).await(done).to.equalsIgnoreCase(markup);
+    expect(context.layoutInfo.editableEl.innerHTML).await(done).to.equalsIgnoreCase(markup);
   }
 
   function expectToHaveBeenCalled(context, customEvent, handler) {
-    const $note = context.layoutInfo.note;
+    const $note = $(context.layoutInfo.noteEl);
     const spy = chai.spy();
     $note[0].addEventListener(customEvent, spy);
     handler();
@@ -52,7 +51,7 @@ describe('Editor', () => {
     context = new Context($('<div><p>hello</p></div>')[0], options);
 
     editor = context.modules.editor;
-    $editable = context.layoutInfo.editable;
+    $editable = $(context.layoutInfo.editableEl);
 
     // [workaround]
     //  - IE8-11 can't create range in headless mode
@@ -204,7 +203,7 @@ describe('Editor', () => {
     });
 
     it('should set last range without content', (done) => {
-      context.layoutInfo.editable.html('');
+      context.layoutInfo.editableEl.innerHTML = '';
       document.body.click();
       editor.setLastRange();
 
@@ -313,7 +312,7 @@ describe('Editor', () => {
         html += '</div>';
         return html;
       };
-      var $note = context.layoutInfo.note;
+      var $note = $(context.layoutInfo.noteEl);
       var spy = chai.spy();
       $note[0].addEventListener('summernote.change', spy);
       var html = generateLargeHtml();
@@ -376,7 +375,7 @@ describe('Editor', () => {
       $('body').empty();
       context = new Context($('<div><p>hello</p></div>').appendTo('body')[0], options);
       editor = context.modules.editor;
-      $editable = context.layoutInfo.editable;
+      $editable = $(context.layoutInfo.editableEl);
       $editable.appendTo('body');
 
       range.createFromNode($editable.find('p')[0]).normalize().select();
@@ -446,7 +445,7 @@ describe('Editor', () => {
       var $target = $('<h4 class="customH4Class"></h4>');
       $editable.appendTo('body');
       range.createFromNode($editable.find('p')[0]).normalize().select();
-      editor.formatBlock('h4', func.jqueryToHtmlElement($target));
+      editor.formatBlock('h4', $target[0]);
 
       // start <p>hello</p> => <h4 class="h4">hello</h4>
       expectContentsAwait(context, '<h4 class="customH4Class">hello</h4>', done);
@@ -456,7 +455,7 @@ describe('Editor', () => {
       var $target = $('<a class="dropdown-item" href="#" data-value="h6" role="listitem" aria-label="h6"><h6 class="customH6Class">H6</h6></a>');
       $editable.appendTo('body');
       range.createFromNode($editable.find('p')[0]).normalize().select();
-      editor.formatBlock('h6', func.jqueryToHtmlElement($target));
+      editor.formatBlock('h6', $target[0]);
 
       // start <p>hello</p> => <h6 class="h6">hello</h6>
       expectContentsAwait(context, '<h6 class="customH6Class">hello</h6>', done);
@@ -466,9 +465,9 @@ describe('Editor', () => {
       const $target1 = $('<p class="old"></p>');
       $editable.appendTo('body');
       range.createFromNode($editable.find('p')[0]).normalize().select();
-      editor.formatBlock('p', func.jqueryToHtmlElement($target1));
+      editor.formatBlock('p', $target1[0]);
       const $target2 = $('<p class="new"></p>');
-      editor.formatBlock('p', func.jqueryToHtmlElement($target2));
+      editor.formatBlock('p', $target2[0]);
 
       // start <p class="old">hello</p> => <p class="new">hello</p>
       expectContentsAwait(context, '<p class="new">hello</p>', done);
@@ -478,9 +477,9 @@ describe('Editor', () => {
       const $target1 = $('<p class="customClass" />');
       $editable.appendTo('body');
       range.createFromNode($editable.find('p')[0]).normalize().select();
-      editor.formatBlock('p', func.jqueryToHtmlElement($target1));
+      editor.formatBlock('p', $target1[0]);
       const $target2 = $('<p />');
-      editor.formatBlock('p', func.jqueryToHtmlElement($target2));
+      editor.formatBlock('p', $target2[0]);
 
       // start <p class="customClass">hello</p> => <p>hello</p>
       expectContentsAwait(context, '<p class="">hello</p>', done);
@@ -611,7 +610,7 @@ describe('Editor', () => {
       options.maxTextLength = 5;
       context = new Context($('<p><a href="http://summernote.org">hello</a></p>')[0], options);
 
-      var editable = context.layoutInfo.editable;
+      var editable = $(context.layoutInfo.editableEl);
       var anchorNode = editable.find('a')[0];
       var rng = range.createFromNode(anchorNode);
       editor = context.modules.editor;

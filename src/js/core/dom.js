@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import func from './func';
 import lists from './lists';
 import env from './env';
@@ -1113,14 +1112,13 @@ function html(node, isNewlineOnBlock) {
   return markup;
 }
 
-function posFromPlaceholder(placeholder) {
-  const $placeholder = $(placeholder);
-  const pos = $placeholder.offset();
-  const height = $placeholder.outerHeight(true); // include margin
+function posFromPlaceholder(placeholderEl) {
+  const offset = func.getElementOffset(placeholderEl);
+  const height = placeholderEl.offsetHeight;
 
   return {
-    left: pos.left,
-    top: pos.top + height,
+    left: offset.left,
+    top: offset.top + height,
   };
 }
 

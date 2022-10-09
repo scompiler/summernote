@@ -5,9 +5,9 @@ const EDITABLE_PADDING = 24;
 export default class Statusbar {
   constructor(context) {
     this.document = document;
-    this.statusbarEl = func.jqueryToHtmlElement(context.layoutInfo.statusbar);
-    this.editableEl = func.jqueryToHtmlElement(context.layoutInfo.editable);
-    this.codableEl = func.jqueryToHtmlElement(context.layoutInfo.codable);
+    this.statusbarEl = context.layoutInfo.statusbarEl;
+    this.editableEl = context.layoutInfo.editableEl;
+    this.codableEl = context.layoutInfo.codableEl;
     this.options = context.options;
   }
 

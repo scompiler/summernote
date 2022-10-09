@@ -1,29 +1,51 @@
-import $ from 'jquery';
+import func from "../../../js/core/func";
 
 class ModalUI {
-  constructor($node /*, options */) {
-    this.$modal = $node;
-    this.$backdrop = $('<div class="note-modal-backdrop"></div>');
+  static unsubscribe = () => {};
+
+  constructor(nodeEl /*, options */) {
+    this.modalEl = nodeEl;
+    this.backdropEl = func.makeElement('<div class="note-modal-backdrop"></div>');
+
+    this.onKeyDown = (domEvent) => {
+      if (domEvent.which === 27) {
+        domEvent.preventDefault();
+        this.hide();
+      }
+    };
   }
 
   show() {
-    this.$backdrop.appendTo(document.body).show();
-    this.$modal.addClass('open').show();
-    this.$modal.trigger('note.modal.show');
-    this.$modal.off('click', '.close').on('click', '.close', this.hide.bind(this));
-    this.$modal.on('keydown', (event) => {
-      if (event.which === 27) {
-        event.preventDefault();
-        this.hide();
+    document.body.appendChild(this.backdropEl);
+    this.backdropEl.style.display = 'block';
+
+    this.modalEl.classList.add('open');
+    this.modalEl.style.display = 'block';
+    this.modalEl.dispatchEvent(new Event('note.modal.show'));
+    this.modalEl.addEventListener('keydown', this.onKeyDown);
+
+    ModalUI.unsubscribe();
+
+    const onClose = (domEvent) => {
+      const closeBtnEl = domEvent.target.closest('.close');
+
+      if (!closeBtnEl) {
+        return;
       }
-    });
+
+      this.hide();
+    };
+
+    this.modalEl.addEventListener('click', onClose);
+    ModalUI.unsubscribe = () => this.modalEl.removeEventListener('click', onClose);
   }
 
   hide() {
-    this.$modal.removeClass('open').hide();
-    this.$backdrop.hide();
-    this.$modal.trigger('note.modal.hide');
-    this.$modal.off('keydown');
+    this.backdropEl.style.display = 'none';
+    this.modalEl.classList.remove('open');
+    this.modalEl.style.display = 'none';
+    this.modalEl.dispatchEvent(new Event('note.modal.hide'));
+    this.modalEl.removeEventListener('keydown', this.onKeyDown);
   }
 }
 

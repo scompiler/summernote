@@ -1,13 +1,11 @@
-import func from "../core/func";
-
 export default class Fullscreen {
   constructor(context) {
     this.context = context;
 
-    this.editorEl = func.jqueryToHtmlElement(context.layoutInfo.editor);
-    this.toolbarEl = func.jqueryToHtmlElement(context.layoutInfo.toolbar);
-    this.editableEl = func.jqueryToHtmlElement(context.layoutInfo.editable);
-    this.codableEl = func.jqueryToHtmlElement(context.layoutInfo.codable);
+    this.editorEl = context.layoutInfo.editorEl;
+    this.toolbarEl = context.layoutInfo.toolbarEl;
+    this.editableEl = context.layoutInfo.editableEl;
+    this.codableEl = context.layoutInfo.codableEl;
 
     this.window = window;
     this.htmlEl = document.documentElement;

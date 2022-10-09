@@ -44,8 +44,8 @@ describe('Buttons', () => {
     context = new Context($note[0], options);
     context.initialize();
 
-    $toolbar = context.layoutInfo.toolbar;
-    $editable = context.layoutInfo.editable;
+    $toolbar = $(context.layoutInfo.toolbarEl);
+    $editable = $(context.layoutInfo.editableEl);
 
     // Select the first paragraph
     range.createFromNode($editable.find('p')[0]).normalize().select();

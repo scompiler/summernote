@@ -1,12 +1,11 @@
 import dom from '../core/dom';
-import func from "../core/func";
 
 /**
  * textarea auto sync.
  */
 export default class AutoSync {
   constructor(context) {
-    this.noteEl = func.jqueryToHtmlElement(context.layoutInfo.note);
+    this.noteEl = context.layoutInfo.noteEl;
     this.events = {
       'summernote.change': () => {
         this.noteEl.value = context.invoke('code');

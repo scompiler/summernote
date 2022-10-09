@@ -4,7 +4,7 @@ export default class Placeholder {
   constructor(context) {
     this.context = context;
 
-    this.editingAreaEl = func.jqueryToHtmlElement(context.layoutInfo.editingArea);
+    this.editingAreaEl = context.layoutInfo.editingAreaEl;
     this.options = context.options;
 
     if (this.options.inheritPlaceholder === true) {

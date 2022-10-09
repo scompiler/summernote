@@ -61,7 +61,12 @@ export default class Context {
     // set own id
     this.options.id = func.uniqueId((new Date()).getTime().toString());
     // set default container for tooltips, popovers, and dialogs
-    this.options.container = this.options.container || this.layoutInfo.editor;
+    let optionsContainer = this.options.container;
+    if (optionsContainer && typeof optionsContainer === 'string') {
+      optionsContainer = document.querySelector(optionsContainer);
+    }
+
+    this.options.container = optionsContainer ? optionsContainer : this.layoutInfo.editorEl;
 
     // add optional buttons
     const buttons = Object.assign({}, this.options.buttons);
@@ -99,24 +104,24 @@ export default class Context {
 
     if (html === undefined) {
       this.invoke('codeview.sync');
-      return isActivated ? this.layoutInfo.codable.val() : this.layoutInfo.editable.html();
+      return isActivated ? this.layoutInfo.codableEl.value : this.layoutInfo.editableEl.innerHTML;
     } else {
       if (isActivated) {
         this.invoke('codeview.sync', html);
       } else {
-        this.layoutInfo.editable.html(html);
+        this.layoutInfo.editableEl.innerHTML = html;
       }
       this.noteEl.value = html;
-      this.triggerEvent('change', html, this.layoutInfo.editable);
+      this.triggerEvent('change', html, this.layoutInfo.editableEl);
     }
   }
 
   isDisabled() {
-    return this.layoutInfo.editable.attr('contenteditable') === 'false';
+    return this.layoutInfo.editableEl.getAttribute('contenteditable') === 'false';
   }
 
   enable() {
-    this.layoutInfo.editable.attr('contenteditable', true);
+    this.layoutInfo.editableEl.setAttribute('contenteditable', true);
     this.invoke('toolbar.activate', true);
     this.triggerEvent('disable', false);
     this.options.editing = true;
@@ -127,7 +132,7 @@ export default class Context {
     if (this.invoke('codeview.isActivated')) {
       this.invoke('codeview.deactivate');
     }
-    this.layoutInfo.editable.attr('contenteditable', false);
+    this.layoutInfo.editableEl.setAttribute('contenteditable', false);
     this.options.editing = false;
     this.invoke('toolbar.deactivate', true);
 

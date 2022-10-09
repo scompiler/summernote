@@ -7,7 +7,7 @@
 const genericFontFamilies = ['sans-serif', 'serif', 'monospace', 'cursive', 'fantasy'];
 
 function validFontName(fontName) {
-  return !genericFontFamilies.includes(fontName.toLowerCase()) ? `'${fontName}'` : fontName;
+  return fontName && !genericFontFamilies.includes(fontName.toLowerCase()) ? `'${fontName}'` : fontName;
 }
 
 function isFontInstalled(fontName) {

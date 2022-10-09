@@ -44,7 +44,7 @@ export default class TablePopover {
     this.popoverEl = this.ui.popover({
       className: 'note-table-popover',
     }).render2();
-    func.jqueryToHtmlElement(this.options.container).appendChild(this.popoverEl);
+    this.options.container.appendChild(this.popoverEl);
     const contentEl = this.popoverEl.querySelector('.popover-content, .note-popover-content');
 
     this.context.invoke('buttons.build', contentEl, this.options.popover.table);
@@ -70,7 +70,7 @@ export default class TablePopover {
 
     if (isCell) {
       const pos = dom.posFromPlaceholder(target);
-      const containerOffset = func.getElementOffset(func.jqueryToHtmlElement(this.options.container));
+      const containerOffset = func.getElementOffset(this.options.container);
       pos.top -= containerOffset.top;
       pos.left -= containerOffset.left;
 
