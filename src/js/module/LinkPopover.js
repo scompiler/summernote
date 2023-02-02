@@ -1,4 +1,4 @@
-import lists from '../core/lists';
+import lists from '../core/lists.ts';
 import dom from '../core/dom';
 import Summernote from '../class';
 

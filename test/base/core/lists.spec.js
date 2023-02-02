@@ -5,7 +5,7 @@
  */
 import chai from 'chai';
 import $ from 'jquery';
-import lists from 'src/js/core/lists';
+import lists from 'src/js/core/lists.ts';
 
 var expect = chai.expect;
 

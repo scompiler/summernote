@@ -1,4 +1,4 @@
-import lists from '../core/lists';
+import lists from '../core/lists.ts';
 import func from '../core/func.ts';
 import dom from '../core/dom';
 import range from '../core/range';

@@ -1,6 +1,6 @@
 import env from './env';
 import func from './func.ts';
-import lists from './lists';
+import lists from './lists.ts';
 import dom from './dom';
 
 /**

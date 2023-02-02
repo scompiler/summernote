@@ -1,5 +1,5 @@
 import func from './func.ts';
-import lists from './lists';
+import lists from './lists.ts';
 import env from './env';
 
 const NBSP_CHAR = String.fromCharCode(160);

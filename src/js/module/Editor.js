@@ -1,7 +1,7 @@
 import env from '../core/env';
 import key from '../core/key';
 import func from '../core/func.ts';
-import lists from '../core/lists';
+import lists from '../core/lists.ts';
 import dom from '../core/dom';
 import range from '../core/range';
 import { readFileAsDataURL, createImage } from '../core/async.ts';

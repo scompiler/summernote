@@ -1,5 +1,5 @@
 import env from '../core/env';
-import lists from '../core/lists';
+import lists from '../core/lists.ts';
 import dom from '../core/dom';
 import func from "../core/func.ts";
 import Summernote from "../class";

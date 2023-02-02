@@ -1,4 +1,4 @@
-import lists from './lists';
+import lists from './lists.ts';
 import func from './func.ts';
 
 const KEY_MAP = {

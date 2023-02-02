@@ -1,4 +1,4 @@
-import lists from '../core/lists';
+import lists from '../core/lists.ts';
 import key from '../core/key';
 
 const defaultScheme = 'http://';

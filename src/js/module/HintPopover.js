@@ -1,5 +1,5 @@
 import func from '../core/func.ts';
-import lists from '../core/lists';
+import lists from '../core/lists.ts';
 import dom from '../core/dom';
 import range from '../core/range';
 import key from '../core/key';

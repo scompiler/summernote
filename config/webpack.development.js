@@ -10,6 +10,7 @@ module.exports = {
 
   resolve: {
     roots: [path.resolve('./src')],
+    extensions: ['.tsx', '.ts', '.js'],
   },
 
   entry: Object.fromEntries([

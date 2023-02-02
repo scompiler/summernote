@@ -1,7 +1,7 @@
 import '../lang/summernote-en-US';
 import dom from './core/dom';
 import range from './core/range';
-import lists from './core/lists';
+import lists from './core/lists.ts';
 import Editor from './module/Editor';
 import Clipboard from './module/Clipboard';
 import Dropzone from './module/Dropzone';

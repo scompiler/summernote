@@ -1,4 +1,4 @@
-import lists from "./core/lists";
+import lists from "./core/lists.ts";
 import merge from "lodash.merge";
 import env from "./core/env";
 import Context from "./Context";
