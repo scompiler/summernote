@@ -1,4 +1,4 @@
-import func from './func';
+import func from './func.ts';
 import lists from './lists';
 import env from './env';
 

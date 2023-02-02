@@ -6,7 +6,7 @@ import './summernote-lite.scss';
 import TooltipUI from './js/TooltipUI';
 import DropdownUI from './js/DropdownUI';
 import ModalUI from './js/ModalUI';
-import func from "../../js/core/func";
+import func from "../../js/core/func.ts";
 
 const editor = renderer.create('<div class="note-editor note-frame"></div>');
 const toolbar = renderer.create('<div class="note-toolbar" role="toolbar"></div>');

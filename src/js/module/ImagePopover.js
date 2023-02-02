@@ -1,6 +1,6 @@
 import lists from '../core/lists';
 import dom from '../core/dom';
-import func from "../core/func";
+import func from "../core/func.ts";
 import Summernote from "../class";
 
 /**

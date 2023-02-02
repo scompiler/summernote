@@ -1,4 +1,4 @@
-import func from "../../../js/core/func";
+import func from "../../../js/core/func.ts";
 
 class DropdownUI {
   constructor(nodeEl, options) {

@@ -1,5 +1,5 @@
 import dom from '../core/dom';
-import func from "../core/func";
+import func from "../core/func.ts";
 
 export default class Handle {
   constructor(context) {

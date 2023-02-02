@@ -1,7 +1,7 @@
 import dom from '../core/dom';
 import range from '../core/range';
 import Bullet from '../editing/Bullet';
-import func from "../core/func";
+import func from "../core/func.ts";
 
 /**
  * @class editing.Typing

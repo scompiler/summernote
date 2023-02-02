@@ -10,14 +10,15 @@
   "rules": {
     "indent": ["warn", 2, {"ArrayExpression": "off", "SwitchCase": 1}],
     "semi": [2, "always"],
-    "space-before-function-paren": ["error", "never"],
+    "@typescript-eslint/space-before-function-paren": ["error", "never"],
     "no-useless-escape": 0,
     "no-unused-expressions": 0,
     "chai-friendly/no-unused-expressions": 2,
     "comma-dangle": ["error", "always-multiline"],
     "@typescript-eslint/no-var-requires": "off",
     "@typescript-eslint/no-this-alias": "off",
-    "@typescript-eslint/no-empty-function": "off"
+    "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/no-explicit-any": "off"
   },
   "env": {
     "amd": true,

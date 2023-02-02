@@ -1,5 +1,5 @@
 import env from '../core/env';
-import func from "../core/func";
+import func from "../core/func.ts";
 import Summernote from "../class";
 
 export default class HelpDialog {

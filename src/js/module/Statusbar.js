@@ -1,4 +1,4 @@
-import func from "../core/func";
+import func from "../core/func.ts";
 
 const EDITABLE_PADDING = 24;
 

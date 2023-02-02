@@ -1,5 +1,5 @@
 import env from './env';
-import func from './func';
+import func from './func.ts';
 import lists from './lists';
 import dom from './dom';
 

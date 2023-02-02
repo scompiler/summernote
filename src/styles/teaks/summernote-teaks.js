@@ -6,7 +6,7 @@ import './summernote-teaks.scss';
 import TooltipUI from './js/TooltipUI';
 import DropdownUI from './js/DropdownUI';
 import ModalUI from './js/ModalUI';
-import func from "../../js/core/func";
+import func from "../../js/core/func.ts";
 
 const editor = renderer.create('<div class="tea-editor    note-editor note-frame" data-mode="frame"></div>');
 const toolbar = renderer.create([

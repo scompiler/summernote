@@ -1,4 +1,4 @@
-import func from './core/func';
+import func from './core/func.ts';
 import lists from './core/lists';
 import dom from './core/dom';
 import merge from 'lodash.merge';

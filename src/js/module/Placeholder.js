@@ -1,4 +1,4 @@
-import func from "../core/func";
+import func from "../core/func.ts";
 
 export default class Placeholder {
   constructor(context) {

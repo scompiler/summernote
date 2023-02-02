@@ -1,5 +1,5 @@
 import lists from '../core/lists';
-import func from '../core/func';
+import func from '../core/func.ts';
 import Summernote from "../class";
 
 const AIRMODE_POPOVER_X_OFFSET = -5;

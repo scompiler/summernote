@@ -1,4 +1,4 @@
-import func from "../../../js/core/func";
+import func from "../../../js/core/func.ts";
 
 class TooltipUI {
   constructor(nodeEl, options) {

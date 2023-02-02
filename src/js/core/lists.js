@@ -1,4 +1,4 @@
-import func from './func';
+import func from './func.ts';
 
 /**
  * returns the first item of an array.

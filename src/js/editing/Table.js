@@ -1,7 +1,7 @@
 import dom from '../core/dom';
 import range from '../core/range';
 import lists from '../core/lists';
-import func from "../core/func";
+import func from "../core/func.ts";
 
 /**
  * @class Create a virtual table to create what actions to do in change.
