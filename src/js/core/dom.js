@@ -1,6 +1,6 @@
 import func from './func.ts';
 import lists from './lists.ts';
-import env from './env';
+import env from './env.ts';
 
 const NBSP_CHAR = String.fromCharCode(160);
 const ZERO_WIDTH_NBSP_CHAR = '\ufeff';

@@ -1,4 +1,4 @@
-import env from '../core/env';
+import env from '../core/env.ts';
 import key from '../core/key';
 import func from '../core/func.ts';
 import Summernote from "../class";

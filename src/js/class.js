@@ -1,6 +1,6 @@
 import lists from "./core/lists.ts";
 import merge from "lodash.merge";
-import env from "./core/env";
+import env from "./core/env.ts";
 import Context from "./Context";
 
 export default class Summernote {

@@ -1,4 +1,4 @@
-import env from './env';
+import env from './env.ts';
 import func from './func.ts';
 import lists from './lists.ts';
 import dom from './dom';
