@@ -36,23 +36,24 @@ module.exports = {
 
   resolve: {
     roots: [path.resolve('./src')],
+    extensions: ['.tsx', '.ts', '.js'],
   },
 
   entry: Object.fromEntries([
     // entries for each style
-    ...styles.map(style => 
+    ...styles.map(style =>
       [`${style.target}`, `./src/styles/${style.id}/summernote-${style.id}.js`]
     ),
     // ... and for minimized
-    ...styles.map(style => 
+    ...styles.map(style =>
       [`${style.target}.min`, `./src/styles/${style.id}/summernote-${style.id}.js`]
     ),
     // entries for each language
-    ...languages.map(lang => 
+    ...languages.map(lang =>
       [`lang/${lang}`, `./src/lang/${lang}.js`]
     ),
     // ... and for minimized
-    ...languages.map(lang => 
+    ...languages.map(lang =>
       [`lang/${lang}.min`, `./src/lang/${lang}.js`]
     ),
   ]),
@@ -86,6 +87,22 @@ module.exports = {
             },
           }, {
             loader: 'babel-loader',
+          },
+        ],
+      },
+      {
+        test: /\.tsx?$/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: 'string-replace-loader',
+            options: {
+              search: '@@VERSION@@',
+              replace: pkg.version,
+            },
+          },
+          {
+            loader: 'ts-loader',
           },
         ],
       },

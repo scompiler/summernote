@@ -4,7 +4,7 @@ import func from '../core/func';
 import lists from '../core/lists';
 import dom from '../core/dom';
 import range from '../core/range';
-import { readFileAsDataURL, createImage } from '../core/async';
+import { readFileAsDataURL, createImage } from '../core/async.ts';
 import History from '../editing/History';
 import Style from '../editing/Style';
 import Typing from '../editing/Typing';

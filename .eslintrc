@@ -1,7 +1,11 @@
 {
-  "extends": "eslint:recommended",
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
   "plugins": [
-    "chai-friendly"
+    "chai-friendly",
+    "@typescript-eslint"
   ],
   "rules": {
     "indent": ["warn", 2, {"ArrayExpression": "off", "SwitchCase": 1}],
@@ -10,7 +14,10 @@
     "no-useless-escape": 0,
     "no-unused-expressions": 0,
     "chai-friendly/no-unused-expressions": 2,
-    "comma-dangle": ["error", "always-multiline"]
+    "comma-dangle": ["error", "always-multiline"],
+    "@typescript-eslint/no-var-requires": "off",
+    "@typescript-eslint/no-this-alias": "off",
+    "@typescript-eslint/no-empty-function": "off"
   },
   "env": {
     "amd": true,
@@ -20,8 +27,16 @@
     "mocha": true,
     "node": true
   },
-  "parser": "@babel/eslint-parser",
+  "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "sourceType": "module",
-  }
+    "sourceType": "module"
+  },
+  "overrides": [
+    {
+      "files": [ "*.ts" ],
+      "rules": {
+        "indent": ["warn", 4, {"ArrayExpression": "off", "SwitchCase": 1}]
+      }
+    }
+  ]
 }

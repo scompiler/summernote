@@ -14,11 +14,11 @@ module.exports = {
 
   entry: Object.fromEntries([
     // entries for each style
-    ...styles.map(style => 
+    ...styles.map(style =>
       [`summernote-${style.id}`, `./src/styles/${style.id}/summernote-${style.id}.js`]
     ),
     // entries for each language
-    ...languages.map(lang => 
+    ...languages.map(lang =>
       [`lang/${lang}`, `./src/lang/${lang}.js`]
     ),
   ]),
@@ -35,6 +35,11 @@ module.exports = {
         use: [
           'babel-loader',
         ],
+      },
+      {
+        test: /\.tsx?$/,
+        exclude: /node_modules/,
+        use: 'ts-loader',
       },
       {
         test: /\.(sa|sc|c)ss$/i,
@@ -71,7 +76,7 @@ module.exports = {
       ],
     }),
     // Testing pages for each style
-    ...styles.map(style => 
+    ...styles.map(style =>
       new HtmlWebPackPlugin({
         chunks: [`summernote-${style.id}`],
         template: `./src/styles/${style.id}/summernote-${style.id}.html`,
