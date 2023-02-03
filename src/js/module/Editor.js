@@ -3,7 +3,7 @@ import key from '../core/key.ts';
 import func from '../core/func.ts';
 import lists from '../core/lists.ts';
 import dom from '../core/dom.ts';
-import range from '../core/range';
+import range from '../core/range.ts';
 import { readFileAsDataURL, createImage } from '../core/async.ts';
 import History from '../editing/History';
 import Style from '../editing/Style';

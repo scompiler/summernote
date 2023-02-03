@@ -1,4 +1,4 @@
-import range from '../core/range';
+import range from '../core/range.ts';
 
 export default class History {
   constructor(context) {

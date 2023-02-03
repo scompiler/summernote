@@ -7,7 +7,7 @@ import $ from 'jquery';
 import chai from 'chai';
 import chaidom from 'test/chaidom';
 import Context from 'src/js/Context';
-import range from 'src/js/core/range';
+import range from 'src/js/core/range.ts';
 import env from 'src/js/core/env.ts';
 import key from 'src/js/core/key.ts';
 import 'src/styles/bs4/summernote-bs4';

@@ -9,7 +9,7 @@ import spies from 'chai-spies';
 import chaidom from 'test/chaidom';
 import $ from 'jquery';
 import env from 'src/js/core/env.ts';
-import range from 'src/js/core/range';
+import range from 'src/js/core/range.ts';
 import Context from 'src/js/Context';
 import 'src/styles/bs4/summernote-bs4';
 import Summernote from "../../../src/js/class";
