@@ -1,5 +1,5 @@
 import lists from '../core/lists.ts';
-import key from '../core/key';
+import key from '../core/key.ts';
 
 const defaultScheme = 'http://';
 const linkPattern = /^([A-Za-z][A-Za-z0-9+-.]*\:[\/]{2}|tel:|mailto:[A-Z0-9._%+-]+@|xmpp:[A-Z0-9._%+-]+@)?(www\.)?(.+)$/i;

@@ -1,4 +1,4 @@
-import key from '../core/key';
+import key from '../core/key.ts';
 import Summernote from "../class";
 
 export default class ImageDialog {

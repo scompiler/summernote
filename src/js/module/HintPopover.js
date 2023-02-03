@@ -2,7 +2,7 @@ import func from '../core/func.ts';
 import lists from '../core/lists.ts';
 import dom from '../core/dom.ts';
 import range from '../core/range';
-import key from '../core/key';
+import key from '../core/key.ts';
 import Summernote from "../class";
 
 const POPOVER_DIST = 5;

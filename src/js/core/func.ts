@@ -76,7 +76,7 @@ function rect2bnd(rect: DOMRect) {
 /**
  * Returns a copy of the object where the keys have become the values and the values the keys.
  */
-function invertObject<T extends {[property: string]: string}>(obj: T) {
+function invertObject<T extends {[property: string | number]: string | number}>(obj: T) {
     const inverted: {[K in keyof T as T[K]]: K} = {} as any;
 
     for (const key in obj) {

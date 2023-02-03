@@ -1,6 +1,6 @@
 import lists from '../core/lists.ts';
 import dom from '../core/dom.ts';
-import key from '../core/key';
+import key from '../core/key.ts';
 
 export default class AutoReplace {
   constructor(context) {
