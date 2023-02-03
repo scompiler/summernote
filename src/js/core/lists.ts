@@ -10,7 +10,7 @@ function head(array: any[]) {
 /**
  * Returns the last item of an array.
  */
-function last(array: any[]) {
+function last<T>(array: T[]): T {
     return array[array.length - 1];
 }
 
@@ -24,7 +24,7 @@ function initial(array: any[]) {
 /**
  * Returns the rest of the items in an array.
  */
-function tail(array: any[]) {
+function tail<T>(array: T[]): T[] {
     return array.slice(1);
 }
 

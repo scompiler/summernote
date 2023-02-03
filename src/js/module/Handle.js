@@ -1,4 +1,4 @@
-import dom from '../core/dom';
+import dom from '../core/dom.ts';
 import func from "../core/func.ts";
 
 export default class Handle {

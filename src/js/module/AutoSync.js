@@ -1,4 +1,4 @@
-import dom from '../core/dom';
+import dom from '../core/dom.ts';
 
 /**
  * textarea auto sync.

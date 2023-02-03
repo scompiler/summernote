@@ -1,6 +1,6 @@
 import lists from '../core/lists.ts';
 import func from '../core/func.ts';
-import dom from '../core/dom';
+import dom from '../core/dom.ts';
 import range from '../core/range';
 
 export default class Bullet {

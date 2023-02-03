@@ -7,7 +7,7 @@
 import chai from 'chai';
 import chaidom from 'test/chaidom';
 import $ from 'jquery';
-import dom from 'src/js/core/dom';
+import dom from 'src/js/core/dom.ts';
 import range from 'src/js/core/range';
 
 var expect = chai.expect;

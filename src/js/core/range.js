@@ -1,7 +1,7 @@
 import env from './env.ts';
 import func from './func.ts';
 import lists from './lists.ts';
-import dom from './dom';
+import dom from './dom.ts';
 
 /**
  * return boundaryPoint from TextRange, inspired by Andy Na's HuskyRange.js
