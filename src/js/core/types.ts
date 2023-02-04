@@ -16,6 +16,11 @@ export interface Bookmark {
     };
 }
 
+export interface Snapshot {
+    contents: string;
+    bookmark: Bookmark;
+}
+
 export interface ModuleConstructor {
     new (context: Context): Module;
 }
@@ -79,6 +84,7 @@ export interface Options {
         onScroll?: (...args: any) => any | null;
     };
     icons?: {[icon: string]: string};
+    historyLimit?: number;
 }
 
 export interface Layout {

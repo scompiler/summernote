@@ -5,7 +5,7 @@ import lists from '../core/lists.ts';
 import dom from '../core/dom.ts';
 import range from '../core/range.ts';
 import { readFileAsDataURL, createImage } from '../core/async.ts';
-import History from '../editing/History';
+import History from '../editing/History.ts';
 import Style from '../editing/Style.ts';
 import Typing from '../editing/Typing';
 import Table from '../editing/Table.ts';
