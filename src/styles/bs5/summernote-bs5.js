@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import '/js/settings';
-import renderer from '/js/renderer';
+import renderer from '/js/renderer.ts';
 import './summernote-bs5.scss';
 import '../../js/summernote';
 import Summernote from "../../js/class";

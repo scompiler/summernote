@@ -1,5 +1,5 @@
 import '/js/settings';
-import renderer from '/js/renderer';
+import renderer from '/js/renderer.ts';
 import Summernote from "../../js/class";
 
 import './summernote-lite.scss';
