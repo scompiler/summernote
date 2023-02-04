@@ -12,7 +12,7 @@ import Handle from './module/Handle';
 import AutoLink from './module/AutoLink';
 import AutoSync from './module/AutoSync';
 import AutoReplace from './module/AutoReplace';
-import Placeholder from './module/Placeholder';
+import Placeholder from './module/Placeholder.ts';
 import Buttons from './module/Buttons';
 import Toolbar from './module/Toolbar';
 import LinkDialog from './module/LinkDialog';

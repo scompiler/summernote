@@ -90,6 +90,8 @@ export interface Options {
     disableResizeEditor?: boolean;
     minHeight?: number;
     maxHeight?: number;
+    inheritPlaceholder?: boolean;
+    placeholder?: string;
 }
 
 export interface Layout {
