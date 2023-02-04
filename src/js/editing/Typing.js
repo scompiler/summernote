@@ -1,6 +1,6 @@
 import dom from '../core/dom.ts';
 import range from '../core/range.ts';
-import Bullet from '../editing/Bullet';
+import Bullet from './Bullet.ts';
 import func from "../core/func.ts";
 
 /**

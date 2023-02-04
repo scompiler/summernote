@@ -607,6 +607,49 @@ class WrappedRange {
 }
 
 /**
+ * Create Range Object From arguments or Browser Selection.
+ *
+ * @param sc - start container
+ */
+function create(sc: Node): WrappedRange;
+/**
+ * Create Range Object From arguments or Browser Selection.
+ *
+ * @param sc - start container
+ * @param so - start offset
+ */
+function create(sc: Node, so: number): WrappedRange;
+/**
+ * Create Range Object From arguments or Browser Selection.
+ *
+ * @param sc - start container
+ * @param so - start offset
+ * @param ec - end container
+ * @param eo - end offset
+ */
+function create(sc: Node, so: number, ec: Node, eo: number): WrappedRange;
+function create(sc: Node | HTMLElement, so?: number, ec?: Node, eo?: number): WrappedRange {
+    if (arguments.length === 4) {
+        return new WrappedRange(sc, so, ec, eo);
+    } else if (arguments.length === 2) { // collapsed
+        ec = sc;
+        eo = so;
+        return new WrappedRange(sc, so, ec, eo);
+    } else {
+        const wrappedRange = this.createFromSelection();
+
+        if (!wrappedRange && arguments.length === 1) {
+            let bodyElement = sc;
+            if (dom.isEditable(bodyElement)) {
+                bodyElement = bodyElement.lastChild;
+            }
+            return this.createFromBodyElement(bodyElement, sc instanceof Element && dom.emptyPara === sc.innerHTML);
+        }
+        return wrappedRange;
+    }
+}
+
+/**
  * Data structure
  *  * BoundaryPoint: a point of dom tree
  *  * BoundaryPoints: two boundaryPoints corresponding to the start and the end of the Range
@@ -614,34 +657,7 @@ class WrappedRange {
  * See to http://www.w3.org/TR/DOM-Level-2-Traversal-Range/ranges.html#Level-2-Range-Position
  */
 export default {
-    /**
-     * Create Range Object From arguments or Browser Selection.
-     *
-     * @param sc - start container
-     * @param so - start offset
-     * @param ec - end container
-     * @param eo - end offset
-     */
-    create: function(sc: Node, so: number, ec: Node, eo: number): WrappedRange {
-        if (arguments.length === 4) {
-            return new WrappedRange(sc, so, ec, eo);
-        } else if (arguments.length === 2) { // collapsed
-            ec = sc;
-            eo = so;
-            return new WrappedRange(sc, so, ec, eo);
-        } else {
-            const wrappedRange = this.createFromSelection();
-
-            if (!wrappedRange && arguments.length === 1) {
-                let bodyElement = sc;
-                if (dom.isEditable(bodyElement)) {
-                    bodyElement = bodyElement.lastChild;
-                }
-                return this.createFromBodyElement(bodyElement, sc instanceof Element && dom.emptyPara === sc.innerHTML);
-            }
-            return wrappedRange;
-        }
-    },
+    create,
 
     createFromBodyElement: function(bodyElement: Node, isCollapseToStart = false) {
         const wrappedRange = this.createFromNode(bodyElement);

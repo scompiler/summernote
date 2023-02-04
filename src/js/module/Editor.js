@@ -9,7 +9,7 @@ import History from '../editing/History';
 import Style from '../editing/Style';
 import Typing from '../editing/Typing';
 import Table from '../editing/Table';
-import Bullet from '../editing/Bullet';
+import Bullet from '../editing/Bullet.ts';
 
 const KEY_BOGUS = 'bogus';
 

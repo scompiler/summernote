@@ -3,7 +3,7 @@ import func from './func';
 /**
  * Returns the first item of an array.
  */
-function head(array: any[]) {
+function head<T>(array: T[]): T {
     return array[0];
 }
 
@@ -80,7 +80,7 @@ function sum(array: any[], fn?: (item: number) => number) {
 /**
  * Returns a copy of the collection with array type.
  */
-function from(collection: NodeList) {
+function from(collection: NodeList | Node[]) {
     const result = [];
     const length = collection.length;
     let idx = -1;

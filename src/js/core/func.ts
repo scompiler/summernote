@@ -8,8 +8,8 @@ function eq2(itemA: any, itemB: any) {
     return itemA === itemB;
 }
 
-function peq2(propName: string) {
-    return function(itemA: any, itemB: any) {
+function peq2<T extends {[property: string]: any}>(propName: string) {
+    return function(itemA: T, itemB: T) {
         return itemA[propName] === itemB[propName];
     };
 }
