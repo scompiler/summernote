@@ -6,7 +6,7 @@ import Editor from './module/Editor';
 import Clipboard from './module/Clipboard';
 import Dropzone from './module/Dropzone';
 import Codeview from './module/Codeview';
-import Statusbar from './module/Statusbar';
+import Statusbar from './module/Statusbar.ts';
 import Fullscreen from './module/Fullscreen';
 import Handle from './module/Handle';
 import AutoLink from './module/AutoLink';

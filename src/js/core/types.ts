@@ -86,6 +86,10 @@ export interface Options {
     icons?: {[icon: string]: string};
     historyLimit?: number;
     blockquoteBreakingLevel?: number;
+    airMode?: boolean;
+    disableResizeEditor?: boolean;
+    minHeight?: number;
+    maxHeight?: number;
 }
 
 export interface Layout {
