@@ -6,14 +6,14 @@ import { Bookmark, BoundaryPoint } from "./types";
 /**
  * Wrapped Range.
  */
-class WrappedRange {
-    private readonly sc: Node;
+export class WrappedRange {
+    readonly sc: Node;
 
-    private readonly so: number;
+    readonly so: number;
 
-    private readonly ec: Node;
+    readonly ec: Node;
 
-    private readonly eo: number;
+    readonly eo: number;
 
     constructor(sc: Node, so: number, ec: Node, eo: number) {
         this.sc = sc;
@@ -171,7 +171,7 @@ class WrappedRange {
     /**
      * Returns matched nodes on range.
      */
-    nodes(pred: (node: Node) => boolean, options: {
+    nodes(pred?: (node: Node) => boolean, options?: {
         includeAncestor?: boolean;
         fullyContains?: boolean;
     }): Node[] {
