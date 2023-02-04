@@ -144,7 +144,7 @@ function getElementOffset(element: Element) {
     };
 }
 
-function makeElement(markup: string, parent: string) {
+function makeElement(markup: string, parent?: string) {
     const div = document.createElement(parent || 'div');
 
     div.innerHTML = markup;
