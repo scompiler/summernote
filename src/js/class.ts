@@ -1,15 +1,12 @@
 import merge from "lodash.merge";
 import env from "./core/env";
 import Context from "./Context";
+import { Options, SummernoteElement, UserInterface } from "./core/types";
 
 declare global {
     interface Window {
         Summernote: Summernote;
     }
-}
-
-export interface SummernoteElement extends HTMLElement {
-    __summernoteInstance?: Context;
 }
 
 export default class Summernote {
@@ -18,7 +15,12 @@ export default class Summernote {
     } = {};
 
     static meta: {
-        options?: any;
+        options?: Options;
+        ui?: UserInterface;
+        ui_template?: (options: Options) => UserInterface;
+        plugins?: {
+            [plugin: string]: (context: Context) => void;
+        };
     } = {};
 
     static init(noteEl: SummernoteElement, ...args: any[]) {
@@ -41,7 +43,7 @@ export default class Summernote {
 
         const context = noteEl.__summernoteInstance;
         if (isExternalAPICalled) {
-            return context.invoke(...args);
+            return context.invoke(args[0], ...args.slice(1));
         } else if (options.focus) {
             context.invoke('editor.focus');
         }

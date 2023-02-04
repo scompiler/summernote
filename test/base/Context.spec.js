@@ -9,7 +9,7 @@ import $ from 'jquery';// window.jQuery = $;
 import 'bootstrap';
 import chaidom from 'test/chaidom';
 import env from 'src/js/core/env.ts';
-import Context from 'src/js/Context';
+import Context from 'src/js/Context.ts';
 import 'src/styles/bs4/summernote-bs4';
 import Summernote from "../../src/js/class";
 

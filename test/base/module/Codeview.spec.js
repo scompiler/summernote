@@ -6,7 +6,7 @@
 import $ from 'jquery';
 import chai from 'chai';
 import chaidom from 'test/chaidom';
-import Context from 'src/js/Context';
+import Context from 'src/js/Context.ts';
 import Codeview from 'src/js/module/Codeview';
 import 'src/styles/bs4/summernote-bs4';
 import Summernote from "../../../src/js/class";
