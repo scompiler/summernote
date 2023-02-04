@@ -628,7 +628,7 @@ function create(sc: Node, so: number): WrappedRange;
  * @param eo - end offset
  */
 function create(sc: Node, so: number, ec: Node, eo: number): WrappedRange;
-function create(sc: Node | HTMLElement, so?: number, ec?: Node, eo?: number): WrappedRange {
+function create(sc?: Node | HTMLElement, so?: number, ec?: Node, eo?: number): WrappedRange {
     if (arguments.length === 4) {
         return new WrappedRange(sc, so, ec, eo);
     } else if (arguments.length === 2) { // collapsed

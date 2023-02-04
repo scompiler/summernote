@@ -748,9 +748,10 @@ function splitNode(point: BoundaryPoint, options: {
  *
  * @return {Node} right node of boundaryPoint
  */
-function splitTree(root: Node, point: BoundaryPoint, options: {
+function splitTree(root: Node, point: BoundaryPoint, options?: {
     isSkipPaddingBlankHTML?: boolean,
     isNotSplitEdgePoint?: boolean,
+    isDiscardEmptySplits?: boolean,
 }): Node {
     // ex) [#text, <span>, <p>]
     let ancestors = listAncestor(point.node, func.eq(root));

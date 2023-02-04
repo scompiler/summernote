@@ -84,7 +84,7 @@ export default class Bullet {
     /**
      * Toggle list.
      */
-    toggleList(listName: string, editable: HTMLElement) {
+    toggleList(listName: string, editable?: HTMLElement) {
         const rng = range.create(editable).wrapBodyInlineWithPara();
 
         let paras = rng.nodes(dom.isPara, { includeAncestor: true });

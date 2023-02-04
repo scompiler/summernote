@@ -85,6 +85,7 @@ export interface Options {
     };
     icons?: {[icon: string]: string};
     historyLimit?: number;
+    blockquoteBreakingLevel?: number;
 }
 
 export interface Layout {
