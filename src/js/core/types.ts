@@ -1,5 +1,6 @@
 import Context from "../Context";
 import { Renderer } from "../renderer";
+import { CodeMirrorConstructor } from "../module/Codeview";
 
 export interface BoundaryPoint {
     node: Node;
@@ -172,7 +173,19 @@ export interface Options {
     disableLinkTarget?: boolean;
     useProtocol?: boolean;
 
-    disableDragAndDrop?: boolean
+    disableDragAndDrop?: boolean;
+
+    codeviewFilter?: boolean;
+    codeviewFilterRegex?: RegExp;
+    codeviewIframeFilter?: boolean;
+    codeviewIframeWhitelistSrc?: string[];
+    codeviewIframeWhitelistSrcBase?: string[];
+    prettifyHtml?: boolean;
+    height?: number;
+    codemirror?: {
+        tern?: any;
+        CodeMirrorConstructor?: CodeMirrorConstructor;
+    };
 }
 
 export interface Layout {

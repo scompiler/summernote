@@ -5,7 +5,7 @@ import lists from './core/lists.ts';
 import Editor from './module/Editor';
 import Clipboard from './module/Clipboard.ts';
 import Dropzone from './module/Dropzone.ts';
-import Codeview from './module/Codeview';
+import Codeview from './module/Codeview.ts';
 import Statusbar from './module/Statusbar.ts';
 import Fullscreen from './module/Fullscreen.ts';
 import Handle from './module/Handle.ts';

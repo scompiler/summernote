@@ -107,7 +107,7 @@ export default class Context {
         this.triggerEvent('destroy', this);
     }
 
-    code(html: string) {
+    code(html?: string) {
         const isActivated = this.invoke('codeview.isActivated');
 
         if (html === undefined) {
