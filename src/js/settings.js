@@ -18,7 +18,7 @@ import Toolbar from './module/Toolbar';
 import LinkDialog from './module/LinkDialog';
 import LinkPopover from './module/LinkPopover';
 import ImageDialog from './module/ImageDialog.ts';
-import ImagePopover from './module/ImagePopover';
+import ImagePopover from './module/ImagePopover.ts';
 import TablePopover from './module/TablePopover';
 import VideoDialog from './module/VideoDialog';
 import HelpDialog from './module/HelpDialog.ts';

@@ -101,6 +101,7 @@ export interface Options {
     inheritPlaceholder?: boolean;
     placeholder?: string;
 
+    popatmouse?: boolean;
     popover?: {
         image?: [string, string[]][];
         link?: [string, string[]][];
