@@ -3,7 +3,7 @@ import dom from './core/dom.ts';
 import range from './core/range.ts';
 import lists from './core/lists.ts';
 import Editor from './module/Editor';
-import Clipboard from './module/Clipboard';
+import Clipboard from './module/Clipboard.ts';
 import Dropzone from './module/Dropzone';
 import Codeview from './module/Codeview';
 import Statusbar from './module/Statusbar.ts';
