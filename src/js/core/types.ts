@@ -1,4 +1,5 @@
 import Context from "../Context";
+import { Renderer } from "../renderer";
 
 export interface BoundaryPoint {
     node: Node;
@@ -92,6 +93,13 @@ export interface Options {
     maxHeight?: number;
     inheritPlaceholder?: boolean;
     placeholder?: string;
+
+    popover?: {
+        image?: [string, string[]][];
+        link?: [string, string[]][];
+        table?: [string, string[]][];
+        air?: [string, string[]][];
+    },
 }
 
 export interface Layout {
@@ -108,4 +116,8 @@ export interface Layout {
 export interface UserInterface {
     createLayout(el: SummernoteElement): Layout;
     removeLayout(el: SummernoteElement, layout: Layout): void;
+
+    popover(options: {className: string}): Renderer;
+
+    toggleBtnActive(btnEl: Element, isActive: boolean): void;
 }

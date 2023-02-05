@@ -8,7 +8,7 @@ export interface RendererOptions {
 
 export type RendererCallback = (nodeEls: Node[], options: RendererOptions) => void;
 
-class Renderer {
+export class Renderer {
     markup: string;
 
     children: Renderer[];
@@ -24,7 +24,7 @@ class Renderer {
         this.callback = callback;
     }
 
-    render2(parentEls: Node[]) {
+    render2(parentEls?: Node[]) {
         const templateEl = document.createElement('template');
         templateEl.innerHTML = this.markup;
         const nodeEls: Node[] = [].slice.call(templateEl.content.childNodes);

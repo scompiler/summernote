@@ -22,7 +22,7 @@ import ImagePopover from './module/ImagePopover';
 import TablePopover from './module/TablePopover';
 import VideoDialog from './module/VideoDialog';
 import HelpDialog from './module/HelpDialog';
-import AirPopover from './module/AirPopover';
+import AirPopover from './module/AirPopover.ts';
 import HintPopover from './module/HintPopover';
 import Summernote from "./class";
 

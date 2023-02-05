@@ -467,9 +467,9 @@ export class WrappedRange {
     /**
      * Returns range for word before cursor.
      *
-     * @param {Boolean} [findAfter] - find after cursor, default: false
+     * @param findAfter - find after cursor, default: false.
      */
-    getWordRange(findAfter: boolean): WrappedRange {
+    getWordRange(findAfter = false): WrappedRange {
         let endPoint = this.getEndPoint();
 
         if (!dom.isCharPoint(endPoint)) {
