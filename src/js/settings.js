@@ -11,7 +11,7 @@ import Fullscreen from './module/Fullscreen';
 import Handle from './module/Handle';
 import AutoLink from './module/AutoLink.ts';
 import AutoSync from './module/AutoSync';
-import AutoReplace from './module/AutoReplace';
+import AutoReplace from './module/AutoReplace.ts';
 import Placeholder from './module/Placeholder.ts';
 import Buttons from './module/Buttons';
 import Toolbar from './module/Toolbar';

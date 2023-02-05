@@ -103,6 +103,10 @@ export interface Options {
 
     showDomainOnlyForAutolink?: boolean;
     linkTargetBlank?: boolean;
+
+    replace?: {
+        match?: (keyword: string, callback: (match: Node | string | null) => void) => void;
+    };
 }
 
 export interface Layout {

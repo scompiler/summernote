@@ -40,6 +40,9 @@ const KEY_MAP = {
     'Y': 89,
     'Z': 90,
 
+    'SEMICOLON': 186,
+    'COMMA': 188,
+    'PERIOD': 190,
     'SLASH': 191,
     'LEFTBRACKET': 219,
     'BACKSLASH': 220,
