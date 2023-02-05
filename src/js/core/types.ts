@@ -107,6 +107,14 @@ export interface Options {
     replace?: {
         match?: (keyword: string, callback: (match: Node | string | null) => void) => void;
     };
+
+    disableResizeImage?: boolean;
+
+    langInfo?: {
+        image: {
+            original: string;
+        };
+    };
 }
 
 export interface Layout {

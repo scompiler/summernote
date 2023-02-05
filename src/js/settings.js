@@ -8,7 +8,7 @@ import Dropzone from './module/Dropzone';
 import Codeview from './module/Codeview';
 import Statusbar from './module/Statusbar.ts';
 import Fullscreen from './module/Fullscreen.ts';
-import Handle from './module/Handle';
+import Handle from './module/Handle.ts';
 import AutoLink from './module/AutoLink.ts';
 import AutoSync from './module/AutoSync.ts';
 import AutoReplace from './module/AutoReplace.ts';
