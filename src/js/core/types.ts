@@ -129,6 +129,16 @@ export interface Options {
         options: {
             help: string;
         };
+        link: {
+            textToDisplay: string;
+            url: string;
+            openInNewWindow: string;
+            useProtocol: string;
+            insert: string;
+        };
+        help: {
+            'linkDialog.show': string;
+        }
     };
 
     dialogsInBody?: boolean;
@@ -146,6 +156,9 @@ export interface Options {
 
     maximumImageFileSize?: number | null;
     acceptImageFileTypes?: string;
+
+    disableLinkTarget?: boolean;
+    useProtocol?: boolean;
 }
 
 export interface Layout {
@@ -174,11 +187,18 @@ export interface UserInterface {
     toggleBtn(btnEl: Element, isEnable: boolean): void;
 
     dialog(options: {
+        className?: string;
         title: string;
         fade: boolean;
         body: string;
         footer: string;
         callback2?: (nodeEls: Node[]) => void;
+    }): Renderer;
+
+    checkbox(options: {
+        className: string;
+        text: string;
+        checked: boolean;
     }): Renderer;
 
     hideDialog(dialogEl: HTMLElement): void;
