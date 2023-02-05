@@ -7,7 +7,7 @@
 import chai from 'chai';
 import $ from 'jquery';
 import Context from 'src/js/Context.ts';
-import Fullscreen from 'src/js/module/Fullscreen';
+import Fullscreen from 'src/js/module/Fullscreen.ts';
 import 'src/styles/bs4/summernote-bs4';
 import Summernote from "../../../src/js/class";
 

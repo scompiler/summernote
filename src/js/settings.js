@@ -7,7 +7,7 @@ import Clipboard from './module/Clipboard.ts';
 import Dropzone from './module/Dropzone';
 import Codeview from './module/Codeview';
 import Statusbar from './module/Statusbar.ts';
-import Fullscreen from './module/Fullscreen';
+import Fullscreen from './module/Fullscreen.ts';
 import Handle from './module/Handle';
 import AutoLink from './module/AutoLink.ts';
 import AutoSync from './module/AutoSync.ts';
