@@ -51,6 +51,13 @@ export interface SummernoteElement extends HTMLElement {
     __summernoteInstance?: Context;
 }
 
+export interface Hint {
+    match: RegExp;
+    content?: (item: any) => Node | string;
+    search: (keyword: string, callback: (items: any[]) => void) => void;
+    template?: (item: any) => string;
+}
+
 export interface Options {
     id?: string;
     container?: string | Element;
@@ -126,6 +133,11 @@ export interface Options {
         mac: {[shortcut: string]: string};
         pc: {[shortcut: string]: string};
     };
+
+    hint?: Hint | Hint[];
+    hintMode?: 'word' | 'words';
+    hintSelect?: 'after' | 'next';
+    hintDirection?: 'bottom' | 'top';
 }
 
 export interface Layout {
@@ -143,7 +155,11 @@ export interface UserInterface {
     createLayout(el: SummernoteElement): Layout;
     removeLayout(el: SummernoteElement, layout: Layout): void;
 
-    popover(options: {className: string}): Renderer;
+    popover(options: {
+        className: string;
+        hideArrow?: boolean;
+        direction?: string;
+    }): Renderer;
 
     toggleBtnActive(btnEl: Element, isActive: boolean): void;
 

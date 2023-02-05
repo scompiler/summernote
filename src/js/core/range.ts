@@ -7,13 +7,13 @@ import { Bookmark, BoundaryPoint } from "./types";
  * Wrapped Range.
  */
 export class WrappedRange {
-    readonly sc: Node;
+    sc: Node;
 
-    readonly so: number;
+    so: number;
 
-    readonly ec: Node;
+    ec: Node;
 
-    readonly eo: number;
+    eo: number;
 
     constructor(sc: Node, so: number, ec: Node, eo: number) {
         this.sc = sc;

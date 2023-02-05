@@ -23,7 +23,7 @@ import TablePopover from './module/TablePopover';
 import VideoDialog from './module/VideoDialog';
 import HelpDialog from './module/HelpDialog.ts';
 import AirPopover from './module/AirPopover.ts';
-import HintPopover from './module/HintPopover';
+import HintPopover from './module/HintPopover.ts';
 import Summernote from "./class";
 
 Summernote.meta = Object.assign(Summernote.meta, {
