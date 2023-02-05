@@ -6,7 +6,7 @@
 import chai from 'chai';
 import $ from 'jquery';
 import Context from 'src/js/Context.ts';
-import VideoDialog from 'src/js/module/VideoDialog';
+import VideoDialog from 'src/js/module/VideoDialog.ts';
 import 'src/styles/bs4/summernote-bs4';
 import Summernote from "../../../src/js/class";
 

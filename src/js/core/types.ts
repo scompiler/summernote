@@ -138,7 +138,12 @@ export interface Options {
         };
         help: {
             'linkDialog.show': string;
-        }
+        };
+        video: {
+            url: string;
+            providers: string;
+            insert: string;
+        };
     };
 
     dialogsInBody?: boolean;
