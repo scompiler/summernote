@@ -14,7 +14,7 @@ import AutoSync from './module/AutoSync.ts';
 import AutoReplace from './module/AutoReplace.ts';
 import Placeholder from './module/Placeholder.ts';
 import Buttons from './module/Buttons';
-import Toolbar from './module/Toolbar';
+import Toolbar from './module/Toolbar.ts';
 import LinkDialog from './module/LinkDialog.ts';
 import LinkPopover from './module/LinkPopover.ts';
 import ImageDialog from './module/ImageDialog.ts';

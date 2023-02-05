@@ -109,6 +109,11 @@ export interface Options {
         air?: [string, string[]][];
     },
 
+    toolbar?: [string, string[]][];
+    followingToolbar?: boolean;
+    otherStaticBar?: HTMLElement;
+    toolbarContainer?: Element | string;
+
     showDomainOnlyForAutolink?: boolean;
     linkTargetBlank?: boolean;
 
