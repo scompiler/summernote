@@ -21,7 +21,7 @@ import ImageDialog from './module/ImageDialog';
 import ImagePopover from './module/ImagePopover';
 import TablePopover from './module/TablePopover';
 import VideoDialog from './module/VideoDialog';
-import HelpDialog from './module/HelpDialog';
+import HelpDialog from './module/HelpDialog.ts';
 import AirPopover from './module/AirPopover.ts';
 import HintPopover from './module/HintPopover';
 import Summernote from "./class";

@@ -205,7 +205,7 @@ export default class Context {
         delete this.modules[key];
     }
 
-    memo(key: string, obj: any) {
+    memo(key: string, obj?: any) {
         if (arguments.length === 1) {
             return this.memos[key];
         }

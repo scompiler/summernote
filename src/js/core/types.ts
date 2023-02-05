@@ -114,6 +114,17 @@ export interface Options {
         image: {
             original: string;
         };
+        options: {
+            help: string;
+        };
+    };
+
+    dialogsInBody?: boolean;
+    dialogsFade?: boolean;
+
+    keyMap?: {
+        mac: {[shortcut: string]: string};
+        pc: {[shortcut: string]: string};
     };
 }
 
@@ -135,4 +146,18 @@ export interface UserInterface {
     popover(options: {className: string}): Renderer;
 
     toggleBtnActive(btnEl: Element, isActive: boolean): void;
+
+    dialog(options: {
+        title: string;
+        fade: boolean;
+        body: string;
+        footer: string;
+        callback2: (nodeEls: Node[]) => void;
+    }): Renderer;
+
+    hideDialog(dialogEl: HTMLElement): void;
+
+    showDialog(dialogEl: HTMLElement): void;
+
+    onDialogShown(dialogEl: HTMLElement, callback: () => void): void;
 }
