@@ -9,7 +9,7 @@ import Codeview from './module/Codeview';
 import Statusbar from './module/Statusbar.ts';
 import Fullscreen from './module/Fullscreen';
 import Handle from './module/Handle';
-import AutoLink from './module/AutoLink';
+import AutoLink from './module/AutoLink.ts';
 import AutoSync from './module/AutoSync';
 import AutoReplace from './module/AutoReplace';
 import Placeholder from './module/Placeholder.ts';

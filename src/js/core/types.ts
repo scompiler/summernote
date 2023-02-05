@@ -100,6 +100,9 @@ export interface Options {
         table?: [string, string[]][];
         air?: [string, string[]][];
     },
+
+    showDomainOnlyForAutolink?: boolean;
+    linkTargetBlank?: boolean;
 }
 
 export interface Layout {
