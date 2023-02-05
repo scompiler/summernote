@@ -103,7 +103,7 @@ function namespaceToCamel(namespace: string, prefix: string): string {
  * after it stops being called for N milliseconds. If `immediate` is passed, trigger the function on the leading edge,
  * instead of the trailing.
  */
-function debounce<T extends any[]>(func: (...args: T) => any, wait: number, immediate: boolean) {
+function debounce<T extends any[]>(func: (...args: T) => any, wait: number, immediate = false) {
     let timeout: NodeJS.Timeout;
     return function(...args: T) {
         const context = this;

@@ -68,7 +68,7 @@ export default class Style {
     /**
      * Paragraph level style.
      */
-    stylePara(rng: WrappedRange, styleInfo: CSSStyleDeclaration) {
+    stylePara(rng: WrappedRange, styleInfo: Partial<CSSStyleDeclaration>) {
         rng.nodes(dom.isPara, {
             includeAncestor: true,
         }).forEach((para: HTMLParagraphElement) => {
@@ -81,7 +81,7 @@ export default class Style {
     /**
      * Insert and returns styleNodes on range.
      */
-    styleNodes(rng: WrappedRange, options: {
+    styleNodes(rng: WrappedRange, options?: {
         nodeName?: string;
         expandClosestSibling?: boolean;
         onlyPartialContains?: boolean;

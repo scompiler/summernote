@@ -611,7 +611,7 @@ export class WrappedRange {
  *
  * @param sc - start container
  */
-function create(sc: Node): WrappedRange;
+function create(sc?: Node): WrappedRange;
 /**
  * Create Range Object From arguments or Browser Selection.
  *
@@ -659,7 +659,7 @@ function create(sc?: Node | HTMLElement, so?: number, ec?: Node, eo?: number): W
 export default {
     create,
 
-    createFromBodyElement: function(bodyElement: Node, isCollapseToStart = false) {
+    createFromBodyElement: function(bodyElement: Node, isCollapseToStart = false): WrappedRange {
         const wrappedRange = this.createFromNode(bodyElement);
         return wrappedRange.collapse(isCollapseToStart);
     },

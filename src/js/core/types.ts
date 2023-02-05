@@ -91,6 +91,7 @@ export interface Options {
         onMouseup?: (...args: any) => any | null;
         onPaste?: (...args: any) => any | null;
         onScroll?: (...args: any) => any | null;
+        onApplyCustomStyle?: (...args: any) => any | null;
     };
     icons?: {[icon: string]: string};
     historyLimit?: number;
@@ -142,6 +143,7 @@ export interface Options {
             floatRight: string;
             floatNone: string;
             remove: string;
+            maximumFileSizeError: string;
         };
         options: {
             help: string;
@@ -160,6 +162,38 @@ export interface Options {
         };
         help: {
             'linkDialog.show': string;
+            escape: string;
+            undo: string;
+            redo: string;
+            tab: string;
+            untab: string;
+            insertParagraph: string;
+            insertOrderedList: string;
+            insertUnorderedList: string;
+            indent: string;
+            outdent: string;
+            formatPara: string;
+            insertHorizontalRule: string;
+            fontName: string;
+            formatH1: string;
+            formatH2: string;
+            formatH3: string;
+            formatH4: string;
+            formatH5: string;
+            formatH6: string;
+            bold: string;
+            italic: string;
+            underline: string;
+            strikethrough: string;
+            superscript: string;
+            subscript: string;
+            justifyLeft: string;
+            justifyCenter: string;
+            justifyRight: string;
+            justifyFull: string;
+            formatBlock: string;
+            removeFormat: string;
+            backColor: string;
         };
         video: {
             video: string;
@@ -222,6 +256,9 @@ export interface Options {
             redo: string;
             undo: string;
         };
+        output: {
+            noSelection: string;
+        };
     };
 
     dialogsInBody?: boolean;
@@ -252,6 +289,7 @@ export interface Options {
     codeviewIframeWhitelistSrcBase?: string[];
     prettifyHtml?: boolean;
     height?: number;
+    width?: number;
     codemirror?: {
         tern?: any;
         CodeMirrorConstructor?: CodeMirrorConstructor;
@@ -276,6 +314,20 @@ export interface Options {
         row: number;
         col: number;
     };
+
+    tableClassName?: string;
+    linkAddNoReferrer?: boolean;
+    linkAddNoOpener?: boolean;
+    onCreateLink?: (url: string) => string;
+    defaultProtocol?: string;
+    maxTextLength?: number;
+    recordEveryKeystroke?: boolean;
+    spellCheck?: boolean;
+    disableGrammar?: boolean;
+    overrideContextMenu?: boolean;
+    tabDisable?: boolean;
+    styleWithCSS?: boolean;
+    tabSize?: number;
 }
 
 export interface Layout {

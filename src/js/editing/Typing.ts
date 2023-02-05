@@ -39,7 +39,7 @@ export default class Typing {
      *   1 - Break the first blockquote in the ancestors list
      *   2 - Break all blockquotes, so that the new paragraph is not quoted (this is the default)
      */
-    insertParagraph(editable: HTMLElement, rng: WrappedRange) {
+    insertParagraph(editable: HTMLElement, rng?: WrappedRange) {
         rng = rng || range.create(editable);
 
         // deleteContents on range.
