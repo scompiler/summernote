@@ -120,6 +120,10 @@ export interface Options {
     langInfo?: {
         image: {
             original: string;
+            maximumFileSize: string;
+            selectFromFiles: string;
+            url: string;
+            insert: string;
         };
         options: {
             help: string;
@@ -138,6 +142,9 @@ export interface Options {
     hintMode?: 'word' | 'words';
     hintSelect?: 'after' | 'next';
     hintDirection?: 'bottom' | 'top';
+
+    maximumImageFileSize?: number | null;
+    acceptImageFileTypes?: string;
 }
 
 export interface Layout {
@@ -163,12 +170,14 @@ export interface UserInterface {
 
     toggleBtnActive(btnEl: Element, isActive: boolean): void;
 
+    toggleBtn(btnEl: Element, isEnable: boolean): void;
+
     dialog(options: {
         title: string;
         fade: boolean;
         body: string;
         footer: string;
-        callback2: (nodeEls: Node[]) => void;
+        callback2?: (nodeEls: Node[]) => void;
     }): Renderer;
 
     hideDialog(dialogEl: HTMLElement): void;
@@ -176,4 +185,6 @@ export interface UserInterface {
     showDialog(dialogEl: HTMLElement): void;
 
     onDialogShown(dialogEl: HTMLElement, callback: () => void): void;
+
+    onDialogHidden(dialogEl: HTMLElement, callback: () => void): void;
 }

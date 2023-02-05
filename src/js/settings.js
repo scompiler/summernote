@@ -17,7 +17,7 @@ import Buttons from './module/Buttons';
 import Toolbar from './module/Toolbar';
 import LinkDialog from './module/LinkDialog';
 import LinkPopover from './module/LinkPopover';
-import ImageDialog from './module/ImageDialog';
+import ImageDialog from './module/ImageDialog.ts';
 import ImagePopover from './module/ImagePopover';
 import TablePopover from './module/TablePopover';
 import VideoDialog from './module/VideoDialog';
