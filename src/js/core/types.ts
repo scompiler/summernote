@@ -130,6 +130,8 @@ export interface Options {
             selectFromFiles: string;
             url: string;
             insert: string;
+            dragImageHere: string;
+            dropImage: string;
         };
         options: {
             help: string;
@@ -169,6 +171,8 @@ export interface Options {
 
     disableLinkTarget?: boolean;
     useProtocol?: boolean;
+
+    disableDragAndDrop?: boolean
 }
 
 export interface Layout {
