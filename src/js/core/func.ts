@@ -34,7 +34,10 @@ function self(a: any) {
     return a;
 }
 
-function invoke<T extends {[property: string]: (...args: any) => any}>(obj: T, method: keyof T) {
+type Func = (...args: any[]) => any;
+type PropertiesWithType<T extends {[property: string]: any}, Type> = {[K in keyof T as (T[K] extends Type ? K : never)]: T[K]};
+
+function invoke<T extends {[property: string]: any}>(obj: T, method: keyof PropertiesWithType<T, Func>) {
     return function(...args: any[]) {
         // eslint-disable-next-line prefer-spread
         return obj[method].apply(obj, args);

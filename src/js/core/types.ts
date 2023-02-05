@@ -126,6 +126,7 @@ export interface Options {
 
     langInfo?: {
         image: {
+            image: string;
             original: string;
             maximumFileSize: string;
             selectFromFiles: string;
@@ -133,24 +134,93 @@ export interface Options {
             insert: string;
             dragImageHere: string;
             dropImage: string;
+            resizeFull: string;
+            resizeHalf: string;
+            resizeQuarter: string;
+            resizeNone: string;
+            floatLeft: string;
+            floatRight: string;
+            floatNone: string;
+            remove: string;
         };
         options: {
             help: string;
+            fullscreen: string;
+            codeview: string;
         };
         link: {
+            link: string;
             textToDisplay: string;
             url: string;
             openInNewWindow: string;
             useProtocol: string;
             insert: string;
+            edit: string;
+            unlink: string;
         };
         help: {
             'linkDialog.show': string;
         };
         video: {
+            video: string;
             url: string;
             providers: string;
             insert: string;
+        };
+        color: {
+            more: string;
+            background: string;
+            transparent: string;
+            cpSelect: string;
+            foreground: string;
+            resetToDefault: string;
+            recent: string;
+        };
+        font: {
+            bold: string;
+            italic: string;
+            underline: string;
+            clear: string;
+            strikethrough: string;
+            superscript: string;
+            subscript: string;
+            name: string;
+            size: string;
+            sizeunit: string;
+            height: string;
+        };
+        lists: {
+            unordered: string;
+            ordered: string;
+        };
+        paragraph: {
+            paragraph: string;
+            left: string;
+            center: string;
+            right: string;
+            justify: string;
+            outdent: string;
+            indent: string;
+        };
+        style: {
+            style: string;
+        };
+        table: {
+            table: string;
+            addRowAbove: string;
+            addRowBelow: string;
+            addColLeft: string;
+            addColRight: string;
+            delRow: string;
+            delCol: string;
+            delTable: string;
+        };
+        hr: {
+            insert: string;
+        };
+        history: {
+            redo: string;
+            undo: string;
         };
     };
 
@@ -185,6 +255,26 @@ export interface Options {
     codemirror?: {
         tern?: any;
         CodeMirrorConstructor?: CodeMirrorConstructor;
+    };
+
+    tooltip?: 'auto';
+    fontNamesIgnoreCheck?: string[];
+    colorButton?: {
+        foreColor: string;
+        backColor: string;
+    };
+    shortcuts?: boolean;
+    colors?: string[][];
+    colorsName?: string[][];
+    styleTags?: string[];
+    addDefaultFonts?: boolean;
+    fontNames?: string[];
+    fontSizes?: string[];
+    fontSizeUnits?: string[];
+    lineHeights?: string[];
+    insertTableMaxSize?: {
+        row: number;
+        col: number;
     };
 }
 
@@ -228,6 +318,60 @@ export interface UserInterface {
         text: string;
         checked: boolean;
     }): Renderer;
+
+    button(options: {
+        className?: string;
+        contents: string;
+        tooltip: string;
+        click?: (domEvent: MouseEvent) => void;
+        callback2?: (nodeEls: Node[]) => void;
+        container?: Element | string;
+        data?: {[key: string]: string};
+    }): Renderer;
+
+    buttonGroup(options: {
+        className: string;
+        children?: Renderer[];
+    } | Renderer[], options2?: {
+        callback2?: (nodeEls: Node[]) => void;
+    }): Renderer;
+
+    buttonsStack(options: Renderer[]): Renderer;
+
+    dropdownButtonContents(contents: string, options?: Options): string;
+
+    dropdown(options: {
+        className?: string;
+        title?: string;
+        items?: string[] | string;
+        callback2?: (nodeEls: Node[]) => void;
+        click?: (domEvent: MouseEvent) => void;
+        template?: (item: {
+            tag: string;
+            title: string;
+            style?: string;
+            className?: string;
+        } | string) => string;
+    } | Renderer[]): Renderer;
+
+    dropdownCheck(options: {
+        className: string;
+        checkClassName: string;
+        items: string[];
+        title: string;
+        template?: (item: string) => string;
+        click: (domEvent: MouseEvent) => void;
+    }): Renderer;
+
+    palette(options: {
+        colors: string[][];
+        colorsName: string[][];
+        eventName: string;
+        container: Element | string;
+        tooltip: 'auto';
+    }): Renderer;
+
+    icon(className: string, tagName?: string): string;
 
     hideDialog(dialogEl: HTMLElement): void;
 
