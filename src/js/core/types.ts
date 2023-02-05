@@ -180,6 +180,7 @@ export interface UserInterface {
         className: string;
         hideArrow?: boolean;
         direction?: string;
+        callback2?: (nodeEls: Node[]) => void;
     }): Renderer;
 
     toggleBtnActive(btnEl: Element, isActive: boolean): void;

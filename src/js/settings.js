@@ -16,7 +16,7 @@ import Placeholder from './module/Placeholder.ts';
 import Buttons from './module/Buttons';
 import Toolbar from './module/Toolbar';
 import LinkDialog from './module/LinkDialog.ts';
-import LinkPopover from './module/LinkPopover';
+import LinkPopover from './module/LinkPopover.ts';
 import ImageDialog from './module/ImageDialog.ts';
 import ImagePopover from './module/ImagePopover.ts';
 import TablePopover from './module/TablePopover';
