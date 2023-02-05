@@ -19,7 +19,7 @@ import LinkDialog from './module/LinkDialog.ts';
 import LinkPopover from './module/LinkPopover.ts';
 import ImageDialog from './module/ImageDialog.ts';
 import ImagePopover from './module/ImagePopover.ts';
-import TablePopover from './module/TablePopover';
+import TablePopover from './module/TablePopover.ts';
 import VideoDialog from './module/VideoDialog';
 import HelpDialog from './module/HelpDialog.ts';
 import AirPopover from './module/AirPopover.ts';
