@@ -2,8 +2,6 @@ import func from "../core/func";
 import Context from "../Context";
 import { Options } from "../core/types";
 
-const EDITABLE_PADDING = 24;
-
 export default class Statusbar {
     statusbarEl: HTMLElement;
 
@@ -43,10 +41,12 @@ export default class Statusbar {
 
         const editableTop = func.getElementRect(this.editableEl).top - document.scrollingElement.scrollTop;
         const editableCodeTop = func.getElementRect(this.codableEl).top - document.scrollingElement.scrollTop;
+        const statusbarTop = func.getElementRect(this.statusbarEl).top - document.scrollingElement.scrollTop;
+        const mouseOffsetTop = domEvent.clientY - statusbarTop;
 
         this.onMouseMove = (domEventMove: MouseEvent) => {
-            let height = domEventMove.clientY - (editableTop + EDITABLE_PADDING);
-            let heightCode = domEventMove.clientY - (editableCodeTop + EDITABLE_PADDING);
+            let height = domEventMove.clientY - (editableTop + mouseOffsetTop);
+            let heightCode = domEventMove.clientY - (editableCodeTop + mouseOffsetTop);
 
             height = (this.options.minHeight > 0) ? Math.max(height, this.options.minHeight) : height;
             height = (this.options.maxHeight > 0) ? Math.min(height, this.options.maxHeight) : height;
