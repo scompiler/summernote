@@ -9,7 +9,9 @@ module.exports = function (config) {
     files: [
       '../node_modules/jquery/dist/jquery.js',
       { pattern: '../src/js/**/*.js' },
-      { pattern: '../test/**/*.spec.js' }
+      { pattern: '../test/**/*.spec.js' },
+      { pattern: '../src/js/**/*.ts', type: 'js' },
+      { pattern: '../test/**/*.spec.ts', type: 'js' }
     ],
 
     detectBrowsers: {
@@ -24,6 +26,8 @@ module.exports = function (config) {
     preprocessors: {
       '../src/js/**/*.js': ['webpack', ],
       '../test/**/*.spec.js': ['webpack', ],
+      '../src/js/**/*.ts': ['webpack', ],
+      '../test/**/*.spec.ts': ['webpack', ],
     },
 
     webpack: webpackConfig,

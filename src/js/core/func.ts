@@ -14,11 +14,11 @@ function peq2<T extends {[property: string]: any}>(propName: string) {
     };
 }
 
-function ok() {
+function ok(): true {
     return true;
 }
 
-function fail() {
+function fail(): false {
     return false;
 }
 
@@ -26,8 +26,8 @@ function not<T extends any[]>(f: (...args: T) => boolean): (...args: T) => boole
     return (...args: T) => !f.apply(f, args);
 }
 
-function and<T>(fA: (item: T) => boolean, fB: (item: T) => boolean) {
-    return (item: T) => fA(item) && fB(item);
+function and<T extends any[]>(fA: (...args: T) => boolean, fB: (...args: T) => boolean) {
+    return (...args: T) => fA(...args) && fB(...args);
 }
 
 function self(a: any) {
@@ -91,7 +91,7 @@ function invertObject<T extends {[property: string | number]: string | number}>(
     return inverted;
 }
 
-function namespaceToCamel(namespace: string, prefix: string): string {
+function namespaceToCamel(namespace: string, prefix?: string): string {
     prefix = prefix || '';
     return prefix + namespace.split('.').map(function(name) {
         return name.substring(0, 1).toUpperCase() + name.substring(1);
