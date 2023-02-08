@@ -12,6 +12,7 @@ module.exports = {
     roots: [path.resolve('./src')],
     alias: {
       src: path.resolve('./src'),
+      test: path.resolve('./test'),
     },
     extensions: ['.tsx', '.ts', '.js'],
   },
