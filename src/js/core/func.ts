@@ -147,12 +147,12 @@ function getElementOffset(element: Element) {
     };
 }
 
-function makeElement(markup: string, parent?: string): HTMLElement {
+function makeElement<T extends HTMLElement>(markup: string, parent?: string): T {
     const div = document.createElement(parent || 'div');
 
     div.innerHTML = markup;
 
-    return div.firstElementChild as HTMLElement;
+    return div.firstElementChild as T;
 }
 
 export default {

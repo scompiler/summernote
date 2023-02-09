@@ -595,7 +595,7 @@ export default class Table {
     /**
      * Create empty table element.
      */
-    createTable(colCount: number, rowCount: number, options?: {tableClassName?: string}): Node {
+    createTable(colCount: number, rowCount: number, options?: {tableClassName?: string}): HTMLTableElement {
         const tds = [];
         for (let idxCol = 0; idxCol < colCount; idxCol++) {
             tds.push('<td>' + dom.blank + '</td>');
@@ -607,7 +607,7 @@ export default class Table {
             trs.push('<tr>' + tdHTML + '</tr>');
         }
         const trHTML = trs.join('');
-        const tableEl = func.makeElement('<table>' + trHTML + '</table>');
+        const tableEl = func.makeElement<HTMLTableElement>('<table>' + trHTML + '</table>');
         if (options && options.tableClassName) {
             tableEl.className = options.tableClassName;
         }
