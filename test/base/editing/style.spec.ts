@@ -5,9 +5,9 @@
  */
 
 import chai from 'chai';
-import $ from 'jquery';
 import range from 'src/js/core/range';
 import Style from 'src/js/editing/Style';
+import func from "src/js/core/func";
 
 const expect = chai.expect;
 
@@ -16,77 +16,77 @@ describe('base:editing.Style', () => {
 
     describe('styleNodes', () => {
         it('should wrap selected text with span', () => {
-            const $cont = $('<div class="note-editable"><p>text</p></div>');
-            const $p = $cont.find('p');
-            const rng = range.create($p[0].firstChild, 0, $p[0].firstChild, 4);
+            const contEl = func.makeElement('<div class="note-editable"><p>text</p></div>');
+            const pEl = contEl.querySelector('p');
+            const rng = range.create(pEl.firstChild, 0, pEl.firstChild, 4);
             style.styleNodes(rng);
 
-            expect($cont.html()).to.deep.equal('<p><span>text</span></p>');
+            expect(contEl.innerHTML).to.deep.equal('<p><span>text</span></p>');
         });
 
         it('should split text and wrap selected text with span', () => {
-            const $cont = $('<div class="note-editable"><p>text</p></div>');
-            const $p = $cont.find('p');
-            const rng = range.create($p[0].firstChild, 1, $p[0].firstChild, 3);
+            const contEl = func.makeElement('<div class="note-editable"><p>text</p></div>');
+            const pEl = contEl.querySelector('p');
+            const rng = range.create(pEl.firstChild, 1, pEl.firstChild, 3);
             style.styleNodes(rng);
 
-            expect($cont.html()).to.deep.equal('<p>t<span>ex</span>t</p>');
+            expect(contEl.innerHTML).to.deep.equal('<p>t<span>ex</span>t</p>');
         });
 
         it('should split text and insert span', () => {
-            const $cont = $('<div class="note-editable"><p>text</p></div>');
-            const $p = $cont.find('p');
-            const rng = range.create($p[0].firstChild, 2, $p[0].firstChild, 2);
+            const contEl = func.makeElement('<div class="note-editable"><p>text</p></div>');
+            const pEl = contEl.querySelector('p');
+            const rng = range.create(pEl.firstChild, 2, pEl.firstChild, 2);
             style.styleNodes(rng);
 
-            expect($cont.html()).to.deep.equal('<p>te<span></span>xt</p>');
+            expect(contEl.innerHTML).to.deep.equal('<p>te<span></span>xt</p>');
         });
 
         it('should just return a parent span', () => {
-            const $cont = $('<div class="note-editable"><p><span>text</span></p></div>');
-            const $span = $cont.find('span');
-            const rng = range.create($span[0].firstChild, 0, $span[0].firstChild, 4);
+            const contEl = func.makeElement('<div class="note-editable"><p><span>text</span></p></div>');
+            const spanEl = contEl.querySelector('span');
+            const rng = range.create(spanEl.firstChild, 0, spanEl.firstChild, 4);
             style.styleNodes(rng);
 
-            expect($cont.html()).to.deep.equal('<p><span>text</span></p>');
+            expect(contEl.innerHTML).to.deep.equal('<p><span>text</span></p>');
         });
 
         it('should wrap each texts with span', () => {
-            const $cont = $('<div class="note-editable"><p><b>bold</b><span>span</span></p></div>');
-            const $b = $cont.find('b');
-            const $span = $cont.find('span');
-            const rng = range.create($b[0].firstChild, 2, $span[0].firstChild, 2);
+            const contEl = func.makeElement('<div class="note-editable"><p><b>bold</b><span>span</span></p></div>');
+            const bEl = contEl.querySelector('b');
+            const spanEl = contEl.querySelector('span');
+            const rng = range.create(bEl.firstChild, 2, spanEl.firstChild, 2);
             style.styleNodes(rng);
 
-            expect($cont.html()).to.deep.equal('<p><b>bo<span>ld</span></b><span><span>sp</span>an</span></p>');
+            expect(contEl.innerHTML).to.deep.equal('<p><b>bo<span>ld</span></b><span><span>sp</span>an</span></p>');
         });
 
         it('should wrap each texts with span except not a single blood line', () => {
-            const $cont = $('<div class="note-editable"><p><b>bold</b><span>span</span></p></div>');
-            const $b = $cont.find('b');
-            const $span = $cont.find('span');
-            const rng = range.create($b[0].firstChild, 2, $span[0].firstChild, 4);
+            const contEl = func.makeElement('<div class="note-editable"><p><b>bold</b><span>span</span></p></div>');
+            const bEl = contEl.querySelector('b');
+            const spanEl = contEl.querySelector('span');
+            const rng = range.create(bEl.firstChild, 2, spanEl.firstChild, 4);
             style.styleNodes(rng);
 
-            expect($cont.html()).to.deep.equal('<p><b>bo<span>ld</span></b><span>span</span></p>');
+            expect(contEl.innerHTML).to.deep.equal('<p><b>bo<span>ld</span></b><span>span</span></p>');
         });
 
         it('should expand b tag when providing the expandClosestSibling option', () => {
-            const $cont = $('<div class="note-editable"><p>text<b>bold</b></p></div>');
-            const $p = $cont.find('p');
-            const rng = range.create($p[0].firstChild, 0, $p[0].firstChild, 4);
+            const contEl = func.makeElement('<div class="note-editable"><p>text<b>bold</b></p></div>');
+            const pEl = contEl.querySelector('p');
+            const rng = range.create(pEl.firstChild, 0, pEl.firstChild, 4);
             style.styleNodes(rng, { nodeName: 'B', expandClosestSibling: true });
 
-            expect($cont.html()).to.deep.equal('<p><b>textbold</b></p>');
+            expect(contEl.innerHTML).to.deep.equal('<p><b>textbold</b></p>');
         });
 
         it('should not expand b tag when providing the onlyPartialContains option', () => {
-            const $cont = $('<div class="note-editable"><p>text<b>bold</b></p></div>');
-            const $p = $cont.find('p');
-            const rng = range.create($p[0].firstChild, 0, $p[0].firstChild, 4);
+            const contEl = func.makeElement('<div class="note-editable"><p>text<b>bold</b></p></div>');
+            const pEl = contEl.querySelector('p');
+            const rng = range.create(pEl.firstChild, 0, pEl.firstChild, 4);
             style.styleNodes(rng, { nodeName: 'B', expandClosestSibling: true, onlyPartialContains: true });
 
-            expect($cont.html()).to.deep.equal('<p><b>text</b><b>bold</b></p>');
+            expect(contEl.innerHTML).to.deep.equal('<p><b>text</b><b>bold</b></p>');
         });
     });
 });

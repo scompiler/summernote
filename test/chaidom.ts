@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import env from 'src/js/core/env';
 
 export default function(chai: Chai.ChaiStatic) {
@@ -22,9 +21,11 @@ export default function(chai: Chai.ChaiStatic) {
         return str1 === str2;
     };
 
-    chai.dom.equalsStyle = ($node: JQuery, expected: string, style: string) => {
-        const nodeStyle = window.getComputedStyle($node[0]).getPropertyValue(style);
-        const testerStyle = $('<div></div>').css(style, expected).css(style);
+    chai.dom.equalsStyle = (nodeEl: HTMLElement, expected: string, style: string) => {
+        const nodeStyle = window.getComputedStyle(nodeEl).getPropertyValue(style);
+        const divEl = document.createElement('div');
+        divEl.style.setProperty(style, expected);
+        const testerStyle = divEl.style.getPropertyValue(style);
         return nodeStyle === testerStyle;
     };
 
@@ -48,12 +49,12 @@ export default function(chai: Chai.ChaiStatic) {
     });
 
     chai.Assertion.addChainableMethod('equalsStyle', function(expected: string, style: string) {
-        const $node = this._obj;
+        const nodeEl = this._obj as HTMLElement;
 
         return this.assert(
-            chai.dom.equalsStyle($node, expected, style),
-            'expected ' + this._obj.css(style) + ' to equal ' + expected + ' style',
-            'expected ' + this._obj.css(style) + ' not to equal ' + expected + ' style',
+            chai.dom.equalsStyle(nodeEl, expected, style),
+            'expected ' + nodeEl.style.getPropertyValue(style) + ' to equal ' + expected + ' style',
+            'expected ' + nodeEl.style.getPropertyValue(style) + ' not to equal ' + expected + ' style',
             expected
         );
     });

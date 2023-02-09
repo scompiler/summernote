@@ -3,7 +3,6 @@
  * (c) 2015~ Summernote Team
  * summernote may be freely distributed under the MIT license./
  */
-import $ from 'jquery';
 import chai from 'chai';
 import chaidom from 'test/chaidom';
 import Context from 'src/js/Context';
@@ -15,16 +14,17 @@ import 'src/styles/bs4/summernote-bs4';
 import spies from "chai-spies";
 import Summernote from "src/js/class";
 import Editor from "src/js/module/Editor";
+import func from "src/js/core/func";
 
 chai.use(chaidom);
 chai.use(spies);
 
 describe('HintPopover', () => {
     const expect = chai.expect;
-    let $note: JQuery<HTMLElement>;
+    let noteEl: HTMLElement;
     let editor: Editor;
     let context: Context;
-    let $editable: JQuery<HTMLElement>;
+    let editableEl: HTMLElement;
 
     function expectContents(context: Context, markup: string) {
         expect(context.layoutInfo.editableEl.innerHTML).to.equalsIgnoreCase(markup);
@@ -32,16 +32,17 @@ describe('HintPopover', () => {
 
     describe('Single word hint', () => {
         beforeEach(function() {
-            $('body').empty(); // important !
-            $note = $('<div><p>hello world</p></div>');
-            $note.appendTo('body');
+            document.body.innerHTML = ''; // important !
+            noteEl = func.makeElement('<div><p>hello world</p></div>');
+            document.body.appendChild(noteEl);
 
-            const options = $.extend({}, Summernote.meta.options, {
+            const options = {
+                ...Summernote.meta.options,
                 hint: {
                     mentions: ['jayden', 'sam', 'alvin', 'david'],
                     match: /\B#(\w*)$/,
                     search: function(keyword, callback) {
-                        callback($.grep(this.mentions, function(item) {
+                        callback(this.mentions.filter(function(item: string) {
                             return item.indexOf(keyword) === 0;
                         }));
                     },
@@ -49,11 +50,11 @@ describe('HintPopover', () => {
                         return '#' + item;
                     },
                 },
-            } as Options);
+            } as Options;
 
-            context = new Context($note[0], options);
+            context = new Context(noteEl, options);
             editor = context.modules.editor as Editor;
-            $editable = $(context.layoutInfo.editableEl);
+            editableEl = context.layoutInfo.editableEl;
 
             // [workaround]
             //  - Safari does not popup hintpopover
@@ -64,48 +65,48 @@ describe('HintPopover', () => {
         });
 
         it('should not be shown without matches', () => {
-            $editable[0].dispatchEvent(new Event('keyup'));
-            expect($('.note-hint-popover').css('display')).to.equals('none');
+            editableEl.dispatchEvent(new Event('keyup'));
+            expect(document.querySelector<HTMLElement>('.note-hint-popover').style.display).to.equals('none');
         });
 
         it('should be shown when it matches the given condition', (done) => {
-            const textNode = $editable.find('p')[0].firstChild;
+            const textNode = editableEl.querySelector('p').firstChild;
             editor.setLastRange(range.create(textNode, 5, textNode, 5).select());
             editor.insertText(' #');
-            $editable[0].dispatchEvent(new Event('keyup'));
+            editableEl.dispatchEvent(new Event('keyup'));
 
             setTimeout(() => {
-                expect($('.note-hint-popover').css('display')).to.equals('block');
+                expect(document.querySelector<HTMLElement>('.note-hint-popover').style.display).to.equals('block');
                 done();
             }, 10);
         });
 
         it('should select the best matched item with the given condition', (done) => {
-            const textNode = $editable.find('p')[0].firstChild;
+            const textNode = editableEl.querySelector('p').firstChild;
             editor.setLastRange(range.create(textNode, 5, textNode, 5).select());
             editor.insertText(' #al');
-            $editable[0].dispatchEvent(new Event('keyup'));
+            editableEl.dispatchEvent(new Event('keyup'));
 
             setTimeout(() => {
                 // alvin should be activated
-                const item = $('.note-hint-popover').find('.note-hint-item');
-                expect(item.text()).to.equals('alvin');
-                expect(item.hasClass('active')).to.be.true;
+                const itemEl = document.querySelector('.note-hint-popover .note-hint-item');
+                expect(itemEl.textContent).to.equals('alvin');
+                expect(itemEl.classList.contains('active')).to.be.true;
                 done();
             }, 10);
         });
 
         it('should be replaced with the selected hint', (done) => {
-            const textNode = $editable.find('p')[0].firstChild;
+            const textNode = editableEl.querySelector('p').firstChild;
             editor.setLastRange(range.create(textNode, 5, textNode, 5).select());
             editor.insertText(' #');
-            $editable[0].dispatchEvent(new Event('keyup'));
+            editableEl.dispatchEvent(new Event('keyup'));
 
             const onChange = chai.spy();
-            $note[0].addEventListener('summernote.change', onChange);
+            noteEl.addEventListener('summernote.change', onChange);
 
             setTimeout(() => {
-                $note[0].dispatchEvent(new CustomEvent('summernote.keydown', {
+                noteEl.dispatchEvent(new CustomEvent('summernote.keydown', {
                     detail: [new KeyboardEvent('keydown', {keyCode: key.code.ENTER})],
                 }));
 
@@ -118,16 +119,16 @@ describe('HintPopover', () => {
         });
 
         it('should move selection by pressing arrow key', (done) => {
-            const textNode = $editable.find('p')[0].firstChild;
+            const textNode = editableEl.querySelector('p').firstChild;
             editor.setLastRange(range.create(textNode, 5, textNode, 5).select());
             editor.insertText(' #');
-            $editable[0].dispatchEvent(new Event('keyup'));
+            editableEl.dispatchEvent(new Event('keyup'));
 
             setTimeout(() => {
-                $note[0].dispatchEvent(new CustomEvent('summernote.keydown', {
+                noteEl.dispatchEvent(new CustomEvent('summernote.keydown', {
                     detail: [new KeyboardEvent('keydown', {keyCode: key.code.DOWN})],
                 }));
-                $note[0].dispatchEvent(new CustomEvent('summernote.keydown', {
+                noteEl.dispatchEvent(new CustomEvent('summernote.keydown', {
                     detail: [new KeyboardEvent('keydown', {keyCode: key.code.ENTER})],
                 }));
 
@@ -141,11 +142,12 @@ describe('HintPopover', () => {
 
     describe('Multiple words hint', () => {
         beforeEach(function() {
-            $('body').empty();
-            $note = $('<div><p>hello world</p></div>');
-            $note.appendTo('body');
+            document.body.innerHTML = ''; // important !
+            noteEl = func.makeElement('<div><p>hello world</p></div>');
+            document.body.appendChild(noteEl);
 
-            const options = $.extend({}, Summernote.meta.options, {
+            const options = {
+                ...Summernote.meta.options,
                 hintMode: 'words',
                 hintSelect: 'next',
                 hint: {
@@ -169,7 +171,7 @@ describe('HintPopover', () => {
                     ],
                     match: /\B@([a-z ]*)/i,
                     search: function(keyword, callback) {
-                        callback($.grep(this.mentions, function(item) {
+                        callback(this.mentions.filter(function(item: {name: string; url: string}) {
                             return item.name.toLowerCase().indexOf(keyword.toLowerCase()) === 0;
                         }));
                     },
@@ -177,17 +179,19 @@ describe('HintPopover', () => {
                         return item.name;
                     },
                     content: function(item) {
-                        return $('<a>')
-                            .attr('href', item.url)
-                            .text('@' + item.name)
-                            .get(0);
+                        const anchor: HTMLAnchorElement = func.makeElement('<a></a>');
+
+                        anchor.href = item.url;
+                        anchor.textContent = '@' + item.name;
+
+                        return anchor;
                     },
                 },
-            } as Options);
+            } as Options;
 
-            context = new Context($note[0], options);
+            context = new Context(noteEl, options);
             editor = context.modules.editor as Editor;
-            $editable = $(context.layoutInfo.editableEl);
+            editableEl = context.layoutInfo.editableEl;
 
             // [workaround]
             //  - Safari does not popup hintpopover
@@ -198,29 +202,29 @@ describe('HintPopover', () => {
         });
 
         it('should select the best matched item with the given condition', (done) => {
-            const textNode = $editable.find('p')[0].firstChild;
+            const textNode = editableEl.querySelector('p').firstChild;
             editor.setLastRange(range.create(textNode, 5, textNode, 5).select());
             editor.insertText(' @David S');
-            $editable[0].dispatchEvent(new Event('keyup'));
+            editableEl.dispatchEvent(new Event('keyup'));
 
             setTimeout(() => {
                 // David Summer should be activated
-                const item = $('.note-hint-popover').find('.note-hint-item');
-                expect(item.text()).to.equals('David Summer');
-                expect(item.hasClass('active')).to.be.true;
+                const itemEl = document.querySelector('.note-hint-popover .note-hint-item');
+                expect(itemEl.textContent).to.equals('David Summer');
+                expect(itemEl.classList.contains('active')).to.be.true;
                 done();
             }, 10);
         });
 
         it('should render hint result with given content', (done) => {
-            const textNode = $editable.find('p')[0].firstChild;
+            const textNode = editableEl.querySelector('p').firstChild;
             editor.setLastRange(range.create(textNode, 5, textNode, 5).select());
             editor.insertText(' @David S');
-            $editable[0].dispatchEvent(new Event('keyup'));
+            editableEl.dispatchEvent(new Event('keyup'));
 
             setTimeout(() => {
                 // alvin should be activated
-                $note[0].dispatchEvent(new CustomEvent('summernote.keydown', {
+                noteEl.dispatchEvent(new CustomEvent('summernote.keydown', {
                     detail: [new KeyboardEvent('keydown', {keyCode: key.code.ENTER})],
                 }));
 

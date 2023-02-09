@@ -4,29 +4,29 @@
  * summernote may be freely distributed under the MIT license./
  */
 import chai from 'chai';
-import $ from 'jquery';
 import Context from 'src/js/Context';
 import 'src/styles/bs4/summernote-bs4';
 import Summernote from "../../../src/js/class";
+import func from "../../../src/js/core/func";
 
 describe('Placeholder', () => {
     const assert = chai.assert;
 
     it('should not be initialized by placeholder attribute without inheritPlaceHolder', () => {
-        const options = $.extend({}, Summernote.meta.options);
-        const context = new Context($('<textarea placeholder="custom_placeholder"><p>hello</p></textarea>')[0], options);
-        const $editor = $(context.layoutInfo.editorEl);
+        const options = {...Summernote.meta.options};
+        const context = new Context(func.makeElement('<textarea placeholder="custom_placeholder"><p>hello</p></textarea>'), options);
+        const editorEl = context.layoutInfo.editorEl;
 
-        assert.isTrue($editor.find('.note-placeholder').length === 0);
+        assert.isTrue(editorEl.querySelector('.note-placeholder') === null);
     });
 
     it('should be initialized by placeholder attribute with inheritPlaceHolder', () => {
-        const options = $.extend({}, Summernote.meta.options);
+        const options = {...Summernote.meta.options};
         options.inheritPlaceholder = true;
-        const context = new Context($('<textarea placeholder="custom_placeholder"><p>hello</p></textarea>')[0], options);
-        const $editor = $(context.layoutInfo.editorEl);
+        const context = new Context(func.makeElement('<textarea placeholder="custom_placeholder"><p>hello</p></textarea>'), options);
+        const editorEl = context.layoutInfo.editorEl;
 
-        assert.isTrue($editor.find('.note-placeholder').length === 1);
-        assert.isTrue($editor.find('.note-placeholder').html() === 'custom_placeholder');
+        assert.isTrue(editorEl.querySelector('.note-placeholder') instanceof HTMLElement);
+        assert.isTrue(editorEl.querySelector('.note-placeholder').innerHTML === 'custom_placeholder');
     });
 });

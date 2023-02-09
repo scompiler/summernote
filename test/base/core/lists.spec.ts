@@ -4,8 +4,8 @@
  * summernote may be freely distributed under the MIT license./
  */
 import chai from 'chai';
-import $ from 'jquery';
 import lists from 'src/js/core/lists';
+import func from "../../../src/js/core/func";
 
 const expect = chai.expect;
 
@@ -77,13 +77,13 @@ describe('base:core.lists', () => {
 
     describe('from', () => {
         it('should return an array of childNodes', () => {
-            const $cont = $('<div><b>b</b><u>u</u><s>s</s><i>i</i></div>'); // busi
-            const $b = $cont.find('b');
-            const $u = $cont.find('u');
-            const $s = $cont.find('s');
-            const $i = $cont.find('i');
+            const cont = func.makeElement('<div><b>b</b><u>u</u><s>s</s><i>i</i></div>');
+            const b = cont.querySelector('b');
+            const u = cont.querySelector('u');
+            const s = cont.querySelector('s');
+            const i = cont.querySelector('i');
 
-            expect(lists.from($cont[0].childNodes)).to.deep.equal([$b[0], $u[0], $s[0], $i[0]]);
+            expect(lists.from(cont.childNodes)).to.deep.equal([b, u, s, i]);
         });
     });
 

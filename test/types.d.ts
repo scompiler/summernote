@@ -2,7 +2,7 @@ declare namespace Chai {
     interface ChaiStatic {
         dom: {
             equalsIgnoreCase?: (str1: string, str2: string) => boolean;
-            equalsStyle?: ($node: JQuery, expected: string, style: string) => boolean;
+            equalsStyle?: (nodeEl: HTMLElement, expected: string, style: string) => boolean;
         };
     }
     interface Assertion {

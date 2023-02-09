@@ -4,41 +4,42 @@
  * summernote may be freely distributed under the MIT license./
  */
 import chai from 'chai';
-import $ from 'jquery';
 import Context from 'src/js/Context';
 import VideoDialog from 'src/js/module/VideoDialog';
 import 'src/styles/bs4/summernote-bs4';
 import Summernote from "src/js/class";
+import func from 'src/js/core/func';
 
 describe('VideoDialog', () => {
     const expect = chai.expect;
     let context: Context;
-    let $video: VideoDialog;
+    let videoDialog: VideoDialog;
 
     function expectUrl(source: string, target: string) {
-        const iframe = $video.createVideoNode(source) as HTMLIFrameElement;
+        const iframe = videoDialog.createVideoNode(source) as HTMLIFrameElement;
         expect(iframe).to.not.equal(false);
         expect(iframe.tagName).to.equal('IFRAME');
         expect(iframe.src).to.be.have.string(target);
     }
 
     beforeEach(() => {
-        const $note = $('<div></div>').appendTo('body');
-        const options = $.extend({}, Summernote.meta.options);
+        const noteEl = func.makeElement('<div></div>');
+        document.body.appendChild(noteEl);
+        const options = {...Summernote.meta.options};
         options.toolbar = [
             ['video', ['video']],
         ];
-        context = new Context($note[0], options);
+        context = new Context(noteEl, options);
         context.initialize();
 
-        $video = new VideoDialog(context);
+        videoDialog = new VideoDialog(context);
     });
 
     describe('#createVideoNode', () => {
         it('should get false when insert invalid urls', () => {
-            expect($video.createVideoNode('http://www.google.com')).to.equal(false);
-            expect($video.createVideoNode('http://www.youtube.com')).to.equal(false);
-            expect($video.createVideoNode('http://www.facebook.com')).to.equal(false);
+            expect(videoDialog.createVideoNode('http://www.google.com')).to.equal(false);
+            expect(videoDialog.createVideoNode('http://www.youtube.com')).to.equal(false);
+            expect(videoDialog.createVideoNode('http://www.facebook.com')).to.equal(false);
         });
 
         it('should get proper iframe src when insert valid video urls', () => {

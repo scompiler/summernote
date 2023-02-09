@@ -5,7 +5,6 @@
  */
 import chai from 'chai';
 import chaidom from 'test/chaidom';
-import $ from 'jquery';
 import dom from 'src/js/core/dom';
 import func from 'src/js/core/func';
 
@@ -14,22 +13,22 @@ chai.use(chaidom);
 
 describe('base:core.dom', () => {
     describe('ancestor', () => {
-        let $cont: JQuery<HTMLElement>;
-        let $b: JQuery<HTMLElement>;
+        let contEl: HTMLElement;
+        let bEl: HTMLElement;
         let txtB: Node;
         before(() => {
             // basic case
-            $cont = $('<div class="note-editable"><b>b</b><u>u</u><s>s</s><i>i</i></div>'); // busi
-            $b = $cont.find('b');
-            txtB = $b[0].firstChild;
+            contEl = func.makeElement('<div class="note-editable"><b>b</b><u>u</u><s>s</s><i>i</i></div>'); // busi
+            bEl = contEl.querySelector('b');
+            txtB = bEl.firstChild;
         });
 
         it('should find ancestor B', () => {
-            expect(dom.ancestor(txtB, dom.isB)).to.deep.equal($b[0]);
+            expect(dom.ancestor(txtB, dom.isB)).to.deep.equal(bEl);
         });
 
         it('should find ancestor DIV', () => {
-            expect(dom.ancestor(txtB, dom.isDiv)).to.deep.equal($cont[0]);
+            expect(dom.ancestor(txtB, dom.isDiv)).to.deep.equal(contEl);
         });
 
         it('should return null when finding ancestor U does not exist', () => {
@@ -42,217 +41,217 @@ describe('base:core.dom', () => {
     });
 
     describe('listAncestor', () => {
-        let $cont: JQuery<HTMLElement>;
-        let $b: JQuery<HTMLElement>;
-        let $u: JQuery<HTMLElement>;
-        let $s: JQuery<HTMLElement>;
-        let $i: JQuery<HTMLElement>;
+        let contEl: HTMLElement;
+        let bEl: HTMLElement;
+        let uEl: HTMLElement;
+        let sEl: HTMLElement;
+        let iEl: HTMLElement;
 
         before(() => {
-            $cont = $('<div class="note-editable"><i><s><u><b>b</b></u></s></i></div>'); // busi
-            $b = $cont.find('b');
-            $u = $cont.find('u');
-            $s = $cont.find('s');
-            $i = $cont.find('i');
+            contEl = func.makeElement('<div class="note-editable"><i><s><u><b>b</b></u></s></i></div>'); // busi
+            bEl = contEl.querySelector('b');
+            uEl = contEl.querySelector('u');
+            sEl = contEl.querySelector('s');
+            iEl = contEl.querySelector('i');
         });
 
-        it('should return [$b, $u, $s, $i] from b to i', () => {
-            const result = dom.listAncestor($b[0], (node) => { return node === $i[0]; });
-            expect(result).to.deep.equal([$b[0], $u[0], $s[0], $i[0]]);
+        it('should return [bEl, uEl, sEl, iEl] from b to i', () => {
+            const result = dom.listAncestor(bEl, (node) => { return node === iEl; });
+            expect(result).to.deep.equal([bEl, uEl, sEl, iEl]);
         });
 
-        it('should return [$u, $s] from u to s', () => {
-            const result = dom.listAncestor($u[0], (node) => { return node === $s[0]; });
-            expect(result).to.deep.equal([$u[0], $s[0]]);
+        it('should return [uEl, sEl] from u to s', () => {
+            const result = dom.listAncestor(uEl, (node) => { return node === sEl; });
+            expect(result).to.deep.equal([uEl, sEl]);
         });
     });
 
     describe('listDescendant', () => {
-        let $cont: JQuery<HTMLElement>;
-        let $b: JQuery<HTMLElement>;
-        let $u: JQuery<HTMLElement>;
-        let $s: JQuery<HTMLElement>;
-        let $i: JQuery<HTMLElement>;
+        let contEl: HTMLElement;
+        let bEl: HTMLElement;
+        let uEl: HTMLElement;
+        let sEl: HTMLElement;
+        let iEl: HTMLElement;
 
         before(() => {
-            $cont = $('<div class="note-editable"><b></b><u></u><s></s><i></i></div>'); // busi
-            $b = $cont.find('b');
-            $u = $cont.find('u');
-            $s = $cont.find('s');
-            $i = $cont.find('i');
+            contEl = func.makeElement('<div class="note-editable"><b></b><u></u><s></s><i></i></div>'); // busi
+            bEl = contEl.querySelector('b');
+            uEl = contEl.querySelector('u');
+            sEl = contEl.querySelector('s');
+            iEl = contEl.querySelector('i');
         });
 
         it('should return an array of descendant elements', () => {
-            expect(dom.listDescendant($cont[0])).to.deep.equal([$b[0], $u[0], $s[0], $i[0]]);
+            expect(dom.listDescendant(contEl)).to.deep.equal([bEl, uEl, sEl, iEl]);
         });
 
         it('should filter an array of descendant elements', () => {
-            const result = dom.listDescendant($cont[0], (node) => {
+            const result = dom.listDescendant(contEl, (node) => {
                 return node.nodeName === 'B' || node.nodeName === 'S';
             });
-            expect(result).to.deep.equal([$b[0], $s[0]]);
+            expect(result).to.deep.equal([bEl, sEl]);
         });
     });
 
     describe('commonAncestor', () => {
-        let $cont: JQuery<HTMLElement>;
-        let $span: JQuery<HTMLElement>;
-        let $div: JQuery<HTMLElement>;
-        let $b: JQuery<HTMLElement>;
-        let $u: JQuery<HTMLElement>;
-        let $s: JQuery<HTMLElement>;
+        let contEl: HTMLElement;
+        let spanEl: HTMLElement;
+        let divEl: HTMLElement;
+        let bEl: HTMLElement;
+        let uEl: HTMLElement;
+        let sEl: HTMLElement;
         before(() => {
-            $cont = $('<div class="note-editable"><div><span><b>b</b><u>u</u></span><span><s>s</s><i>i</i></span></div></div>');
-            $span = $cont.find('span');
-            $div = $cont.find('div');
-            $b = $cont.find('b');
-            $u = $cont.find('u');
-            $s = $cont.find('s');
+            contEl = func.makeElement('<div class="note-editable"><div><span><b>b</b><u>u</u></span><span><s>s</s><i>i</i></span></div></div>');
+            spanEl = contEl.querySelector('span');
+            divEl = contEl.querySelector('div');
+            bEl = contEl.querySelector('b');
+            uEl = contEl.querySelector('u');
+            sEl = contEl.querySelector('s');
         });
 
         it('should return a common element in ancestors', () => {
-            expect(dom.commonAncestor($b[0], $u[0])).to.deep.equal($span[0]);
+            expect(dom.commonAncestor(bEl, uEl)).to.deep.equal(spanEl);
         });
 
         it('should return a common element in ancestors even if they have same nodeName', () => {
-            expect(dom.commonAncestor($b[0], $s[0])).to.deep.equal($div[0]);
+            expect(dom.commonAncestor(bEl, sEl)).to.deep.equal(divEl);
         });
     });
 
     describe('listNext', () => {
-        let $cont: JQuery<HTMLElement>;
-        let $u: JQuery<HTMLElement>;
-        let $s: JQuery<HTMLElement>;
-        let $i: JQuery<HTMLElement>;
+        let contEl: HTMLElement;
+        let uEl: HTMLElement;
+        let sEl: HTMLElement;
+        let iEl: HTMLElement;
         before(() => {
-            $cont = $('<div class="note-editable"><b>b</b><u>u</u><s>s</s><i>i</i></div>'); // busi
-            $u = $cont.find('u');
-            $s = $cont.find('s');
-            $i = $cont.find('i');
+            contEl = func.makeElement('<div class="note-editable"><b>b</b><u>u</u><s>s</s><i>i</i></div>'); // busi
+            uEl = contEl.querySelector('u');
+            sEl = contEl.querySelector('s');
+            iEl = contEl.querySelector('i');
         });
 
         it('should return an array of next sibling elements including itself', () => {
-            expect(dom.listNext($u[0])).to.deep.equal([$u[0], $s[0], $i[0]]);
+            expect(dom.listNext(uEl)).to.deep.equal([uEl, sEl, iEl]);
         });
 
         it('should return itself if there are no next sibling', () => {
-            expect(dom.listNext($i[0])).to.deep.equal([$i[0]]);
+            expect(dom.listNext(iEl)).to.deep.equal([iEl]);
         });
 
         it('should return an array of next sibling elements before predicate is true', () => {
-            expect(dom.listNext($s[0], func.eq($i[0]))).to.deep.equal([$s[0]]);
+            expect(dom.listNext(sEl, func.eq(iEl))).to.deep.equal([sEl]);
         });
     });
 
     describe('listPrev', () => {
-        let $cont: JQuery<HTMLElement>;
-        let $b: JQuery<HTMLElement>;
-        let $u: JQuery<HTMLElement>;
-        let $s: JQuery<HTMLElement>;
-        let $i: JQuery<HTMLElement>;
+        let contEl: HTMLElement;
+        let bEl: HTMLElement;
+        let uEl: HTMLElement;
+        let sEl: HTMLElement;
+        let iEl: HTMLElement;
         before(() => {
-            $cont = $('<div class="note-editable"><b>b</b><u>u</u><s>s</s><i>i</i></div>'); // busi
-            $b = $cont.find('b');
-            $u = $cont.find('u');
-            $s = $cont.find('s');
-            $i = $cont.find('i');
+            contEl = func.makeElement('<div class="note-editable"><b>b</b><u>u</u><s>s</s><i>i</i></div>'); // busi
+            bEl = contEl.querySelector('b');
+            uEl = contEl.querySelector('u');
+            sEl = contEl.querySelector('s');
+            iEl = contEl.querySelector('i');
         });
 
         it('should return an array of previous sibling elements including itself', () => {
-            expect(dom.listPrev($s[0])).to.deep.equal([$s[0], $u[0], $b[0]]);
+            expect(dom.listPrev(sEl)).to.deep.equal([sEl, uEl, bEl]);
         });
 
         it('should return itself if there are no previous sibling', () => {
-            expect(dom.listPrev($b[0])).to.deep.equal([$b[0]]);
+            expect(dom.listPrev(bEl)).to.deep.equal([bEl]);
         });
 
         it('should return an array of previous sibling elements before predicate is true', () => {
-            expect(dom.listPrev($i[0], func.eq($s[0]))).to.deep.equal([$i[0]]);
+            expect(dom.listPrev(iEl, func.eq(sEl))).to.deep.equal([iEl]);
         });
     });
 
     describe('position', () => {
-        let $cont: JQuery<HTMLElement>;
-        let $b: JQuery<HTMLElement>;
-        let $u: JQuery<HTMLElement>;
-        let $s: JQuery<HTMLElement>;
-        let $i: JQuery<HTMLElement>;
+        let contEl: HTMLElement;
+        let bEl: HTMLElement;
+        let uEl: HTMLElement;
+        let sEl: HTMLElement;
+        let iEl: HTMLElement;
         before(() => {
-            $cont = $('<div class="note-editable"><b>b</b><u>u</u><s>s</s><i>i</i></div>'); // busi
-            $b = $cont.find('b');
-            $u = $cont.find('u');
-            $s = $cont.find('s');
-            $i = $cont.find('i');
+            contEl = func.makeElement('<div class="note-editable"><b>b</b><u>u</u><s>s</s><i>i</i></div>'); // busi
+            bEl = contEl.querySelector('b');
+            uEl = contEl.querySelector('u');
+            sEl = contEl.querySelector('s');
+            iEl = contEl.querySelector('i');
         });
 
         it('should return the position of element', () => {
-            expect(dom.position($b[0])).to.be.equal(0);
-            expect(dom.position($u[0])).to.be.equal(1);
-            expect(dom.position($s[0])).to.be.equal(2);
-            expect(dom.position($i[0])).to.be.equal(3);
+            expect(dom.position(bEl)).to.be.equal(0);
+            expect(dom.position(uEl)).to.be.equal(1);
+            expect(dom.position(sEl)).to.be.equal(2);
+            expect(dom.position(iEl)).to.be.equal(3);
         });
 
         it('should return position 0 for text node in b', () => {
-            expect(dom.position($b[0].firstChild)).to.be.equal(0);
+            expect(dom.position(bEl.firstChild)).to.be.equal(0);
         });
     });
 
     describe('makeOffsetPath', () => {
-        let $cont: JQuery<HTMLElement>;
-        let $b: JQuery<HTMLElement>;
-        let $u: JQuery<HTMLElement>;
-        let $s: JQuery<HTMLElement>;
-        let $i: JQuery<HTMLElement>;
+        let contEl: HTMLElement;
+        let bEl: HTMLElement;
+        let uEl: HTMLElement;
+        let sEl: HTMLElement;
+        let iEl: HTMLElement;
         before(() => {
-            $cont = $('<div class="note-editable"><b>b</b><u>u</u><s>s</s><i>i</i></div>'); // busi
-            $b = $cont.find('b');
-            $u = $cont.find('u');
-            $s = $cont.find('s');
-            $i = $cont.find('i');
+            contEl = func.makeElement('<div class="note-editable"><b>b</b><u>u</u><s>s</s><i>i</i></div>'); // busi
+            bEl = contEl.querySelector('b');
+            uEl = contEl.querySelector('u');
+            sEl = contEl.querySelector('s');
+            iEl = contEl.querySelector('i');
         });
 
         it('should return empty array if two elements are same', () => {
-            expect(dom.makeOffsetPath($cont[0], $cont[0])).to.deep.equal([]);
+            expect(dom.makeOffsetPath(contEl, contEl)).to.deep.equal([]);
         });
 
         it('should return offset path array between two elements #1', () => {
-            expect(dom.makeOffsetPath($cont[0], $b[0])).to.deep.equal([0]);
-            expect(dom.makeOffsetPath($cont[0], $b[0].firstChild)).to.deep.equal([0, 0]);
+            expect(dom.makeOffsetPath(contEl, bEl)).to.deep.equal([0]);
+            expect(dom.makeOffsetPath(contEl, bEl.firstChild)).to.deep.equal([0, 0]);
         });
 
         it('should return offset path array between two elements #2', () => {
-            expect(dom.makeOffsetPath($cont[0], $u[0])).to.deep.equal([1]);
-            expect(dom.makeOffsetPath($cont[0], $u[0].firstChild)).to.deep.equal([1, 0]);
+            expect(dom.makeOffsetPath(contEl, uEl)).to.deep.equal([1]);
+            expect(dom.makeOffsetPath(contEl, uEl.firstChild)).to.deep.equal([1, 0]);
         });
 
         it('should return offset path array between two elements #3', () => {
-            expect(dom.makeOffsetPath($cont[0], $s[0])).to.deep.equal([2]);
-            expect(dom.makeOffsetPath($cont[0], $s[0].firstChild)).to.deep.equal([2, 0]);
+            expect(dom.makeOffsetPath(contEl, sEl)).to.deep.equal([2]);
+            expect(dom.makeOffsetPath(contEl, sEl.firstChild)).to.deep.equal([2, 0]);
         });
 
         it('should return offset path array between two elements #2', () => {
-            expect(dom.makeOffsetPath($cont[0], $i[0])).to.deep.equal([3]);
-            expect(dom.makeOffsetPath($cont[0], $i[0].firstChild)).to.deep.equal([3, 0]);
+            expect(dom.makeOffsetPath(contEl, iEl)).to.deep.equal([3]);
+            expect(dom.makeOffsetPath(contEl, iEl.firstChild)).to.deep.equal([3, 0]);
         });
     });
 
     describe('fromOffsetPath', () => {
-        let $cont: JQuery<HTMLElement>;
-        let $b: JQuery<HTMLElement>;
-        let $u: JQuery<HTMLElement>;
-        let $s: JQuery<HTMLElement>;
-        let $i: JQuery<HTMLElement>;
+        let contEl: HTMLElement;
+        let bEl: HTMLElement;
+        let uEl: HTMLElement;
+        let sEl: HTMLElement;
+        let iEl: HTMLElement;
         before(() => {
-            $cont = $('<div class="note-editable"><b>b</b><u>u</u><s>s</s><i>i</i></div>'); // busi
-            $b = $cont.find('b');
-            $u = $cont.find('u');
-            $s = $cont.find('s');
-            $i = $cont.find('i');
+            contEl = func.makeElement('<div class="note-editable"><b>b</b><u>u</u><s>s</s><i>i</i></div>'); // busi
+            bEl = contEl.querySelector('b');
+            uEl = contEl.querySelector('u');
+            sEl = contEl.querySelector('s');
+            iEl = contEl.querySelector('i');
         });
 
         it('should return the element by offsetPath', () => {
-            const cont = $cont[0];
-            $.each([$b[0], $u[0], $s[0], $i[0]], (idx, node) => {
+            const cont = contEl;
+            [bEl, uEl, sEl, iEl].forEach((node) => {
                 expect(dom.fromOffsetPath(cont, dom.makeOffsetPath(cont, node))).to.deep.equal(node);
                 const child = node.firstChild;
                 expect(dom.fromOffsetPath(cont, dom.makeOffsetPath(cont, child))).to.deep.equal(child);
@@ -261,128 +260,128 @@ describe('base:core.dom', () => {
     });
 
     describe('splitTree', () => {
-        let $para: JQuery<HTMLElement>;
+        let paraEl: HTMLElement;
         beforeEach(() => {
-            const $busi = $('<div class="note-editable"><p><b>b</b><u>u</u><s>strike</s><i>i</i></p></div>'); // busi
-            $para = $busi.clone().find('p');
+            const busiEl = func.makeElement('<div class="note-editable"><p><b>b</b><u>u</u><s>strike</s><i>i</i></p></div>'); // busi
+            paraEl = (busiEl.cloneNode(true) as HTMLElement).querySelector('p');
         });
 
         describe('element pivot case', () => {
             it('should be split by u tag with offset 0', () => {
-                const $u = $para.find('u');
-                dom.splitTree($para[0], { node: $u[0], offset: 0 });
+                const uEl = paraEl.querySelector('u');
+                dom.splitTree(paraEl, { node: uEl, offset: 0 });
 
-                expect($para.html()).to.equalsIgnoreCase('<b>b</b><u><br></u>');
-                expect($para.next().html()).to.equalsIgnoreCase('<u>u</u><s>strike</s><i>i</i>');
+                expect(paraEl.innerHTML).to.equalsIgnoreCase('<b>b</b><u><br></u>');
+                expect(paraEl.nextElementSibling.innerHTML).to.equalsIgnoreCase('<u>u</u><s>strike</s><i>i</i>');
             });
 
             it('should be split by u tag with offset 1', () => {
-                const $u = $para.find('u');
-                dom.splitTree($para[0], { node: $u[0], offset: 1 });
+                const uEl = paraEl.querySelector('u');
+                dom.splitTree(paraEl, { node: uEl, offset: 1 });
 
-                expect($para.html()).to.equalsIgnoreCase('<b>b</b><u>u</u>');
-                expect($para.next().html()).to.equalsIgnoreCase('<u><br></u><s>strike</s><i>i</i>');
+                expect(paraEl.innerHTML).to.equalsIgnoreCase('<b>b</b><u>u</u>');
+                expect(paraEl.nextElementSibling.innerHTML).to.equalsIgnoreCase('<u><br></u><s>strike</s><i>i</i>');
             });
 
             it('should be split by b tag with offset 0 (left edge case)', () => {
-                const $b = $para.find('b');
-                dom.splitTree($para[0], { node: $b[0], offset: 0 });
+                const bEl = paraEl.querySelector('b');
+                dom.splitTree(paraEl, { node: bEl, offset: 0 });
 
-                expect($para.html()).to.equalsIgnoreCase('<b><br></b>');
-                expect($para.next().html()).to.equalsIgnoreCase('<b>b</b><u>u</u><s>strike</s><i>i</i>');
+                expect(paraEl.innerHTML).to.equalsIgnoreCase('<b><br></b>');
+                expect(paraEl.nextElementSibling.innerHTML).to.equalsIgnoreCase('<b>b</b><u>u</u><s>strike</s><i>i</i>');
             });
 
             it('should be split by i tag with offset 1 (right edge case)', () => {
-                const $i = $para.find('i');
-                dom.splitTree($para[0], { node: $i[0], offset: 1 });
+                const iEl = paraEl.querySelector('i');
+                dom.splitTree(paraEl, { node: iEl, offset: 1 });
 
-                expect($para.html()).to.equalsIgnoreCase('<b>b</b><u>u</u><s>strike</s><i>i</i>');
-                expect($para.next().html()).to.equalsIgnoreCase('<i><br></i>');
+                expect(paraEl.innerHTML).to.equalsIgnoreCase('<b>b</b><u>u</u><s>strike</s><i>i</i>');
+                expect(paraEl.nextElementSibling.innerHTML).to.equalsIgnoreCase('<i><br></i>');
             });
 
             it('should discard first split if empty and isDiscardEmptySplits=true', () => {
-                const $u = $para.find('u');
-                dom.splitTree($para[0], { node: $u[0], offset: 0 }, { isDiscardEmptySplits: true });
+                const uEl = paraEl.querySelector('u');
+                dom.splitTree(paraEl, { node: uEl, offset: 0 }, { isDiscardEmptySplits: true });
 
-                expect($para.html()).to.equalsIgnoreCase('<b>b</b>');
-                expect($para.next().html()).to.equalsIgnoreCase('<u>u</u><s>strike</s><i>i</i>');
+                expect(paraEl.innerHTML).to.equalsIgnoreCase('<b>b</b>');
+                expect(paraEl.nextElementSibling.innerHTML).to.equalsIgnoreCase('<u>u</u><s>strike</s><i>i</i>');
             });
 
             it('should discard second split if empty and isDiscardEmptySplits=true', () => {
-                const $u = $para.find('u');
-                dom.splitTree($para[0], { node: $u[0], offset: 1 }, { isDiscardEmptySplits: true });
+                const uEl = paraEl.querySelector('u');
+                dom.splitTree(paraEl, { node: uEl, offset: 1 }, { isDiscardEmptySplits: true });
 
-                expect($para.html()).to.equalsIgnoreCase('<b>b</b><u>u</u>');
-                expect($para.next().html()).to.equalsIgnoreCase('<s>strike</s><i>i</i>');
+                expect(paraEl.innerHTML).to.equalsIgnoreCase('<b>b</b><u>u</u>');
+                expect(paraEl.nextElementSibling.innerHTML).to.equalsIgnoreCase('<s>strike</s><i>i</i>');
             });
         });
 
         describe('textNode case', () => {
             it('should be split by s tag with offset 3 (middle case)', () => {
-                const $s = $para.find('s');
-                dom.splitTree($para[0], { node: $s[0].firstChild, offset: 3 });
+                const sEl = paraEl.querySelector('s');
+                dom.splitTree(paraEl, { node: sEl.firstChild, offset: 3 });
 
-                expect($para.html()).to.equalsIgnoreCase('<b>b</b><u>u</u><s>str</s>');
-                expect($para.next().html()).to.equalsIgnoreCase('<s>ike</s><i>i</i>');
+                expect(paraEl.innerHTML).to.equalsIgnoreCase('<b>b</b><u>u</u><s>str</s>');
+                expect(paraEl.nextElementSibling.innerHTML).to.equalsIgnoreCase('<s>ike</s><i>i</i>');
             });
 
             it('should be split by s tag with offset 0 (left edge case)', () => {
-                const $s = $para.find('s');
-                dom.splitTree($para[0], { node: $s[0].firstChild, offset: 0 });
+                const sEl = paraEl.querySelector('s');
+                dom.splitTree(paraEl, { node: sEl.firstChild, offset: 0 });
 
-                expect($para.html()).to.equalsIgnoreCase('<b>b</b><u>u</u><s><br></s>');
-                expect($para.next().html()).to.equalsIgnoreCase('<s>strike</s><i>i</i>');
+                expect(paraEl.innerHTML).to.equalsIgnoreCase('<b>b</b><u>u</u><s><br></s>');
+                expect(paraEl.nextElementSibling.innerHTML).to.equalsIgnoreCase('<s>strike</s><i>i</i>');
             });
 
             it('should be split by s tag with offset 6 (right edge case)', () => {
-                const $s = $para.find('s');
-                dom.splitTree($para[0], { node: $s[0].firstChild, offset: 6 });
+                const sEl = paraEl.querySelector('s');
+                dom.splitTree(paraEl, { node: sEl.firstChild, offset: 6 });
 
-                expect($para.html()).to.equalsIgnoreCase('<b>b</b><u>u</u><s>strike</s><i><br></i>');
-                expect($para.next().html()).to.equalsIgnoreCase('<i>i</i>');
+                expect(paraEl.innerHTML).to.equalsIgnoreCase('<b>b</b><u>u</u><s>strike</s><i><br></i>');
+                expect(paraEl.nextElementSibling.innerHTML).to.equalsIgnoreCase('<i>i</i>');
             });
 
             it('should be split by s tag with offset 3 (2 depth case)', () => {
-                const $s = $para.find('s');
-                dom.splitTree($s[0], { node: $s[0].firstChild, offset: 3 });
+                const sEl = paraEl.querySelector('s');
+                dom.splitTree(sEl, { node: sEl.firstChild, offset: 3 });
 
-                expect($para.html()).to.equalsIgnoreCase('<b>b</b><u>u</u><s>str</s><s>ike</s><i>i</i>');
+                expect(paraEl.innerHTML).to.equalsIgnoreCase('<b>b</b><u>u</u><s>str</s><s>ike</s><i>i</i>');
             });
 
             it('should be split by s tag with offset 3 (1 depth and textNode case)', () => {
-                const $s = $para.find('s');
-                dom.splitTree($s[0].firstChild, { node: $s[0].firstChild, offset: 3 });
+                const sEl = paraEl.querySelector('s');
+                dom.splitTree(sEl.firstChild, { node: sEl.firstChild, offset: 3 });
 
-                expect($para.html()).to.equalsIgnoreCase('<b>b</b><u>u</u><s>strike</s><i>i</i>');
+                expect(paraEl.innerHTML).to.equalsIgnoreCase('<b>b</b><u>u</u><s>strike</s><i>i</i>');
             });
 
             it('should be split by span tag with offset 2 (1 depth and element case)', () => {
-                const $cont = $('<div class="note-editable"><p><span><b>b</b><u>u</u><s>s</s><i>i</i></span></p></div>'); // busi
-                const $span = $cont.find('span');
-                dom.splitTree($span[0], { node: $span[0], offset: 2 });
+                const contEl = func.makeElement('<div class="note-editable"><p><span><b>b</b><u>u</u><s>s</s><i>i</i></span></p></div>'); // busi
+                const spanEl = contEl.querySelector('span');
+                dom.splitTree(spanEl, { node: spanEl, offset: 2 });
 
-                expect($cont.html()).to.equalsIgnoreCase('<p><span><b>b</b><u>u</u></span><span><s>s</s><i>i</i></span></p>');
+                expect(contEl.innerHTML).to.equalsIgnoreCase('<p><span><b>b</b><u>u</u></span><span><s>s</s><i>i</i></span></p>');
             });
         });
     });
 
     describe('splitPoint', () => {
         it('should return rightNode and container for empty paragraph with inline', () => {
-            const $editable = $('<div class="note-editable"><p><br></p></div>');
-            const $para = $editable.clone().find('p');
-            const $br = $para.find('br');
+            const editableEl = func.makeElement('<div class="note-editable"><p><br></p></div>');
+            const paraEl = (editableEl.cloneNode(true) as HTMLElement).querySelector('p');
+            const brEl = paraEl.querySelector('br');
 
-            const result = dom.splitPoint({ node: $para[0], offset: 0 }, true);
-            expect(result).to.deep.equal({ rightNode: $br[0], container: $para[0] });
+            const result = dom.splitPoint({ node: paraEl, offset: 0 }, true);
+            expect(result).to.deep.equal({ rightNode: brEl, container: paraEl });
         });
     });
 
     describe('isVisiblePoint', () => {
         it('should detect as visible when there is a table inside a div', () => {
-            const $editable = $('<div><table></table></div>');
-            const $point = $editable.clone().find('div');
+            const editableEl = func.makeElement('<div><table></table></div>');
+            const pointEl = (editableEl.cloneNode(true) as HTMLElement).querySelector('div');
 
-            const result = dom.isVisiblePoint({node: $point[0], offset: 0});
+            const result = dom.isVisiblePoint({node: pointEl, offset: 0});
             expect(result).to.be.true;
         });
     });

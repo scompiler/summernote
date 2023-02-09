@@ -7,13 +7,13 @@
 import chai from 'chai';
 import spies from 'chai-spies';
 import chaidom from 'test/chaidom';
-import $ from 'jquery';
 import env from 'src/js/core/env';
 import range from 'src/js/core/range';
 import Context from 'src/js/Context';
 import 'src/styles/bs4/summernote-bs4';
 import Summernote from "src/js/class";
 import Editor from "src/js/module/Editor";
+import func from "src/js/core/func";
 
 describe('Editor', () => {
     const expect = chai.expect;
@@ -22,7 +22,7 @@ describe('Editor', () => {
 
     let editor: Editor;
     let context: Context;
-    let $editable: JQuery<HTMLElement>;
+    let editableEl: HTMLElement;
 
     function expectContents(context: Context, markup: string) {
         expect(context.layoutInfo.editableEl.innerHTML).to.equalsIgnoreCase(markup);
@@ -40,21 +40,21 @@ describe('Editor', () => {
     }
 
     function expectToHaveBeenCalled(context: Context, customEvent: string, handler: () => void) {
-        const $note = $(context.layoutInfo.noteEl);
+        const noteEl = context.layoutInfo.noteEl;
         const spy = chai.spy();
-        $note[0].addEventListener(customEvent, spy);
+        noteEl.addEventListener(customEvent, spy);
         handler();
         expect(spy).to.have.been.called();
     }
 
     beforeEach(function() {
-        $('body').empty(); // important !
-        const options = $.extend({}, Summernote.meta.options);
+        document.body.innerHTML = ''; // important !
+        const options = {...Summernote.meta.options};
         options.historyLimit = 5;
-        context = new Context($('<div><p>hello</p></div>')[0], options);
+        context = new Context(func.makeElement('<div><p>hello</p></div>'), options);
 
         editor = context.modules.editor as Editor;
-        $editable = $(context.layoutInfo.editableEl);
+        editableEl = context.layoutInfo.editableEl;
 
         // [workaround]
         //  - IE8-11 can't create range in headless mode
@@ -69,7 +69,7 @@ describe('Editor', () => {
                 'keydown', 'keyup', 'blur', 'mousedown', 'mouseup', 'scroll', 'focusin', 'focusout',
             ].forEach((eventName) => {
                 expectToHaveBeenCalled(context, 'summernote.' + eventName, () => {
-                    $editable[0].dispatchEvent(new Event(eventName));
+                    editableEl.dispatchEvent(new Event(eventName));
                 });
             });
 
@@ -147,7 +147,7 @@ describe('Editor', () => {
         it('should insert image', () => {
             const source = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAYAAADgzO9IAAAAF0lEQVQYGWP8////fwYsgAmLGFiIHhIAT+oECGHuN2UAAAAASUVORK5CYII=';
             return editor.insertImage(source, 'image').then(() => {
-                expect($editable.find('img').attr('src')).to.equalsIgnoreCase(source);
+                expect(editableEl.querySelector('img').getAttribute('src')).to.equalsIgnoreCase(source);
             });
         });
     });
@@ -173,7 +173,7 @@ describe('Editor', () => {
             editor.indent();
             expectContentsChain(context, '<p style="margin-left: 25px;">hello</p>', () => {
                 editor.outdent();
-                expect($editable.find('p').css('margin-left')).await(done).to.be.empty;
+                expect(editableEl.querySelector('p').style.marginLeft).await(done).to.be.empty;
             });
         });
 
@@ -216,33 +216,33 @@ describe('Editor', () => {
 
     describe('insertNode', () => {
         it('should insert node', (done) => {
-            editor.insertNode($('<span> world</span>')[0]);
+            editor.insertNode(func.makeElement('<span> world</span>'));
             expectContentsAwait(context, '<p>hello<span> world</span></p>', done);
         });
 
         it('should be limited', (done) => {
-            const options = $.extend({}, Summernote.meta.options);
+            const options = {...Summernote.meta.options};
             options.maxTextLength = 5;
-            context = new Context($('<div><p>hello</p></div>')[0], options);
+            context = new Context(func.makeElement('<div><p>hello</p></div>'), options);
             editor = context.modules.editor as Editor;
 
-            editor.insertNode($('<span> world</span>')[0]);
+            editor.insertNode(func.makeElement('<span> world</span>'));
             expectContentsAwait(context, '<p>hello</p>', done);
         });
 
         it('should insert node in last focus', (done) => {
-            $editable.appendTo('body');
+            document.body.appendChild(editableEl);
             context.invoke('editor.focus');
 
             setTimeout(() => {
-                const textNode = $editable.find('p')[0].firstChild;
+                const textNode = editableEl.querySelector('p').firstChild;
                 editor.setLastRange(range.create(textNode, 0, textNode, 0).select());
 
                 setTimeout(() => {
-                    editor.insertNode($('<span> world</span>')[0]);
+                    editor.insertNode(func.makeElement('<span> world</span>'));
                     setTimeout(() => {
-                        $('body').focus();
-                        editor.insertNode($('<span> hello</span>')[0]);
+                        document.body.focus();
+                        editor.insertNode(func.makeElement('<span> hello</span>'));
                         setTimeout(() => {
                             expectContentsAwait(context, '<p><span> world</span><span> hello</span>hello</p>', done);
                         }, 10);
@@ -259,9 +259,9 @@ describe('Editor', () => {
         });
 
         it('should be limited', (done) => {
-            const options = $.extend({}, Summernote.meta.options);
+            const options = {...Summernote.meta.options};
             options.maxTextLength = 5;
-            context = new Context($('<div><p>hello</p></div>')[0], options);
+            context = new Context(func.makeElement('<div><p>hello</p></div>'), options);
             editor = context.modules.editor as Editor;
 
             editor.insertText(' world');
@@ -269,16 +269,16 @@ describe('Editor', () => {
         });
 
         it('should insert text in last focus', (done) => {
-            $editable.appendTo('body');
+            document.body.appendChild(editableEl);
             context.invoke('editor.focus');
 
-            const textNode = $editable.find('p')[0].firstChild;
+            const textNode = editableEl.querySelector('p').firstChild;
             editor.setLastRange(range.create(textNode, 0, textNode, 0).select());
 
             setTimeout(() => {
                 editor.insertText(' world');
                 setTimeout(() => {
-                    $('body').focus();
+                    document.body.focus();
                     setTimeout(() => {
                         editor.insertText(' summernote');
                         setTimeout(() => {
@@ -315,18 +315,18 @@ describe('Editor', () => {
                 html += '</div>';
                 return html;
             };
-            const $note = $(context.layoutInfo.noteEl);
+            const noteEl = context.layoutInfo.noteEl;
             const spy = chai.spy();
-            $note[0].addEventListener('summernote.change', spy);
+            noteEl.addEventListener('summernote.change', spy);
             const html = generateLargeHtml();
             editor.pasteHTML(html);
             expect(spy).to.have.been.called.once;
         });
 
         it('should be limited', (done) => {
-            const options = $.extend({}, Summernote.meta.options);
+            const options = {...Summernote.meta.options};
             options.maxTextLength = 5;
-            context = new Context($('<div><p>hello</p></div>')[0], options);
+            context = new Context(func.makeElement('<div><p>hello</p></div>'), options);
             editor = context.modules.editor as Editor;
 
             editor.pasteHTML('<span> world</span>');
@@ -365,23 +365,27 @@ describe('Editor', () => {
 
     describe('styleWithCSS', () => {
         it('should style with tag when it is false (default)', (done) => {
-            $editable.appendTo('body');
-            range.createFromNode($editable.find('p')[0]).normalize().select();
+            document.body.appendChild(editableEl);
+            range.createFromNode(editableEl.querySelector('p')).normalize().select();
             editor.bold();
             expectContentsAwait(context, '<p><b>hello</b></p>', done);
         });
 
         it('should style with CSS when it is true', (done) => {
-            const options = $.extend({}, Summernote.meta.options);
+            const options = {...Summernote.meta.options};
             options.styleWithCSS = true;
 
-            $('body').empty();
-            context = new Context($('<div><p>hello</p></div>').appendTo('body')[0], options);
-            editor = context.modules.editor as Editor;
-            $editable = $(context.layoutInfo.editableEl);
-            $editable.appendTo('body');
+            document.body.innerHTML = '';
 
-            range.createFromNode($editable.find('p')[0]).normalize().select();
+            const divEl = func.makeElement('<div><p>hello</p></div>');
+            document.body.appendChild(divEl);
+
+            context = new Context(divEl, options);
+            editor = context.modules.editor as Editor;
+            editableEl = context.layoutInfo.editableEl;
+            document.body.appendChild(editableEl);
+
+            range.createFromNode(editableEl.querySelector('p')).normalize().select();
             editor.bold();
             expectContentsAwait(context, '<p><span style="font-weight: bold;">hello</span></p>', done);
         });
@@ -389,9 +393,9 @@ describe('Editor', () => {
 
     describe('formatBlock', () => {
         it('should apply formatBlock', (done) => {
-            $editable.appendTo('body');
+            document.body.appendChild(editableEl);
 
-            const textNode = $editable.find('p')[0].firstChild;
+            const textNode = editableEl.querySelector('p').firstChild;
             editor.setLastRange(range.create(textNode, 0, textNode, 0).select());
 
             setTimeout(() => {
@@ -407,10 +411,12 @@ describe('Editor', () => {
             ];
 
             context.invoke('code', codes.join(''));
-            $editable.appendTo('body');
+            document.body.appendChild(editableEl);
 
-            const startNode = $editable.find('p').first()[0];
-            const endNode = $editable.find('p').last()[0];
+            const pEls: HTMLElement[] = [].slice.call(editableEl.querySelectorAll('p'));
+
+            const startNode = pEls[0];
+            const endNode = pEls[pEls.length - 1];
 
             // all p tags is wrapped
             range.create(startNode, 0, endNode, 1).normalize().select();
@@ -427,73 +433,75 @@ describe('Editor', () => {
             ];
 
             context.invoke('code', codes.join(''));
-            $editable.appendTo('body');
+            document.body.appendChild(editableEl);
 
-            const startNode = $editable.find('p').first()[0];
-            const endNode = $editable.find('p').last()[0];
+            const pEls: HTMLElement[] = [].slice.call(editableEl.querySelectorAll('p'));
+
+            const startNode = pEls[0];
+            const endNode = pEls[pEls.length - 1];
 
             // all p tags is wrapped
             range.create(startNode, 0, endNode, 1).normalize().select();
 
             editor.formatBlock('h3');
 
-            const nodeName = $editable.children()[0].nodeName;
+            const nodeName = editableEl.firstChild.nodeName;
             expect(nodeName).to.equalsIgnoreCase('h3');
 
             // p -> h3, p is none
-            expect($editable.find('p').length).await(done).to.equals(0);
+            expect(editableEl.querySelectorAll('p').length).await(done).to.equals(0);
         });
 
         it('should apply custom className in formatBlock', (done) => {
-            const $target = $('<h4 class="customH4Class"></h4>');
-            $editable.appendTo('body');
-            range.createFromNode($editable.find('p')[0]).normalize().select();
-            editor.formatBlock('h4', $target[0]);
+            const targetEl = func.makeElement('<h4 class="customH4Class"></h4>');
+            document.body.appendChild(editableEl);
+            range.createFromNode(editableEl.querySelector('p')).normalize().select();
+            editor.formatBlock('h4', targetEl);
 
             // start <p>hello</p> => <h4 class="h4">hello</h4>
             expectContentsAwait(context, '<h4 class="customH4Class">hello</h4>', done);
         });
 
         it('should find exact target in formatBlock', (done) => {
-            const $target = $('<a class="dropdown-item" href="#" data-value="h6" role="listitem" aria-label="h6"><h6 class="customH6Class">H6</h6></a>');
-            $editable.appendTo('body');
-            range.createFromNode($editable.find('p')[0]).normalize().select();
-            editor.formatBlock('h6', $target[0]);
+            const targetEl = func.makeElement('<a class="dropdown-item" href="#" data-value="h6" role="listitem" aria-label="h6"><h6 class="customH6Class">H6</h6></a>');
+            document.body.appendChild(editableEl);
+            range.createFromNode(editableEl.querySelector('p')).normalize().select();
+            editor.formatBlock('h6', targetEl);
 
             // start <p>hello</p> => <h6 class="h6">hello</h6>
             expectContentsAwait(context, '<h6 class="customH6Class">hello</h6>', done);
         });
 
         it('should replace existing class in formatBlock if target has class', (done) => {
-            const $target1 = $('<p class="old"></p>');
-            $editable.appendTo('body');
-            range.createFromNode($editable.find('p')[0]).normalize().select();
-            editor.formatBlock('p', $target1[0]);
-            const $target2 = $('<p class="new"></p>');
-            editor.formatBlock('p', $target2[0]);
+            const target1El = func.makeElement('<p class="old"></p>');
+            document.body.appendChild(editableEl);
+            range.createFromNode(editableEl.querySelector('p')).normalize().select();
+            editor.formatBlock('p', target1El);
+            const target2El = func.makeElement('<p class="new"></p>');
+            editor.formatBlock('p', target2El);
 
             // start <p class="old">hello</p> => <p class="new">hello</p>
             expectContentsAwait(context, '<p class="new">hello</p>', done);
         });
 
         it('should remove existing class in formatBlock if target has no class', (done) => {
-            const $target1 = $('<p class="customClass" />');
-            $editable.appendTo('body');
-            range.createFromNode($editable.find('p')[0]).normalize().select();
-            editor.formatBlock('p', $target1[0]);
-            const $target2 = $('<p />');
-            editor.formatBlock('p', $target2[0]);
+            const target1El = func.makeElement('<p class="customClass" />');
+            document.body.appendChild(editableEl);
+            range.createFromNode(editableEl.querySelector('p')).normalize().select();
+            editor.formatBlock('p', target1El);
+            const target2El = func.makeElement('<p />');
+            editor.formatBlock('p', target2El);
 
             // start <p class="customClass">hello</p> => <p>hello</p>
             expectContentsAwait(context, '<p class="">hello</p>', done);
         });
 
         it('should add fontSize to block', (done) => {
-            $editable.appendTo('body');
+            document.body.appendChild(editableEl);
             context.invoke('editor.focus');
 
             setTimeout(() => {
-                const textNode = $editable.find('p')[0].firstChild;
+                const textNode = editableEl.querySelector('p').firstChild;
                 editor.setLastRange(range.create(textNode, 0, textNode, 0).select());
 
                 setTimeout(() => {
@@ -508,7 +516,7 @@ describe('Editor', () => {
     describe('createLink', () => {
         it('should create normal link', (done) => {
             const text = 'hello';
-            const pNode = $editable.find('p')[0];
+            const pNode = editableEl.querySelector('p');
             const textNode = pNode.childNodes[0] as Text;
             const startIndex = textNode.wholeText.indexOf(text);
             const endIndex = startIndex + text.length;
@@ -526,7 +534,7 @@ describe('Editor', () => {
 
         it('should create a link with range', (done) => {
             const text = 'hello';
-            const pNode = $editable.find('p')[0];
+            const pNode = editableEl.querySelector('p');
             const textNode = pNode.childNodes[0] as Text;
             const startIndex = textNode.wholeText.indexOf(text);
             const endIndex = startIndex + text.length;
@@ -544,7 +552,7 @@ describe('Editor', () => {
 
         it('should create a link with isNewWindow', (done) => {
             const text = 'hello';
-            const pNode = $editable.find('p')[0];
+            const pNode = editableEl.querySelector('p');
             const textNode = pNode.childNodes[0] as Text;
             const startIndex = textNode.wholeText.indexOf(text);
             const endIndex = startIndex + text.length;
@@ -563,7 +571,7 @@ describe('Editor', () => {
 
         it('should create a relative link without scheme', (done) => {
             const text = 'hello';
-            const pNode = $editable.find('p')[0];
+            const pNode = editableEl.querySelector('p');
             const textNode = pNode.childNodes[0] as Text;
             const startIndex = textNode.wholeText.indexOf(text);
             const endIndex = startIndex + text.length;
@@ -583,7 +591,7 @@ describe('Editor', () => {
         it('should modify a link', (done) => {
             context.invoke('code', '<p><a href="http://summernote.org">hello world</a></p>');
 
-            const anchorNode = $editable.find('a')[0];
+            const anchorNode = editableEl.querySelector('a');
             const rng = range.createFromNode(anchorNode);
 
             editor.createLink({
@@ -596,9 +604,9 @@ describe('Editor', () => {
         });
 
         it('should be limited when creating a link', (done) => {
-            const options = $.extend({}, Summernote.meta.options);
+            const options = {...Summernote.meta.options};
             options.maxTextLength = 5;
-            context = new Context($('<div><p>hello</p></div>')[0], options);
+            context = new Context(func.makeElement('<div><p>hello</p></div>'), options);
             editor = context.modules.editor as Editor;
 
             editor.createLink({
@@ -609,12 +617,12 @@ describe('Editor', () => {
         });
 
         it('should be limited when modifying a link', (done) => {
-            const options = $.extend({}, Summernote.meta.options);
+            const options = {...Summernote.meta.options};
             options.maxTextLength = 5;
-            context = new Context($('<p><a href="http://summernote.org">hello</a></p>')[0], options);
+            context = new Context(func.makeElement('<p><a href="http://summernote.org">hello</a></p>'), options);
 
-            const editable = $(context.layoutInfo.editableEl);
-            const anchorNode = editable.find('a')[0];
+            const editableEl = context.layoutInfo.editableEl;
+            const anchorNode = editableEl.querySelector('a');
             const rng = range.createFromNode(anchorNode);
             editor = context.modules.editor as Editor;
 

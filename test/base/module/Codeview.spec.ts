@@ -3,14 +3,14 @@
  * (c) 2015~ Summernote Team
  * summernote may be freely distributed under the MIT license./
  */
-import $ from 'jquery';
 import chai from 'chai';
 import chaidom from 'test/chaidom';
 import Context from 'src/js/Context';
 import Codeview from 'src/js/module/Codeview';
 import { Options } from 'src/js/core/types';
 import 'src/styles/bs4/summernote-bs4';
-import Summernote from "../../../src/js/class";
+import Summernote from "src/js/class";
+import func from "src/js/core/func";
 
 chai.use(chaidom);
 
@@ -35,12 +35,13 @@ describe('Codeview', () => {
     let context: Context;
 
     beforeEach(() => {
-        $('body').empty(); // important !
-        options = $.extend({}, Summernote.meta.options);
+        document.body.innerHTML = ''; // important !
+        options = {...Summernote.meta.options};
         options.codeviewFilter = true;
 
-        const $note = $('<div><p>hello</p></div>').appendTo('body');
-        context = new Context($note[0], options);
+        const noteEl = func.makeElement('<div><p>hello</p></div>');
+        document.body.appendChild(noteEl);
+        context = new Context(noteEl, options);
         codeview = new Codeview(context);
     });
 
@@ -60,10 +61,10 @@ describe('Codeview', () => {
             expect(codeview.isActivated()).to.be.false;
             codeview.toggle();
             expect(codeview.isActivated()).to.be.true;
-            expect($('.CodeMirror').length).to.be.equal(1);
+            expect(document.querySelectorAll('.CodeMirror').length).to.be.equal(1);
             codeview.toggle();
             expect(codeview.isActivated()).to.be.false;
-            expect($('.CodeMirror').length).to.be.equal(0);
+            expect(document.querySelectorAll('.CodeMirror').length).to.be.equal(0);
             unloadScript(codemirror);
             done();
         };

@@ -4,47 +4,50 @@
  * summernote may be freely distributed under the MIT license./
  */
 import chai from 'chai';
-import $ from 'jquery';
 import range from 'src/js/core/range';
 import Context from 'src/js/Context';
 import LinkDialog from 'src/js/module/LinkDialog';
 import 'src/styles/bs4/summernote-bs4';
-import Summernote from "../../../src/js/class";
+import Summernote from "src/js/class";
+import func from "src/js/core/func";
 
 describe('LinkDialog', () => {
     const expect = chai.expect;
     let context: Context;
     let dialog: LinkDialog;
-    let $editable: JQuery<HTMLElement>;
+    let editableEl: HTMLElement;
 
     beforeEach(() => {
-        const options = $.extend({}, Summernote.meta.options);
+        const options = {...Summernote.meta.options};
         options.toolbar = [
             ['insert', ['link']],
         ];
         context = new Context(
-            $('<div>' +
-                '<p><a href="https://summernote.org/" target="_blank">hello</a></p>' +
-                '<p><a href="https://summernote.org/">world</a></p>' +
-                '<p><a href="summernote.org/">summer</a></p>' +
-                '<p>summer</p>' +
-                '<p>http://summer</p>' +
-                '</div>')[0],
-            options
+            func.makeElement([
+                '<div>' +
+                    '<p><a href="https://summernote.org/" target="_blank">hello</a></p>' +
+                    '<p><a href="https://summernote.org/">world</a></p>' +
+                    '<p><a href="summernote.org/">summer</a></p>' +
+                    '<p>summer</p>' +
+                    '<p>http://summer</p>' +
+                '</div>',
+            ].join()),
+            options,
         );
         context.initialize();
 
         dialog = new LinkDialog(context);
         dialog.initialize();
 
-        $editable = $(context.layoutInfo.editableEl);
-        $editable.appendTo('body');
+        editableEl = context.layoutInfo.editableEl;
+
+        document.body.appendChild(editableEl);
     });
 
     describe('LinkDialog', () => {
         // open-in-new-window
         it('should check new window when target=_blank', () => {
-            range.createFromNode($editable.find('a')[0]).normalize().select();
+            range.createFromNode(editableEl.querySelectorAll('a')[0]).normalize().select();
             context.invoke('editor.setLastRange');
             dialog.show();
 
@@ -53,7 +56,7 @@ describe('LinkDialog', () => {
         });
 
         it('should uncheck new window without target=_blank', () => {
-            range.createFromNode($editable.find('a')[1]).normalize().select();
+            range.createFromNode(editableEl.querySelectorAll('a')[1]).normalize().select();
             context.invoke('editor.setLastRange');
             dialog.show();
 
@@ -63,7 +66,7 @@ describe('LinkDialog', () => {
 
         // use default protocol
         it('should uncheck default protocol if link (with protocol) exists', () => {
-            range.createFromNode($editable.find('a')[1]).normalize().select();
+            range.createFromNode(editableEl.querySelectorAll('a')[1]).normalize().select();
             context.invoke('editor.setLastRange');
             dialog.show();
 
@@ -72,7 +75,7 @@ describe('LinkDialog', () => {
         });
 
         it('should uncheck default protocol if link (without protocol) exists', () => {
-            range.createFromNode($editable.find('a')[2]).normalize().select();
+            range.createFromNode(editableEl.querySelectorAll('a')[2]).normalize().select();
             context.invoke('editor.setLastRange');
             dialog.show();
 
@@ -81,7 +84,7 @@ describe('LinkDialog', () => {
         });
 
         it('should check default protocol if link not exists', () => {
-            range.createFromNode($editable.find('p')[3]).normalize().select();
+            range.createFromNode(editableEl.querySelectorAll('p')[3]).normalize().select();
             context.invoke('editor.setLastRange');
             dialog.show();
 
@@ -90,7 +93,7 @@ describe('LinkDialog', () => {
         });
 
         it('should check default protocol if link not exists although it has protocol', () => {
-            range.createFromNode($editable.find('p')[4]).normalize().select();
+            range.createFromNode(editableEl.querySelectorAll('p')[4]).normalize().select();
             context.invoke('editor.setLastRange');
             dialog.show();
 
