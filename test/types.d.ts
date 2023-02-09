@@ -6,7 +6,9 @@ declare namespace Chai {
         };
     }
     interface Assertion {
+        await: (done: DoneFn) => Chai.Assertion;
         equalsIgnoreCase: (expected: string) => void;
+        equalsStyle: (expected: string, style: string) => void;
     }
     interface AssertStatic {
         equalsIgnoreCase: (val: any, exp: string, msg: string) => void;
