@@ -499,7 +499,7 @@ export class WrappedRange {
      *
      * @param {Boolean} [findAfter] - find after cursor, default: false
      */
-    getWordsRange(findAfter: boolean): WrappedRange {
+    getWordsRange(findAfter = false): WrappedRange {
         let endPoint = this.getEndPoint();
 
         const isNotTextPoint = function(point: BoundaryPoint) {
