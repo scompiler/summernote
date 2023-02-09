@@ -43,6 +43,7 @@
     "@babel/preset-env": "^7.9.5",
     "@popperjs/core": "^2.9.2",
     "@types/chai": "^4.3.4",
+    "@types/chai-spies": "^1.0.3",
     "@types/jasmine": "^4.3.1",
     "@types/jquery": "^3.5.16",
     "@types/lodash.merge": "^4.6.7",

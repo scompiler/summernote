@@ -103,7 +103,7 @@ export default class Editor {
         this.context.memo('help.backColor', this.lang.help.backColor);
     }
 
-    bold = this.wrapCommand((value: string) => document.execCommand('bold', false, value), {isPreventTrigger: true});
+    bold = this.wrapCommand((value?: string) => document.execCommand('bold', false, value), {isPreventTrigger: true});
     italic = this.wrapCommand((value: string) => document.execCommand('italic', false, value), {isPreventTrigger: true});
     underline = this.wrapCommand((value: string) => document.execCommand('underline', false, value), {isPreventTrigger: true});
     strikethrough = this.wrapCommand((value: string) => document.execCommand('strikethrough', false, value), {isPreventTrigger: true});
@@ -121,7 +121,7 @@ export default class Editor {
         return this.fontStyling('font-family', env.validFontName(value));
     });
 
-    fontSize = this.wrapCommand((value: string) => {
+    fontSize = this.wrapCommand((value: string | number) => {
         const unit = this.currentStyle()['font-size-unit'];
         return this.fontStyling('font-size', value + unit);
     });
@@ -213,9 +213,9 @@ export default class Editor {
     createLink = this.wrapCommand((linkInfo: {
         url: string;
         text: string;
-        isNewWindow: boolean;
-        checkProtocol: boolean;
-        range: WrappedRange;
+        isNewWindow?: boolean;
+        checkProtocol?: boolean;
+        range?: WrappedRange;
     }) => {
         const rel: string[] = [];
         let linkUrl = linkInfo.url;
