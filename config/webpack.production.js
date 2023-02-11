@@ -50,11 +50,11 @@ module.exports = {
     ),
     // entries for each language
     ...languages.map(lang =>
-      [`lang/${lang}`, `./src/lang/${lang}.js`]
+      [`lang/${lang.name}`, `./src/lang/${lang.filename}`]
     ),
     // ... and for minimized
     ...languages.map(lang =>
-      [`lang/${lang}.min`, `./src/lang/${lang}.js`]
+      [`lang/${lang.name}.min`, `./src/lang/${lang.filename}`]
     ),
   ]),
 

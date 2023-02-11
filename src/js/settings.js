@@ -1,4 +1,4 @@
-import '../lang/summernote-en-US';
+import '../lang/summernote-en-US.ts';
 import dom from './core/dom.ts';
 import range from './core/range.ts';
 import lists from './core/lists.ts';

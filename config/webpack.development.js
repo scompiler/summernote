@@ -24,7 +24,7 @@ module.exports = {
     ),
     // entries for each language
     ...languages.map(lang =>
-      [`lang/${lang}`, `./src/lang/${lang}.js`]
+      [`lang/${lang.name}`, `./src/lang/${lang.filename}`]
     ),
   ]),
 
