@@ -5,14 +5,16 @@ import { Options, SummernoteElement, UserInterface } from "./core/types";
 
 declare global {
     interface Window {
-        Summernote: Summernote;
+        Summernote?: typeof Summernote;
     }
 }
+
+const languages = (window.Summernote || {languages: {}}).languages;
 
 export default class Summernote {
     static languages: {
         [lang: string]: any;
-    } = {};
+    } = languages;
 
     static meta: {
         options?: Options;
