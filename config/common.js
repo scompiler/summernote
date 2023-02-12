@@ -1,4 +1,4 @@
-const { readdirSync, readFileSync } = require('fs');
+const { readdirSync, readFileSync, existsSync } = require('fs');
 const glob = require('glob');
 const path = require('path');
 
@@ -23,7 +23,10 @@ module.exports = {
         } catch {
           name = id;
         }
-        return { id, name, target };
+
+        const extension = existsSync(`./src/styles/${id}/summernote-${id}.ts`) ? 'ts' : 'js';
+
+        return { id, name, target, extension };
       }),
 
   // Translation files in /src/locales

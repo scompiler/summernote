@@ -20,7 +20,7 @@ module.exports = {
   entry: Object.fromEntries([
     // entries for each style
     ...styles.map(style =>
-      [`summernote-${style.id}`, `./src/styles/${style.id}/summernote-${style.id}.js`]
+      [`summernote-${style.id}`, `./src/styles/${style.id}/summernote-${style.id}.${style.extension}`]
     ),
     // entries for each language
     ...languages.map(lang =>

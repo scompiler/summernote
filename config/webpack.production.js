@@ -42,11 +42,11 @@ module.exports = {
   entry: Object.fromEntries([
     // entries for each style
     ...styles.map(style =>
-      [`${style.target}`, `./src/styles/${style.id}/summernote-${style.id}.js`]
+      [`${style.target}`, `./src/styles/${style.id}/summernote-${style.id}.${style.extension}`]
     ),
     // ... and for minimized
     ...styles.map(style =>
-      [`${style.target}.min`, `./src/styles/${style.id}/summernote-${style.id}.js`]
+      [`${style.target}.min`, `./src/styles/${style.id}/summernote-${style.id}.${style.extension}`]
     ),
     // entries for each language
     ...languages.map(lang =>
