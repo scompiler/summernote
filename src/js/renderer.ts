@@ -4,6 +4,26 @@ export interface RendererOptions {
     data?: {[dataAttribute: string]: string};
     click?: (event: MouseEvent) => void;
     callback2?: (nodeEls: Node[]) => void;
+
+    tooltip?: string;
+    container?: string;
+    codeviewKeepButton?: boolean;
+    items?: (string | {value: string})[];
+    template?: (item: string | {value: string}) => string;
+    title?: string;
+    itemClick?: (event: MouseEvent, item: any, value: string) => void;
+    checkClassName?: string;
+    colors?: string[][];
+    colorsName?: string[][];
+    eventName?: string;
+    body?: string;
+    footer?: string;
+    fade?: boolean;
+    direction?: string;
+    hideArrow?: boolean;
+    id?: string;
+    checked?: boolean;
+    text?: string;
 }
 
 export type RendererCallback = (nodeEls: Node[], options: RendererOptions) => void;
@@ -17,7 +37,7 @@ export class Renderer {
 
     callback: RendererCallback;
 
-    constructor(markup: string, children: Renderer[], options: RendererOptions, callback: RendererCallback) {
+    constructor(markup: string, children: Renderer[], options: RendererOptions, callback?: RendererCallback) {
         this.markup = markup;
         this.children = children;
         this.options = options;
@@ -98,7 +118,7 @@ export class Renderer {
 }
 
 export default {
-    create: (markup: string, callback: RendererCallback) => {
+    create: (markup: string, callback?: RendererCallback) => {
         return function(...args: any[]) {
             const options = typeof args[1] === 'object' ? args[1] : args[0];
             let children: Renderer[] = Array.isArray(args[0]) ? args[0] : [];

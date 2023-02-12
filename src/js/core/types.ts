@@ -102,6 +102,7 @@ export interface Options {
     maxHeight?: number;
     inheritPlaceholder?: boolean;
     placeholder?: string;
+    toolbarPosition?: string;
 
     popatmouse?: boolean;
     popover?: {
