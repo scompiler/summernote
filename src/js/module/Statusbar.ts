@@ -29,6 +29,10 @@ export default class Statusbar {
     destroy() {
         this.removeDocumentListeners();
 
+        if (!this.statusbarEl) {
+            return;
+        }
+
         this.statusbarEl.removeEventListener('mousedown', this.onMouseDown);
         this.statusbarEl.classList.add('locked');
     }
