@@ -12,70 +12,65 @@
 }(function($) {
   // Extends plugins for adding hello.
   //  - plugin is external module for customizing.
-  $.extend($.summernote.plugins, {
-    /**
-     * @param {Object} context - context object has status of editor.
-     */
-    'hello': function(context) {
-      var self = this;
+  window.Summernote.meta.plugins['hello'] = function(context) {
+    var self = this;
 
-      // ui has renders to build ui elements.
-      //  - you can create a button with `ui.button`
-      var ui = $.summernote.ui;
+    // ui has renders to build ui elements.
+    //  - you can create a button with `ui.button`
+    var ui = window.Summernote.meta.ui;
 
-      // add hello button
-      context.memo('button.hello', function() {
-        // create button
-        var button = ui.button({
-          contents: '<i class="fa fa-child"/> Hello',
-          tooltip: 'hello',
-          click: function() {
-            self.$panel.show();
-            self.$panel.hide(500);
-            // invoke insertText method with 'hello' on editor module.
-            context.invoke('editor.insertText', 'hello');
-          },
-        });
-
-        // create jQuery object from button instance.
-        return button.render2();
+    // add hello button
+    context.memo('button.hello', function() {
+      // create button
+      var button = ui.button({
+        contents: '<i class="fa fa-child"/> Hello',
+        tooltip: 'hello',
+        click: function() {
+          self.$panel.show();
+          self.$panel.hide(500);
+          // invoke insertText method with 'hello' on editor module.
+          context.invoke('editor.insertText', 'hello');
+        },
       });
 
-      // This events will be attached when editor is initialized.
-      this.events = {
-        // This will be called after modules are initialized.
-        'summernote.init': function(we, e) {
-          // eslint-disable-next-line
-          console.log('summernote initialized', we, e);
-        },
-        // This will be called when user releases a key on editable.
-        'summernote.keyup': function(we, e) {
-          // eslint-disable-next-line
-          console.log('summernote keyup', we, e);
-        },
-      };
+      // create jQuery object from button instance.
+      return button.render2();
+    });
 
-      // This method will be called when editor is initialized by $('..').summernote();
-      // You can create elements for plugin
-      this.initialize = function() {
-        this.$panel = $('<div class="hello-panel"/>').css({
-          position: 'absolute',
-          width: 100,
-          height: 100,
-          left: '50%',
-          top: '50%',
-          background: 'red',
-        }).hide();
+    // This events will be attached when editor is initialized.
+    this.events = {
+      // This will be called after modules are initialized.
+      'summernote.init': function(we, e) {
+        // eslint-disable-next-line
+        console.log('summernote initialized', we, e);
+      },
+      // This will be called when user releases a key on editable.
+      'summernote.keyup': function(we, e) {
+        // eslint-disable-next-line
+        console.log('summernote keyup', we, e);
+      },
+    };
 
-        this.$panel.appendTo('body');
-      };
+    // This method will be called when editor is initialized by $('..').summernote();
+    // You can create elements for plugin
+    this.initialize = function() {
+      this.$panel = $('<div class="hello-panel"/>').css({
+        position: 'absolute',
+        width: 100,
+        height: 100,
+        left: '50%',
+        top: '50%',
+        background: 'red',
+      }).hide();
 
-      // This methods will be called when editor is destroyed by $('..').summernote('destroy');
-      // You should remove elements on `initialize`.
-      this.destroy = function() {
-        this.$panel.remove();
-        this.$panel = null;
-      };
-    },
-  });
+      this.$panel.appendTo('body');
+    };
+
+    // This methods will be called when editor is destroyed by $('..').summernote('destroy');
+    // You should remove elements on `initialize`.
+    this.destroy = function() {
+      this.$panel.remove();
+      this.$panel = null;
+    };
+  };
 }));
