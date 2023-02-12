@@ -6,7 +6,7 @@
 import chai from 'chai';
 import Context from 'src/js/Context';
 import VideoDialog from 'src/js/module/VideoDialog';
-import 'src/styles/bs4/summernote-bs4';
+import 'src/styles/bs5/summernote-bs5';
 import Summernote from "src/js/class";
 import func from 'src/js/core/func';
 
