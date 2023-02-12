@@ -5,16 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>On a modal dialog</title>
 
-  <!-- include jquery -->
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+  <!-- include jQuery -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.js"></script>
 
-  <!-- include libraries -->
-  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.css" />
-  <script src="//cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.5/umd/popper.js"></script>
-  <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.js"></script>
+  <!-- include Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
   <!-- include summernote -->
-  <script type="text/javascript" src="/summernote-bs4.js"></script>
+  <script type="text/javascript" src="/summernote-bs5.js"></script>
 
   <script>
     $(function () {
@@ -27,8 +26,8 @@
   </script>
 </head>
 <body>
-<button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#dropper">Show Dialog</button>
-<div id="dropper" class="modal fade" tabindex="-1" data-backdrop="static" role="dialog" aria-hidden="true">
+<button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#dropper">Show Dialog</button>
+<div id="dropper" class="modal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-body">
@@ -40,7 +39,7 @@
           Attach Digital Assets
         </button>
         <div class="btn-group">
-          <button type="button" class="btn btn-default opacity75" class="close" data-dismiss="modal">
+          <button type="button" class="btn btn-default opacity75 close" data-dismiss="modal">
             &times; Cancel
           </button>
           <button type="button" class="btn btn-warning" href="javascript:postDrop()">

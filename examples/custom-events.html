@@ -2,36 +2,44 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>jQuery custom events</title>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+  <title>Custom events</title>
 
-  <!-- include libraries -->
-  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.css" />
-  <script src="//cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.5/umd/popper.js"></script>
-  <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.js"></script>
+  <!-- include jQuery -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.js"></script>
+
+  <!-- include Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
   <!-- include summernote -->
-  <script type="text/javascript" src="/summernote-bs4.js"></script>
+  <script type="text/javascript" src="/summernote-bs5.js"></script>
 
   <link rel="stylesheet" href="example.css">
   <script type="text/javascript">
-    $(function() {
-      $('.summernote').on('summernote.init', function() {
-        console.log('summernote initialize!')
-      }).on('summernote.change', function() {
-        console.log(' changed content ')
-      }).on('summernote.keyup', function(event) {
-        console.log('you can use keyboard event', event);
-      }).on('summernote.enter', function(event) {
-        console.log('check enter key ');
-      }).summernote({ height : 500 });
+    document.addEventListener('DOMContentLoaded', () => {
+      const summernoteEl = document.querySelector('.summernote');
 
+      summernoteEl.addEventListener('summernote.init', function() {
+        console.log('summernote initialize!')
+      });
+      summernoteEl.addEventListener('summernote.change', function() {
+        console.log(' changed content ')
+      });
+      summernoteEl.addEventListener('summernote.keyup', function(event) {
+        console.log('you can use keyboard event', event);
+      });
+      summernoteEl.addEventListener('summernote.enter', function() {
+        console.log('check enter key ');
+      });
+    });
+    $(function() {
+      $('.summernote').summernote({ height : 500 });
     });
   </script>
 </head>
 <body>
 <div class="container">
-  <h1>jQuery Custom Event Sample</h1>
+  <h1>Custom Event Sample</h1>
   <div class="summernote">
     <article class="markdown-body js-file js-task-list-container is-task-list-enabled" data-task-list-update-url="https://gist.github.com/easylogic/95d2dbe03ce500bd0ae1/file/gistfile1.md">
 
