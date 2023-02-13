@@ -1,37 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>With language file (Korean)</title>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <title>With language file (Korean)</title>
 
-  <!-- include jQuery -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.js"></script>
+        <!-- include Bootstrap -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
-  <!-- include Bootstrap -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+        <!-- include summernote -->
+        <script type="text/javascript" src="/summernote-bs5.js"></script>
+        <script type="text/javascript" src="/lang/summernote-ko-KR.js"></script>
 
-  <!-- include summernote -->
-  <script type="text/javascript" src="/summernote-bs5.js"></script>
-  <script type="text/javascript" src="/lang/summernote-ko-KR.js"></script>
-
-  <link rel="stylesheet" href="example.css">
-  <script type="text/javascript">
-    $(document).ready(function() {
-      $('.summernote').summernote({
-        height: 200,
-        tabsize: 2,
-        lang: 'ko-KR'
-      });
-    });
-  </script>
-</head>
-<body>
-<div class="container">
-  <h1>Summernote with a language setting</h1>
-  <p>This example shows Summernote with Korean language(ko-KR) setting.</p>
-  <textarea class="summernote"><p>Seasons <b>coming up</b></p></textarea>
-</div>
-</body>
+        <link rel="stylesheet" href="example.css">
+        <script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', () => {
+                Summernote.init(document.querySelector('.summernote'), {
+                    height: 200,
+                    tabsize: 2,
+                    lang: 'ko-KR'
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Summernote with a language setting</h1>
+            <p>This example shows Summernote with Korean language(ko-KR) setting.</p>
+            <textarea class="summernote"><p>Seasons <b>coming up</b></p></textarea>
+        </div>
+    </body>
 </html>

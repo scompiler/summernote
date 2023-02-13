@@ -1,52 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Hinting from ajax</title>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <title>Hinting from ajax</title>
 
-  <!-- include jQuery -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.js"></script>
+        <!-- include Bootstrap -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
-  <!-- include Bootstrap -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+        <!-- include summernote -->
+        <script type="text/javascript" src="/summernote-bs5.js"></script>
 
-  <!-- include summernote -->
-  <script type="text/javascript" src="/summernote-bs5.js"></script>
+        <script src="https://www.google.com/jsapi" type="text/javascript"></script>
 
-  <script src="https://www.google.com/jsapi" type="text/javascript"></script>
-
-  <link rel="stylesheet" href="example.css">
-  <script type="text/javascript">
-    $(function() {
-      $('.summernote').summernote({
-        height: 200,
-        hint: {
-          match: /#(\w{2,})$/,
-          search: function(keyword, callback) {
-            $.ajax({
-              url: 'https://api.github.com/search/repositories?q=' + keyword + '&order=asc'
-            }).then(function (data) {
-              callback(data.items);
+        <link rel="stylesheet" href="example.css">
+        <script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', () => {
+                Summernote.init(document.querySelector('.summernote'), {
+                    height: 200,
+                    hint: {
+                        match: /#(\w{2,})$/,
+                        search: function(keyword, callback) {
+                            fetch('https://api.github.com/search/repositories?q=' + keyword + '&order=asc').then((response) => response.json()).then((data) => {
+                                callback(data.items);
+                            });
+                        },
+                        content: function(item) {
+                            return '[' + item.full_name + '] ' + item.description;
+                        },
+                        template: function(item) {
+                            return '[<strong>' + item.full_name + '</strong>] ' + item.description;
+                        },
+                    },
+                });
             });
-          },
-          content: function(item) {
-            return '[' + item.full_name + '] ' + item.description;
-          },
-          template: function(item) {
-            return '[<strong>' + item.full_name + '</strong>] ' + item.description;
-          }
-        }
-      });
-    });
-  </script>
-</head>
-<body>
-<div class="container">
-  <h1>Summernote with User-defined hint</h1>
-  <p>Please wait a moment while retrieving search result from GitHub after typing.</p>
-  <textarea class="summernote">type #su</textarea>
-</div>
-</body>
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Summernote with User-defined hint</h1>
+            <p>Please wait a moment while retrieving search result from GitHub after typing.</p>
+            <textarea class="summernote">type #su</textarea>
+        </div>
+    </body>
 </html>

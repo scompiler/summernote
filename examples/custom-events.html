@@ -1,110 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Custom events</title>
+    <head>
+        <meta charset="UTF-8">
+        <title>Custom events</title>
 
-  <!-- include jQuery -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.js"></script>
+        <!-- include Bootstrap -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
-  <!-- include Bootstrap -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+        <!-- include summernote -->
+        <script type="text/javascript" src="/summernote-bs5.js"></script>
 
-  <!-- include summernote -->
-  <script type="text/javascript" src="/summernote-bs5.js"></script>
+        <link rel="stylesheet" href="example.css">
+        <script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', () => {
+                const summernoteEl = document.querySelector('.summernote');
 
-  <link rel="stylesheet" href="example.css">
-  <script type="text/javascript">
-    document.addEventListener('DOMContentLoaded', () => {
-      const summernoteEl = document.querySelector('.summernote');
+                summernoteEl.addEventListener('summernote.init', function() {
+                    console.log('summernote initialize!')
+                });
+                summernoteEl.addEventListener('summernote.change', function() {
+                    console.log(' changed content ')
+                });
+                summernoteEl.addEventListener('summernote.keyup', function(event) {
+                    console.log('you can use keyboard event', event);
+                });
+                summernoteEl.addEventListener('summernote.enter', function() {
+                    console.log('check enter key ');
+                });
+                Summernote.init(document.querySelector('.summernote'), {height : 500});
+            });
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Custom Event Sample</h1>
+            <div class="summernote">
+                <article class="markdown-body js-file js-task-list-container is-task-list-enabled" data-task-list-update-url="https://gist.github.com/easylogic/95d2dbe03ce500bd0ae1/file/gistfile1.md">
 
-      summernoteEl.addEventListener('summernote.init', function() {
-        console.log('summernote initialize!')
-      });
-      summernoteEl.addEventListener('summernote.change', function() {
-        console.log(' changed content ')
-      });
-      summernoteEl.addEventListener('summernote.keyup', function(event) {
-        console.log('you can use keyboard event', event);
-      });
-      summernoteEl.addEventListener('summernote.enter', function() {
-        console.log('check enter key ');
-      });
-    });
-    $(function() {
-      $('.summernote').summernote({ height : 500 });
-    });
-  </script>
-</head>
-<body>
-<div class="container">
-  <h1>Custom Event Sample</h1>
-  <div class="summernote">
-    <article class="markdown-body js-file js-task-list-container is-task-list-enabled" data-task-list-update-url="https://gist.github.com/easylogic/95d2dbe03ce500bd0ae1/file/gistfile1.md">
+                    <h1>
+                        <a name="user-content-how-to-set-custom-event" class="anchor" href="#how-to-set-custom-event" rel="noreferrer"><span class="octicon octicon-link"></span></a>How to set custom event</h1>
 
-      <h1>
-        <a name="user-content-how-to-set-custom-event" class="anchor" href="#how-to-set-custom-event" rel="noreferrer"><span class="octicon octicon-link"></span></a>How to set custom event</h1>
+                    <h2>
+                        <a name="user-content-current-style-1" class="anchor" href="#current-style-1" rel="noreferrer"><span class="octicon octicon-link"></span></a>current style</h2>
 
-      <h2>
-        <a name="user-content-current-style-1" class="anchor" href="#current-style-1" rel="noreferrer"><span class="octicon octicon-link"></span></a>current style</h2>
-
-      <div class="highlight highlight-javascript"><pre>$(<span class="pl-s1"><span class="pl-pds">"</span>.summernote<span class="pl-pds">"</span></span>).summernote({
+                    <div class="highlight highlight-javascript"><pre>$(<span class="pl-s1"><span class="pl-pds">"</span>.summernote<span class="pl-pds">"</span></span>).summernote({
   <span class="pl-en">onfocus</span> : <span class="pl-st">function</span>(<span class="pl-vpf">e</span>) {
     <span class="pl-c">// to do something</span>
   }
 });</pre></div>
 
-      <h2>
-        <a name="user-content-jquery-plugin-style" class="anchor" href="#jquery-plugin-style" rel="noreferrer"><span class="octicon octicon-link"></span></a>jquery style</h2>
+                    <h2>
+                        <a name="user-content-jquery-plugin-style" class="anchor" href="#jquery-plugin-style" rel="noreferrer"><span class="octicon octicon-link"></span></a>jquery style</h2>
 
-      <div class="highlight highlight-javascript"><pre>$(<span class="pl-s1"><span class="pl-pds">"</span>.summernote<span class="pl-pds">"</span></span>).on(<span class="pl-s1"><span class="pl-pds">"</span>summernote.focus<span class="pl-pds">"</span></span>, <span class="pl-st">function</span>(<span class="pl-vpf">e</span>) {
+                    <div class="highlight highlight-javascript"><pre>$(<span class="pl-s1"><span class="pl-pds">"</span>.summernote<span class="pl-pds">"</span></span>).on(<span class="pl-s1"><span class="pl-pds">"</span>summernote.focus<span class="pl-pds">"</span></span>, <span class="pl-st">function</span>(<span class="pl-vpf">e</span>) {
   <span class="pl-c">// to do something</span>
 });</pre></div>
 
-      <h1>
-        <a name="user-content-event-list" class="anchor" href="#event-list" rel="noreferrer"><span class="octicon octicon-link"></span></a>Event List</h1>
+                    <h1>
+                        <a name="user-content-event-list" class="anchor" href="#event-list" rel="noreferrer"><span class="octicon octicon-link"></span></a>Event List</h1>
 
-      <h2>
-        <a name="user-content-oninit" class="anchor" href="#oninit" rel="noreferrer"><span class="octicon octicon-link"></span></a>oninit</h2>
+                    <h2>
+                        <a name="user-content-oninit" class="anchor" href="#oninit" rel="noreferrer"><span class="octicon octicon-link"></span></a>oninit</h2>
 
-      <div class="highlight highlight-javascript"><pre>$(<span class="pl-s1"><span class="pl-pds">"</span>.summernote<span class="pl-pds">"</span></span>).on(<span class="pl-s1"><span class="pl-pds">"</span>summernote.init<span class="pl-pds">"</span></span>, ...);</pre></div>
+                    <div class="highlight highlight-javascript"><pre>$(<span class="pl-s1"><span class="pl-pds">"</span>.summernote<span class="pl-pds">"</span></span>).on(<span class="pl-s1"><span class="pl-pds">"</span>summernote.init<span class="pl-pds">"</span></span>, ...);</pre></div>
 
-      <h2>
-        <a name="user-content-onfocus" class="anchor" href="#onfocus" rel="noreferrer"><span class="octicon octicon-link"></span></a>onfocus</h2>
+                    <h2>
+                        <a name="user-content-onfocus" class="anchor" href="#onfocus" rel="noreferrer"><span class="octicon octicon-link"></span></a>onfocus</h2>
 
-      <div class="highlight highlight-javascript"><pre>$(<span class="pl-s1"><span class="pl-pds">"</span>.summernote<span class="pl-pds">"</span></span>).on(<span class="pl-s1"><span class="pl-pds">"</span>summernote.focus<span class="pl-pds">"</span></span>, ...);</pre></div>
+                    <div class="highlight highlight-javascript"><pre>$(<span class="pl-s1"><span class="pl-pds">"</span>.summernote<span class="pl-pds">"</span></span>).on(<span class="pl-s1"><span class="pl-pds">"</span>summernote.focus<span class="pl-pds">"</span></span>, ...);</pre></div>
 
-      <h2>
-        <a name="user-content-onenter" class="anchor" href="#onenter" rel="noreferrer"><span class="octicon octicon-link"></span></a>onenter</h2>
+                    <h2>
+                        <a name="user-content-onenter" class="anchor" href="#onenter" rel="noreferrer"><span class="octicon octicon-link"></span></a>onenter</h2>
 
-      <div class="highlight highlight-javascript"><pre>$(<span class="pl-s1"><span class="pl-pds">"</span>.summernote<span class="pl-pds">"</span></span>).on(<span class="pl-s1"><span class="pl-pds">"</span>summernote.enter<span class="pl-pds">"</span></span>, ...);</pre></div>
+                    <div class="highlight highlight-javascript"><pre>$(<span class="pl-s1"><span class="pl-pds">"</span>.summernote<span class="pl-pds">"</span></span>).on(<span class="pl-s1"><span class="pl-pds">"</span>summernote.enter<span class="pl-pds">"</span></span>, ...);</pre></div>
 
-      <h2>
-        <a name="user-content-onblur" class="anchor" href="#onblur" rel="noreferrer"><span class="octicon octicon-link"></span></a>onblur</h2>
+                    <h2>
+                        <a name="user-content-onblur" class="anchor" href="#onblur" rel="noreferrer"><span class="octicon octicon-link"></span></a>onblur</h2>
 
-      <div class="highlight highlight-javascript"><pre>$(<span class="pl-s1"><span class="pl-pds">"</span>.summernote<span class="pl-pds">"</span></span>).on(<span class="pl-s1"><span class="pl-pds">"</span>summernote.blur<span class="pl-pds">"</span></span>, ...);</pre></div>
+                    <div class="highlight highlight-javascript"><pre>$(<span class="pl-s1"><span class="pl-pds">"</span>.summernote<span class="pl-pds">"</span></span>).on(<span class="pl-s1"><span class="pl-pds">"</span>summernote.blur<span class="pl-pds">"</span></span>, ...);</pre></div>
 
-      <h2>
-        <a name="user-content-onkeyup" class="anchor" href="#onkeyup" rel="noreferrer"><span class="octicon octicon-link"></span></a>onkeyup</h2>
+                    <h2>
+                        <a name="user-content-onkeyup" class="anchor" href="#onkeyup" rel="noreferrer"><span class="octicon octicon-link"></span></a>onkeyup</h2>
 
-      <div class="highlight highlight-javascript"><pre>$(<span class="pl-s1"><span class="pl-pds">"</span>.summernote<span class="pl-pds">"</span></span>).on(<span class="pl-s1"><span class="pl-pds">"</span>summernote.keyup<span class="pl-pds">"</span></span>, ...);</pre></div>
+                    <div class="highlight highlight-javascript"><pre>$(<span class="pl-s1"><span class="pl-pds">"</span>.summernote<span class="pl-pds">"</span></span>).on(<span class="pl-s1"><span class="pl-pds">"</span>summernote.keyup<span class="pl-pds">"</span></span>, ...);</pre></div>
 
-      <h2>
-        <a name="user-content-onkeydown" class="anchor" href="#onkeydown" rel="noreferrer"><span class="octicon octicon-link"></span></a>onkeydown</h2>
+                    <h2>
+                        <a name="user-content-onkeydown" class="anchor" href="#onkeydown" rel="noreferrer"><span class="octicon octicon-link"></span></a>onkeydown</h2>
 
-      <div class="highlight highlight-javascript"><pre>$(<span class="pl-s1"><span class="pl-pds">"</span>.summernote<span class="pl-pds">"</span></span>).on(<span class="pl-s1"><span class="pl-pds">"</span>summernote.keydown<span class="pl-pds">"</span></span>, ...);</pre></div>
+                    <div class="highlight highlight-javascript"><pre>$(<span class="pl-s1"><span class="pl-pds">"</span>.summernote<span class="pl-pds">"</span></span>).on(<span class="pl-s1"><span class="pl-pds">"</span>summernote.keydown<span class="pl-pds">"</span></span>, ...);</pre></div>
 
-      <h2>
-        <a name="user-content-onchange" class="anchor" href="#onchange" rel="noreferrer"><span class="octicon octicon-link"></span></a>onChange</h2>
+                    <h2>
+                        <a name="user-content-onchange" class="anchor" href="#onchange" rel="noreferrer"><span class="octicon octicon-link"></span></a>onChange</h2>
 
-      <div class="highlight highlight-javascript"><pre>$(<span class="pl-s1"><span class="pl-pds">"</span>.summernote<span class="pl-pds">"</span></span>).on(<span class="pl-s1"><span class="pl-pds">"</span>summernote.change<span class="pl-pds">"</span></span>, ...);</pre></div>
+                    <div class="highlight highlight-javascript"><pre>$(<span class="pl-s1"><span class="pl-pds">"</span>.summernote<span class="pl-pds">"</span></span>).on(<span class="pl-s1"><span class="pl-pds">"</span>summernote.change<span class="pl-pds">"</span></span>, ...);</pre></div>
 
-    </article>
+                </article>
 
 
-  </div>
-</div>
+            </div>
+        </div>
 
-</body>
+    </body>
 </html>
