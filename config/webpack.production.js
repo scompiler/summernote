@@ -75,6 +75,7 @@ module.exports = {
       commonjs2: 'jquery',
       amd: 'jquery',
     },
+    bootstrap: 'bootstrap',
   },
 
   module: {

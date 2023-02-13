@@ -7,8 +7,9 @@ export interface RendererOptions {
 
     tooltip?: string;
     container?: string;
+    codeviewButton?: boolean;
     codeviewKeepButton?: boolean;
-    items?: (string | {value: string})[];
+    items?: (string | {value: string; option: string})[];
     template?: (item: string | {value: string}) => string;
     title?: string;
     itemClick?: (event: MouseEvent, item: any, value: string) => void;

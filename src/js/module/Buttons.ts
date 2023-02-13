@@ -338,6 +338,10 @@ export default class Buttons {
         for (let styleIdx = 0, styleLen = this.options.styleTags.length; styleIdx < styleLen; styleIdx++) {
             const item = this.options.styleTags[styleIdx];
 
+            if (!(typeof item === 'string')) {
+                continue;
+            }
+
             this.context.memo('button.style.' + item, () => {
                 return this.button({
                     className: 'note-btn-style-' + item,

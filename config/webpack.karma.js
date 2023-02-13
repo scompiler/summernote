@@ -6,4 +6,6 @@ delete config.entry;
 // Show only errors while using karma
 config.stats = 'errors-only';
 
+delete config.externals.bootstrap;
+
 module.exports = config;

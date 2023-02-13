@@ -305,7 +305,7 @@ export interface Options {
     shortcuts?: boolean;
     colors?: string[][];
     colorsName?: string[][];
-    styleTags?: string[];
+    styleTags?: (string | {title: string; tag: string; className: string; value: string})[];
     addDefaultFonts?: boolean;
     fontNames?: string[];
     fontSizes?: string[];
@@ -396,7 +396,7 @@ export interface UserInterface {
     dropdown(options: {
         className?: string;
         title?: string;
-        items?: string[] | string;
+        items?: (string | {title: string; tag: string; className: string; value: string})[] | string;
         callback2?: (nodeEls: Node[]) => void;
         click?: (domEvent: MouseEvent) => void;
         template?: (item: {
