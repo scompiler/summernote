@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import '/js/settings';
 import renderer from '/js/renderer.ts';
 import './summernote-bs5.scss';
@@ -192,10 +191,14 @@ const ui = function(editorOptions) {
           nodeEl.innerHTML = contents.join('');
 
           if (options.tooltip) {
-            $(nodeEl.querySelector('.note-color-btn')).tooltip({
-              container: options.container || editorOptions.container,
-              trigger: 'hover',
-              placement: 'bottom',
+            const btnEls = [].slice.call(nodeEl.querySelectorAll('.note-color-btn'));
+
+            btnEls.forEach((btnEl) => {
+              new window.bootstrap.Tooltip(btnEl, {
+                container: options.container || editorOptions.container,
+                trigger: 'hover',
+                placement: 'bottom',
+              });
             });
           }
         });
@@ -217,15 +220,13 @@ const ui = function(editorOptions) {
             nodeEl.setAttribute('title', options.tooltip);
             nodeEl.setAttribute('aria-label', options.tooltip);
 
-            $(nodeEl).tooltip({
+            const tooltip = new window.bootstrap.Tooltip(nodeEl, {
               container: options.container || editorOptions.container,
               trigger: 'hover',
               placement: 'bottom',
             });
 
-            nodeEl.addEventListener('click', (domEvent) => {
-              $(domEvent.currentTarget).tooltip('hide');
-            });
+            nodeEl.addEventListener('click', () => tooltip.hide());
           }
           if (options && options.codeviewButton) {
             nodeEl.classList.add('note-codeview-keep');
@@ -244,19 +245,37 @@ const ui = function(editorOptions) {
     },
 
     onDialogShown: function(dialogEl, handler) {
-      $(dialogEl).one('shown.bs.modal', handler);
+      const listener = function() {
+        handler.apply(handler, arguments);
+
+        dialogEl.removeEventListener('shown.bs.modal', listener);
+      };
+
+      dialogEl.addEventListener('shown.bs.modal', listener);
     },
 
     onDialogHidden: function(dialogEl, handler) {
-      $(dialogEl).one('hidden.bs.modal', handler);
+      const listener = function() {
+        handler.apply(handler, arguments);
+
+        dialogEl.removeEventListener('hidden.bs.modal', listener);
+      };
+
+      dialogEl.addEventListener('hidden.bs.modal', listener);
     },
 
     showDialog: function(dialogEl) {
-      $(dialogEl).modal('show');
+      let instance = window.bootstrap.Modal.getInstance(dialogEl);
+
+      if (!instance) {
+        instance = new window.bootstrap.Modal(dialogEl);
+      }
+
+      instance.show();
     },
 
     hideDialog: function(dialogEl) {
-      $(dialogEl).modal('hide');
+      window.bootstrap.Modal.getInstance(dialogEl).hide();
     },
 
     createLayout: function(noteEl) {
