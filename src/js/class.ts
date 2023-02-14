@@ -2,6 +2,9 @@ import merge from "lodash.merge";
 import env from "./core/env";
 import Context from "./Context";
 import { Options, SummernoteElement, UserInterface } from "./core/types";
+import dom from "./core/dom";
+import range from "./core/range";
+import lists from "./core/lists";
 
 declare global {
     interface Window {
@@ -17,6 +20,10 @@ export default class Summernote {
     } = languages;
 
     static meta: {
+        version?: string
+        dom?: typeof dom;
+        range?: typeof range;
+        lists?: typeof lists;
         options?: Options;
         ui?: UserInterface;
         ui_template?: (options: Options) => UserInterface;

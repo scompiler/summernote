@@ -126,6 +126,8 @@ export interface Options {
 
     disableResizeImage?: boolean;
 
+    lang?: string;
+
     langInfo?: {
         image: {
             image: string;
@@ -282,7 +284,11 @@ export interface Options {
     useProtocol?: boolean;
 
     disableDragAndDrop?: boolean;
+    addLinkNoOpener?: boolean;
+    focus?: boolean;
+    textareaAutoSync?: boolean;
 
+    codeviewKeepButton?: boolean;
     codeviewFilter?: boolean;
     codeviewFilterRegex?: RegExp;
     codeviewIframeFilter?: boolean;
@@ -292,6 +298,9 @@ export interface Options {
     height?: number;
     width?: number;
     codemirror?: {
+        mode?: string;
+        htmlMode?: boolean;
+        lineNumbers?: boolean;
         tern?: any;
         CodeMirrorConstructor?: CodeMirrorConstructor;
     };
