@@ -1,7 +1,6 @@
 import 'src/js/settings';
 import renderer from 'src/js/renderer';
 import './summernote-bs5.scss';
-import 'src/js/summernote';
 import Summernote from "src/js/class";
 import { Layout, Options } from "../../js/core/types";
 import * as bootstrap from 'bootstrap';
