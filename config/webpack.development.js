@@ -79,13 +79,13 @@ module.exports = {
     }),
     new CopyPlugin({
       patterns: [
-        {
-          from: 'examples',
-          to: 'examples',
-          globOptions: {
-            ignore: ["**/*.ts", "**/*.scss"],
-          },
-        },
+        // {
+        //   from: 'examples',
+        //   to: 'examples',
+        //   globOptions: {
+        //     ignore: ["**/*.ts", "**/*.scss"],
+        //   },
+        // },
         {
           from: 'plugin',
           to: 'plugin',

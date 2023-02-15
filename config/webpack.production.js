@@ -200,13 +200,13 @@ module.exports = {
     }),
     new CopyPlugin({
       patterns: [
-        {
-          from: 'plugin',
-          to: 'plugin',
-          globOptions: {
-            ignore: ["**/*.ts", "**/*.scss"],
-          },
-        },
+        // {
+        //   from: 'plugin',
+        //   to: 'plugin',
+        //   globOptions: {
+        //     ignore: ["**/*.ts", "**/*.scss"],
+        //   },
+        // },
         {
           from: 'src/font/summernote.*',
           to: 'font/[base]',
