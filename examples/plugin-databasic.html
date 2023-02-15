@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <title>Data basic plugin example</title>
+
+        <!-- include Bootstrap -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+        <!-- include summernote -->
+        <script type="text/javascript" src="/summernote-bs5.js"></script>
+        <link href="/plugin/databasic/summernote-ext-databasic.scss" rel="stylesheet">
+        <script type="text/javascript" src="/plugin/databasic/summernote-ext-databasic.js"></script>
+
+        <script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', () => {
+                Summernote.init(document.querySelector('.summernote'), {
+                    height: 200,
+                    toolbar: [
+                        ['style', ['bold', 'italic', 'underline', 'clear']],
+                        ['databasic', ['databasic']],
+                    ],
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <textarea class="summernote">Seasons coming up</textarea>
+    </body>
+</html>

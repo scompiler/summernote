@@ -110,6 +110,7 @@ export interface Options {
         link?: [string, string[]][];
         table?: [string, string[]][];
         air?: [string, string[]][];
+        databasic?: [string, string[]][];
     },
 
     toolbar?: [string, string[]][];
@@ -265,6 +266,12 @@ export interface Options {
         specialChar: {
             specialChar: string;
             select: string;
+        };
+        databasic: {
+            insert: string;
+            edit: string;
+            testLabel: string;
+            name: string;
         };
     };
 
