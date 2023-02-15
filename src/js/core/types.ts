@@ -262,6 +262,10 @@ export interface Options {
         output: {
             noSelection: string;
         };
+        specialChar: {
+            specialChar: string;
+            select: string;
+        };
     };
 
     dialogsInBody?: boolean;
@@ -369,9 +373,9 @@ export interface UserInterface {
     dialog(options: {
         className?: string;
         title: string;
-        fade: boolean;
+        fade?: boolean;
         body: string;
-        footer: string;
+        footer?: string;
         callback2?: (nodeEls: Node[]) => void;
     }): Renderer;
 
@@ -383,8 +387,8 @@ export interface UserInterface {
 
     button(options: {
         className?: string;
-        contents: string;
-        tooltip: string;
+        contents?: string;
+        tooltip?: string;
         click?: (domEvent: MouseEvent) => void;
         callback2?: (nodeEls: Node[]) => void;
         container?: Element | string;
