@@ -15,7 +15,6 @@ module.exports = function (config) {
     },
 
     files: [
-      '../node_modules/jquery/dist/jquery.js',
       { pattern: '../src/js/**/*.js' },
       { pattern: '../test/**/*.spec.js' }
     ],

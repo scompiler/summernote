@@ -7,7 +7,6 @@ module.exports = function (config) {
     logLevel: config.LOG_INFO,
 
     files: [
-      '../node_modules/jquery/dist/jquery.js',
       { pattern: '../src/js/**/*.js' },
       { pattern: '../test/**/*.spec.js' },
       { pattern: '../src/js/**/*.ts', type: 'js' },

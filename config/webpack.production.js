@@ -77,12 +77,6 @@ module.exports = {
   },
 
   externals: {
-    jquery: {
-      root: 'jQuery',
-      commonjs: 'jquery',
-      commonjs2: 'jquery',
-      amd: 'jquery',
-    },
     bootstrap: 'bootstrap',
   },
 
