@@ -4,6 +4,21 @@ const path = require('path');
 
 const defaultStyle = 'teaks';
 
+const plugins = readdirSync('./plugin', { withFileTypes: true })
+  .filter(dirent => dirent.isDirectory())
+  .map(dirent => {
+    const id = dirent.name;
+
+    if (!existsSync(`./plugin/${id}/summernote-ext-${id}.ts`)) {
+      return null;
+    }
+
+    return {
+      id,
+    };
+  })
+  .filter(plugin => plugin !== null);
+
 module.exports = {
   defaultStyle,
   // Styles in /src/styles
@@ -28,6 +43,8 @@ module.exports = {
 
         return { id, name, target, extension };
       }),
+
+  plugins: plugins,
 
   // Translation files in /src/locales
   languages: glob.sync('./src/lang/*.{js,ts}').map(name => ({

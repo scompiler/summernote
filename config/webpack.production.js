@@ -8,7 +8,7 @@ const ZipPlugin = require('zip-webpack-plugin');
 const path = require('path');
 
 const pkg = require('../package.json');
-const { styles, languages } = require('./common');
+const { styles, languages, plugins } = require('./common');
 
 const date = (new Date()).toISOString().replace(/:\d+\.\d+Z$/, 'Z');
 const banner = `
@@ -60,6 +60,14 @@ module.exports = {
     ...languages.map(lang =>
       [`lang/${lang.name}.min`, `./src/lang/${lang.filename}`]
     ),
+    ...plugins.map(plugin => [
+      `plugin/${plugin.id}/summernote-ext-${plugin.id}`,
+      `./plugin/${plugin.id}/summernote-ext-${plugin.id}.ts`,
+    ]),
+    ...plugins.map(plugin => [
+      `plugin/${plugin.id}/summernote-ext-${plugin.id}.min`,
+      `./plugin/${plugin.id}/summernote-ext-${plugin.id}.ts`,
+    ]),
   ]),
 
   output: {
@@ -195,6 +203,9 @@ module.exports = {
         {
           from: 'plugin',
           to: 'plugin',
+          globOptions: {
+            ignore: ["**/*.ts", "**/*.scss"],
+          },
         },
         {
           from: 'src/font/summernote.*',

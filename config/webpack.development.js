@@ -3,7 +3,7 @@ const HtmlWebPackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
 
-const { defaultStyle, styles, languages, examples } = require('./common');
+const { defaultStyle, styles, languages, examples, plugins } = require('./common');
 
 module.exports = {
   mode: 'development',
@@ -26,6 +26,14 @@ module.exports = {
     ...languages.map(lang =>
       [`lang/${lang.name}`, `./src/lang/${lang.filename}`]
     ),
+    ...plugins.map(plugin => [
+      `plugin/${plugin.id}/summernote-ext-${plugin.id}`,
+      `./plugin/${plugin.id}/summernote-ext-${plugin.id}.ts`,
+    ]),
+    ...plugins.map(plugin => [
+      `plugin/${plugin.id}/summernote-ext-${plugin.id}.min`,
+      `./plugin/${plugin.id}/summernote-ext-${plugin.id}.ts`,
+    ]),
   ]),
 
   externals: {
@@ -74,6 +82,9 @@ module.exports = {
         {
           from: 'examples',
           to: 'examples',
+          globOptions: {
+            ignore: ["**/*.ts", "**/*.scss"],
+          },
         },
         {
           from: 'plugin',
