@@ -122,6 +122,18 @@
         inset 0 0 0 1px #ccc;
     }
 
+    &:hover:before {
+      box-shadow:
+        0 1px 3px rgba(0, 0, 0, .04),
+        inset 0 0 0 1px rgba(0, 0, 0, .3);
+    }
+    &:focus-within:before {
+      box-shadow:
+        0 1px 3px rgba(0, 0, 0, .04),
+        inset 0 0 0 1px rgba(0, 0, 0, .4),
+        0 0 0 3px rgba(0, 0, 0, .1);
+    }
+
     .tea-editor__toolbar {
       border-radius: calc(var(--tea-editor__border-radius) - 1px) calc(var(--tea-editor__border-radius) - 1px) 0 0;
     }
