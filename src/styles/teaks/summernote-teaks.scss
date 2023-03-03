@@ -138,6 +138,11 @@
       border-radius: calc(var(--tea-editor__border-radius) - 1px) calc(var(--tea-editor__border-radius) - 1px) 0 0;
     }
   }
+
+  &.note-editor.note-frame .note-editing-area .note-editable,
+  &.note-editor.note-frame .note-editing-area .note-codable {
+    padding: 12px 14px;
+  }
 }
 
 
