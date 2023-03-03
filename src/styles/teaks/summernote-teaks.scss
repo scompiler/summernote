@@ -139,6 +139,13 @@
     }
   }
 
+  &.note-editor.note-frame .note-editing-area .note-codable {
+    background: #fff;
+    color: inherit;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
   &.note-editor.note-frame .note-editing-area .note-editable,
   &.note-editor.note-frame .note-editing-area .note-codable {
     padding: 12px 14px;
