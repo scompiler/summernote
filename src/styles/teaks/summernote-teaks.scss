@@ -150,6 +150,15 @@
   &.note-editor.note-frame .note-editing-area .note-codable {
     padding: 12px 14px;
   }
+
+  &.note-editor.note-frame .note-editing-area .note-editable {
+    & > *:first-child {
+      margin-top: 0;
+    }
+    & > *:last-child {
+      margin-bottom: 0;
+    }
+  }
 }
 
 
