@@ -101,6 +101,14 @@
     box-sizing: border-box;
   }
 
+  .note-dropzone {
+    left: 0;
+    top: 0;
+    opacity: 1;
+    z-index: 9;
+    background: rgba(#fff, .7);
+    border-radius: inherit;
+  }
 
   &:not([data-fullscreen="true"]) {
     border-radius: var(--tea-editor__border-radius);
