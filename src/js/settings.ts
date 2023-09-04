@@ -78,7 +78,7 @@ Summernote.meta = {
         codeviewKeepButton: false,
         toolbar: [
             ['style', ['style']],
-            ['font', ['bold', 'underline', 'clear']],
+            ['font', ['bold', 'italic', 'underline',  'strikethrough', 'clear']],
             ['fontname', ['fontname']],
             ['color', ['color']],
             ['para', ['ul', 'ol', 'paragraph']],
