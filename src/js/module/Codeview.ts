@@ -165,10 +165,16 @@ export default class CodeView {
             }
 
             cmEditor.on('blur', (domEvent: FocusEvent) => {
-                this.context.triggerEvent('blur.codeview', cmEditor.getValue(), domEvent);
+                this.codableEl.value = cmEditor.getValue();
+                const value = this.purify(dom.value(this.codableEl, this.options.prettifyHtml) || dom.emptyPara);
+
+                this.context.triggerEvent('blur.codeview', value, domEvent);
             });
             cmEditor.on('change', () => {
-                this.context.triggerEvent('change.codeview', cmEditor.getValue(), cmEditor);
+                this.codableEl.value = cmEditor.getValue();
+                const value = this.purify(dom.value(this.codableEl, this.options.prettifyHtml) || dom.emptyPara);
+
+                this.context.triggerEvent('change.codeview', value, cmEditor);
             });
 
             // CodeMirror hasn't Padding.
@@ -176,10 +182,14 @@ export default class CodeView {
             this.codableEl.__cmEditorInstance = cmEditor;
         } else {
             this.codableEl.addEventListener('blur', (domEvent) => {
-                this.context.triggerEvent('blur.codeview', this.codableEl.value, domEvent);
+                const value = this.purify(dom.value(this.codableEl, this.options.prettifyHtml) || dom.emptyPara);
+
+                this.context.triggerEvent('blur.codeview', value, domEvent);
             });
             this.codableEl.addEventListener('input', () => {
-                this.context.triggerEvent('change.codeview', this.codableEl.value, this.codableEl);
+                const value = this.purify(dom.value(this.codableEl, this.options.prettifyHtml) || dom.emptyPara);
+
+                this.context.triggerEvent('change.codeview', value, this.codableEl);
             });
         }
     }
